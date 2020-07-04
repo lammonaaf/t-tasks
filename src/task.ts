@@ -3,7 +3,7 @@ import { Either, right, isRight, left } from './either';
 
 export type TaskBase<R> = {
   readonly _invoke: Promise<Maybe<Either<R>>>;
-  readonly _cancel: (fail: boolean) => void;
+  readonly _cancel: (reject: boolean) => void;
 }
 
 export type Task<R> = TaskBase<R> & {
@@ -41,7 +41,7 @@ export const chainTaskMaybe = <R1, R2>(_task: TaskBase<R1>, op: (value: Maybe<Ei
     globalCancel = cancel2;
 
     return invoke2;
-  }), (fail: boolean) => globalCancel(fail));
+  }), (reject: boolean) => globalCancel(reject));
 };
 
 export const chainTaskEither = <R1, R2>(_task: TaskBase<R1>, op: (value: Either<R1>) => Task<R2>): Task<R2> => {
@@ -59,7 +59,7 @@ export const chainTask = <R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>)
     if (isRight(either)) {
       return op(either.right);
     } else {
-      return failedTask(either.left);
+      return rejectedTask(either.left);
     }
   });
 };
@@ -68,7 +68,7 @@ export const resolveTask = <R>({ _invoke }: TaskBase<R>): Promise<Maybe<Either<R
 export const cancelTask = <R>({ _cancel }: TaskBase<R>): void => _cancel(false);
 export const rejectTask = <R>({ _cancel }: TaskBase<R>): void => _cancel(true);
 
-export const task = <R>(_invoke: Promise<Maybe<Either<R>>>, _cancel: (fail: boolean) => void): Task<R> => ({
+export const task = <R>(_invoke: Promise<Maybe<Either<R>>>, _cancel: (reject: boolean) => void): Task<R> => ({
   _invoke,
   _cancel,
 
@@ -86,5 +86,5 @@ export const task = <R>(_invoke: Promise<Maybe<Either<R>>>, _cancel: (fail: bool
 })
 
 export const resolvedTask = <R>(value: R): Task<R> => task(Promise.resolve(just(right(value))), () => {});
-export const failedTask = <R>(error: any): Task<R> => task(Promise.resolve(just(left(error))), () => {});
+export const rejectedTask = <R>(error: any): Task<R> => task(Promise.resolve(just(left(error))), () => {});
 export const cancelledTask = <R>(): Task<R> => task(Promise.resolve(nothing()), () => {});

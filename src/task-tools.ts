@@ -1,7 +1,8 @@
-import { Result } from './functional';
 import { Maybe, just, nothing, isJust, isNothing } from './maybe';
 import { Either, right, left, isRight } from './either';
 import { Task, task, resolvedTask, chainTaskEither, chainTask, fmapTask, fmapTaskMaybe, resolveTask, cancelTask, rejectTask } from './task';
+
+export type Result<ResultType> = PromiseLike<ResultType> | ResultType;
 
 export const createTask = <R>(from: Result<R>): Task<R> => {
   const stub = (_?: Result<Maybe<Either<R>>> | undefined) => {};

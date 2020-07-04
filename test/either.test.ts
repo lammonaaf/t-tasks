@@ -1,4 +1,4 @@
-import { Either, right, isRight, left, isLeft } from '../src/either';
+import { Either, right, isRight, left, isLeft, fmapMaybe, fmapEither, chainEither } from '../src';
 
 describe('right("data")', () => {
   // So typescript does not make assumptions about actual type
@@ -26,6 +26,24 @@ describe('right("data")', () => {
 
   it('chains to false', () => {
     const mapped = subject.chain(() => left(false));
+
+    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+  });
+
+  it('transforms to length 4', () => {
+    const mapped = fmapEither(subject, (value) => value.length);
+
+    expect(isRight(mapped) && mapped.right === 4).toBeTruthy();
+  });
+
+  it('chains to length 4', () => {
+    const mapped = chainEither(subject, (value) => right(value.length));
+
+    expect(isRight(mapped) && mapped.right === 4).toBeTruthy();
+  });
+
+  it('chains to false', () => {
+    const mapped = chainEither(subject, () => left(false));
 
     expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
   });
@@ -57,6 +75,24 @@ describe('left(false)', () => {
 
   it('chains to left(false)', () => {
     const mapped = subject.chain(() => left(true));
+
+    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+  });
+
+  it('transforms to left(false)', () => {
+    const mapped = fmapEither(subject, (value) => value.length);
+
+    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+  });
+
+  it('chains to left(false)', () => {
+    const mapped = chainEither(subject, (value) => right(value.length));
+
+    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+  });
+
+  it('chains to left(false)', () => {
+    const mapped = chainEither(subject, () => left(true));
 
     expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
   });

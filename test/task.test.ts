@@ -1,7 +1,5 @@
 import { timeoutTask, generateTask, cast } from '../src/task-tools';
-import { isJust, isNothing } from '../src/maybe';
-import { isRight, isLeft } from '../src/either';
-import { failedTask } from '../src/task';
+import { isJust, isNothing, isRight, isLeft, rejectedTask } from '../src';
 
 describe('tasks', () => {
   const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
@@ -329,7 +327,7 @@ describe('tasks', () => {
         if (isRight(value.just)) {
           return delayedValueTask(value.just.right.length, 300);
         } else {
-          return failedTask(value.just.left);
+          return rejectedTask(value.just.left);
         }
       } else {
         return delayedValueTask(7, 100);
