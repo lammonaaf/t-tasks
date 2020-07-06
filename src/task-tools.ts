@@ -86,24 +86,26 @@ export function castTaskCreator<TT extends TaskCreator<any[], any>, R extends Ta
   return arg as TaskCreatorType<TT>;
 }
 
-export function sequenceTask<TT extends Task<any>>(tasks: TT[]): Task<TaskType<TT>[]> {
+export function sequenceTask<TT extends TaskCreator<any, any>>(tasks: TT[]): Task<TaskCreatorType<TT>[]> {
   return tasks.reduce((prev, task) => {
     return chainTask(prev, (list) => {
-      return fmapTask(task, (value: TaskType<TT>) => list.concat(value));
+      return fmapTask(task(), (value) => list.concat(value));
     });
-  }, resolvedTask<TaskType<TT>[]>([]));
+  }, resolvedTask<TaskCreatorType<TT>[]>([]));
 }
 
-export function parallelTask<TT extends Task<any>>(tasks: TT[]): Task<TaskType<TT>[]> {
-  const stub = (_?: Result<Maybe<Either<TaskType<TT>[]>>> | undefined) => {};
+export function parallelTask<TT extends TaskCreator<any,any>>(taskCreators: TT[]): Task<TaskCreatorType<TT>[]> {
+  const stub = (_?: Result<Maybe<Either<TaskCreatorType<TT>[]>>> | undefined) => {};
 
   let globalResolve = stub;
 
-  return task(new Promise<Maybe<Either<TaskType<TT>[]>>>((resolve) => {
+  const tasks = taskCreators.map((creator) => creator());
+
+  return task(new Promise<Maybe<Either<TaskCreatorType<TT>[]>>>((resolve) => {
     globalResolve = resolve;
 
     Promise.all(tasks.map((task) => {
-      return resolveTask<TaskType<TT>>(task).then((result) => {
+      return resolveTask<TaskCreatorType<TT>>(task).then((result) => {
         if (isJust(result)) {
           if (isRight(result.just)) {
             return result.just.right;
@@ -113,8 +115,6 @@ export function parallelTask<TT extends Task<any>>(tasks: TT[]): Task<TaskType<T
         } else {
           throw nothing();
         }
-      }, (error: any) => {
-        throw just(error);
       });
     })).then((result) => {
       globalResolve(just(right(result)));
@@ -168,7 +168,7 @@ export const timeoutTask = (delay: number): Task<void> => {
 }
 
 export const onCancelled = <T>(task: Task<T>, callback: () => void): Task<T> => fmapTaskMaybe(task, (value) => {
-  if (!value) {
+  if (isNothing(value)) {
     callback();
   }
 
