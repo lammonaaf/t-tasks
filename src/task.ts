@@ -21,7 +21,13 @@ export type Task<R> = TaskBase<R> & {
 };
 
 export const fmapTaskMaybe = <R, R2>(_task: TaskBase<R>, op: (value: Maybe<Either<R>>) => Maybe<Either<R2>>): Task<R2> => {
-  return task(_task._invoke.then(op), _task._cancel);
+  return task(_task._invoke.then((maybe) => {
+    try {
+      return op(maybe);
+    } catch (e) {
+      return just(left(e));
+    }
+  }), _task._cancel);
 };
 
 export const fmapTaskEither = <R, R2>(_task: TaskBase<R>, op: (value: Either<R>) => Either<R2>): Task<R2> => {
@@ -36,11 +42,15 @@ export const chainTaskMaybe = <R1, R2>(_task: TaskBase<R1>, op: (value: Maybe<Ei
   let globalCancel = _task._cancel;
 
   return task(_task._invoke.then((result) => {
-    const { _invoke: invoke2, _cancel: cancel2 } = op(result);
+    try {
+      const { _invoke: invoke2, _cancel: cancel2 } = op(result);
 
-    globalCancel = cancel2;
+      globalCancel = cancel2;
 
-    return invoke2;
+      return invoke2;
+    } catch (e) {
+      return just(left(e));
+    }
   }), (reject: boolean) => globalCancel(reject));
 };
 
