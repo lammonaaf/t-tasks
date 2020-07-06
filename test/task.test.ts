@@ -1,13 +1,13 @@
-import { timeoutTask, generateTask, cast } from '../src/task-tools';
+import { timeoutTask, generateTask, liftResult, liftResultCreator, castResult } from '../src/task-tools';
 import { isJust, isNothing, isRight, isLeft, rejectedTask } from '../src';
-
-const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
 
 const time = () => performance.now();
 const measureTime = (last: number) => time() - last;
 const expectTime = (last: number, limit: number) => expect(Math.abs(measureTime(last) - limit)).toBeLessThan(20);
 
 describe('tasks', () => {
+  const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
+
   it('return 42 in 500ms', async () => {
     const callback = jest.fn();
     const startTime = time();
@@ -92,6 +92,8 @@ describe('tasks', () => {
 });
 
 describe('chainTask', () => {
+  const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
+
   it('return 4 in 700ms', async () => {
     const callback = jest.fn();
     const startTime = time();
@@ -393,16 +395,18 @@ describe('chainTask', () => {
 });
 
 describe('generateTask', () => {
+  const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
+
   it('return 4 in 700ms', async () => {
     const callback = jest.fn();
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 400));
+      const value1 = castResult<string>(yield delayedValueTask('data', 400));
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 300));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
       
       callback();
 
@@ -424,11 +428,11 @@ describe('generateTask', () => {
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 400));
+      const value1 = castResult<string>(yield delayedValueTask('data', 400));
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 300));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
       
       callback();
 
@@ -450,11 +454,11 @@ describe('generateTask', () => {
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 400));
+      const value1 = castResult<string>(yield delayedValueTask('data', 400));
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 300));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
       
       callback();
 
@@ -476,11 +480,11 @@ describe('generateTask', () => {
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 400));
+      const value1 = castResult<string>(yield delayedValueTask('data', 400));
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 300));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
       
       callback();
 
@@ -503,11 +507,11 @@ describe('generateTask', () => {
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 400));
+      const value1 = castResult<string>(yield delayedValueTask('data', 400));
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 300));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
       
       callback();
 
@@ -530,13 +534,13 @@ describe('generateTask', () => {
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 200));
+      const value1 = castResult<string>(yield delayedValueTask('data', 200));
 
       throw new Error('Failed');
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 300));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
       
       callback();
 
@@ -557,11 +561,11 @@ describe('generateTask', () => {
     const startTime = time();
 
     const task = generateTask(function* () {
-      const value1 = cast<string>(yield delayedValueTask('data', 400));
+      const value1 = castResult<string>(yield delayedValueTask('data', 400));
       
       callback();
   
-      const value2 = cast<number>(yield delayedValueTask(value1.length, 100));
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 100));
 
       throw new Error('Failed');
       
@@ -586,13 +590,13 @@ describe('generateTask', () => {
     const task = generateTask(function* () {
       let value1: number;
       try {
-        value1 = cast<string>(yield delayedValueTask('data', 400)).length;
+        value1 = castResult<string>(yield delayedValueTask('data', 400)).length;
       
         callback();
       } catch (error) {
         callback();
 
-        value1 = cast<number>(yield delayedValueTask(5, 100));
+        value1 = castResult<number>(yield delayedValueTask(5, 100));
       }
       
       callback();
@@ -619,7 +623,7 @@ describe('generateTask', () => {
     const task = generateTask(function* () {
       let value1: number;
       try {
-        value1 = cast<string>(yield delayedValueTask('data', 200)).length;
+        value1 = castResult<string>(yield delayedValueTask('data', 200)).length;
 
         throw new Error('Failed');
       
@@ -627,7 +631,7 @@ describe('generateTask', () => {
       } catch (error) {
         callback();
 
-        value1 = cast<number>(yield delayedValueTask(5, 100));
+        value1 = castResult<number>(yield delayedValueTask(5, 100));
       }
       
       callback();
@@ -644,4 +648,122 @@ describe('generateTask', () => {
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
     expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
   }, 1000);
+});
+
+describe('liftResult', () => {
+  it('return 42 in 500ms', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = liftResult(new Promise((resolve) => setTimeout(() => {
+      resolve(42);
+    }, 500))).fmap((value) => {
+      callback();
+
+      return value;
+    });
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 500);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
+  });
+
+  it('fail externally in 200ms', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = liftResult(new Promise((resolve) => setTimeout(() => {
+      resolve(42);
+    }, 500))).fmap((value) => {
+      callback();
+
+      return value;
+    });
+
+    setTimeout(() => task.reject(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(callback).toBeCalledTimes(0);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isLeft(result.just)).toBeTruthy();
+  }, 1000);
+
+  it('fail internally in 200ms', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = liftResult(new Promise((_, reject) => setTimeout(() => {
+      reject("Rejected");
+    }, 200))).fmap((value) => {
+      callback();
+
+      return value;
+    });
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(callback).toBeCalledTimes(0);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isLeft(result.just)).toBeTruthy();
+  }, 1000);
+
+  it('cancel in 200ms', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = liftResult(new Promise((resolve) => setTimeout(() => {
+      resolve(42);
+    }, 500))).fmap((value) => {
+      callback();
+
+      return value;
+    });
+
+    setTimeout(() => task.cancel(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(callback).toBeCalledTimes(0);
+    expect(isNothing(result)).toBeTruthy();
+  }, 1000);
+});
+
+describe('liftResultCreator', () => {
+  const resultCreator = <R>(value: R, delay: number) => new Promise<R>((resolve) => setTimeout(() => {
+    resolve(value);
+  }, delay));
+
+  it('return 42 in 500ms', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const taskCreator = liftResultCreator(resultCreator);
+
+    const task = taskCreator(42, 500).fmap((value) => {
+      callback();
+
+      return value;
+    });
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 500);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
+  });
 });

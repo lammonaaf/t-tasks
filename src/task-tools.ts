@@ -2,9 +2,18 @@ import { Maybe, just, nothing, isJust, isNothing } from './maybe';
 import { Either, right, left, isRight } from './either';
 import { Task, task, resolvedTask, chainTaskEither, chainTask, fmapTask, fmapTaskMaybe, resolveTask, cancelTask, rejectTask } from './task';
 
-export type Result<ResultType> = PromiseLike<ResultType> | ResultType;
+export type Result<R> = PromiseLike<R> | R;
 
-export const createTask = <R>(from: Result<R>): Task<R> => {
+export type ResultCreator<A extends any[], R> = (...args: A) => Result<R>
+export type TaskCreator<A extends any[], R> = (...args: A) => Task<R>
+
+export type ResultType<T> = T extends PromiseLike<infer U> ? U : T;
+export type TaskType<TT extends Task<any>> = ResultType<TT['_invoke']> extends Maybe<Either<infer U>> ? U : never;
+
+export type ResultCreatorType<TT extends (...args: any[]) => Result<any>> = ResultType<ReturnType<TT>>;
+export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
+
+export function liftResult<R>(from: Result<R>): Task<R> {
   const stub = (_?: Result<Maybe<Either<R>>> | undefined) => {};
 
   let globalResolve = stub;
@@ -27,15 +36,13 @@ export const createTask = <R>(from: Result<R>): Task<R> => {
     }
     globalResolve = stub;
   });
-};
+}
 
-export const liftTask = <A extends any[], R>(creator: (...args: A) => Result<R>) => (...args: A) => createTask(creator(...args));
-
-type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
-
-export type TaskType<TT extends Task<any>> = ThenArg<TT['_invoke']> extends Maybe<Either<infer U>> ? U : never;
-
-export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
+export function liftResultCreator<A extends any[], R>(
+  creator: ResultCreator<A, R>,
+): TaskCreator<A, R> {
+  return (...args: A) => liftResult(creator(...args));
+}
 
 export const generateTask = <TT extends Task<any>, R>(
   from: () => Generator<TT, R, TaskType<TT>> | AsyncGenerator<TT, R, TaskType<TT>>,
@@ -46,30 +53,34 @@ export const generateTask = <TT extends Task<any>, R>(
     resolvedTask<R>(next.value)
   ) : (
     chainTaskEither(next.value, (v: Either<TaskType<TT>>) => isRight(v) ? (
-      chainTask(createTask(Promise.resolve().then(() => iterator.next(v.right))), sequentor)
+      chainTask(liftResult(Promise.resolve().then(() => iterator.next(v.right))), sequentor)
     ) : (
-      chainTask(createTask(Promise.resolve().then(() => iterator.throw(v.left))), sequentor)
+      chainTask(liftResult(Promise.resolve().then(() => iterator.throw(v.left))), sequentor)
     ))
   );
 
-  return chainTask(createTask(Promise.resolve().then(() => iterator.next())), sequentor);
+  return chainTask(liftResult(Promise.resolve().then(() => iterator.next())), sequentor);
 };
 
-export function cast<T, R extends T = any>(arg: R): T {
-  return arg as T;
-}
-
-export function castResult<TT extends (...args: any[]) => Result<any>, R extends ThenArg<ReturnType<TT>> = any>(
+export function castResult<TT extends Result<any>, R extends ResultType<TT> = any>(
   arg: R,
-): ThenArg<ReturnType<TT>> {
-  return arg as ThenArg<ReturnType<TT>>;
+): ResultType<TT> {
+  return arg as ResultType<TT>;
 }
 
-export function castTask<TT extends Task<any>, R extends TaskType<TT> = any>(arg: R): TaskType<TT> {
+export function castTask<TT extends Task<any>, R extends TaskType<TT> = any>(
+  arg: R,
+): TaskType<TT> {
   return arg as TaskType<TT>;
 }
 
-export function castTaskCreator<TT extends (...args: any[]) => Task<any>, R extends TaskCreatorType<TT> = any>(
+export function castResultCreator<TT extends ResultCreator<any[], any>, R extends ResultCreatorType<TT> = any>(
+  arg: R,
+): ResultCreatorType<TT> {
+  return arg as ResultCreatorType<TT>;
+}
+
+export function castTaskCreator<TT extends TaskCreator<any[], any>, R extends TaskCreatorType<TT> = any>(
   arg: R,
 ): TaskCreatorType<TT> {
   return arg as TaskCreatorType<TT>;
