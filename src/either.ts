@@ -14,6 +14,12 @@ export type Left<L> = {
   chain(): Left<L>;
 }
 
+/**
+ * Genric Either monad
+ * 
+ * As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
+ * Used throughout the library to represent the result of failable operations, namely failed tasks
+ */
 export type Either<R, L = any> = (Left<L> | Right<R>) & {
   fmap<R2>(op: (value: R) => R2): Either<R2, L>;
   chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L | L2>;

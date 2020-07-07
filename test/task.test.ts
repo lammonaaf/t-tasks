@@ -1182,4 +1182,42 @@ describe('sequenceTask', () => {
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isLeft(result.just)).toBeTruthy();
   });
+
+  it('fail internally in 1000ms', async () => {
+    const resultCreator1 = jest.fn(() => 40);
+    const resultCreator2 = jest.fn(() => {
+      throw new Error('Failed');
+
+      return 41;
+    });
+    const resultCreator3 = jest.fn(() => 42);
+
+    const taskCreator = jest.fn(() => resolvedTask(65))
+      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+
+    const startTime = time();
+
+    const task = sequenceTask([
+      taskCreator,
+      taskCreator,
+      taskCreator,
+    ]);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 1000);
+
+    expect(taskCreator).toBeCalledTimes(2);
+    expect(resultCreator1).toBeCalledTimes(1);
+    expect(resultCreator1).toReturnTimes(1);
+    expect(resultCreator2).toBeCalledTimes(1);
+    expect(resultCreator2).toReturnTimes(0);
+    expect(resultCreator3).toBeCalledTimes(0);
+    expect(resultCreator3).toReturnTimes(0);
+
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isLeft(result.just)).toBeTruthy();
+  });
 });
