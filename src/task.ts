@@ -4,7 +4,7 @@ import { Either, right, isRight, left } from './either';
 export type TaskBase<R> = {
   readonly _invoke: Promise<Maybe<Either<R>>>;
   readonly _cancel: (reject: boolean) => void;
-}
+};
 
 export type Task<R> = TaskBase<R> & {
   tapMaybe(op: (value: Maybe<Either<R>>) => void): Task<R>;
@@ -24,25 +24,36 @@ export type Task<R> = TaskBase<R> & {
   reject: () => void;
 };
 
-export const fmapTaskMaybe = <R, R2>(_task: TaskBase<R>, op: (value: Maybe<Either<R>>) => Maybe<Either<R2>>): Task<R2> => {
-  return task(_task._invoke.then((maybe) => {
-    try {
-      return op(maybe);
-    } catch (e) {
-      return just(left(e));
-    }
-  }), _task._cancel);
+export const fmapTaskMaybe = <R, R2>(
+  _task: TaskBase<R>,
+  op: (value: Maybe<Either<R>>) => Maybe<Either<R2>>,
+): Task<R2> => {
+  return task(
+    _task._invoke.then((maybe) => {
+      try {
+        return op(maybe);
+      } catch (e) {
+        return just(left(e));
+      }
+    }),
+    _task._cancel,
+  );
 };
 
-export const fmapTaskEither = <R, R2>(_task: TaskBase<R>, op: (value: Either<R>) => Either<R2>): Task<R2> => {
-  return fmapTaskMaybe(_task, (maybe) => maybe.fmap(op));
-};
+export const fmapTaskEither = <R, R2>(
+  _task: TaskBase<R>,
+  op: (value: Either<R>) => Either<R2>,
+): Task<R2> => fmapTaskMaybe(_task, (maybe) => maybe.fmap(op));
 
-export const fmapTask = <R, R2>(_task: TaskBase<R>, op: (value: R) => R2): Task<R2> => {
-  return fmapTaskEither(_task, (either) => either.fmap(op));
-};
+export const fmapTask = <R, R2>(
+  _task: TaskBase<R>,
+  op: (value: R) => R2,
+): Task<R2> => fmapTaskEither(_task, (either) => either.fmap(op));
 
-export const tapTaskMaybe = <R>(_task: TaskBase<R>, op: (value: Maybe<Either<R>>) => void): Task<R> => {
+export const tapTaskMaybe = <R>(
+  _task: TaskBase<R>,
+  op: (value: Maybe<Either<R>>) => void,
+): Task<R> => {
   return fmapTaskMaybe(_task, (value) => {
     op(value);
 
@@ -50,7 +61,10 @@ export const tapTaskMaybe = <R>(_task: TaskBase<R>, op: (value: Maybe<Either<R>>
   });
 };
 
-export const tapTaskEither = <R>(_task: TaskBase<R>, op: (value: Either<R>) => void): Task<R> => {
+export const tapTaskEither = <R>(
+  _task: TaskBase<R>,
+  op: (value: Either<R>) => void,
+): Task<R> => {
   return fmapTaskEither(_task, (value) => {
     op(value);
 
@@ -58,7 +72,10 @@ export const tapTaskEither = <R>(_task: TaskBase<R>, op: (value: Either<R>) => v
   });
 };
 
-export const tapTask = <R>(_task: TaskBase<R>, op: (value: R) => void): Task<R> => {
+export const tapTask = <R>(
+  _task: TaskBase<R>,
+  op: (value: R) => void,
+): Task<R> => {
   return fmapTask(_task, (value) => {
     op(value);
 
@@ -66,23 +83,32 @@ export const tapTask = <R>(_task: TaskBase<R>, op: (value: R) => void): Task<R> 
   });
 };
 
-export const chainTaskMaybe = <R1, R2>(_task: TaskBase<R1>, op: (value: Maybe<Either<R1>>) => Task<R2>): Task<R2> => {
+export const chainTaskMaybe = <R1, R2>(
+  _task: TaskBase<R1>,
+  op: (value: Maybe<Either<R1>>) => Task<R2>,
+): Task<R2> => {
   let globalCancel = _task._cancel;
 
-  return task(_task._invoke.then((result) => {
-    try {
-      const { _invoke: invoke2, _cancel: cancel2 } = op(result);
+  return task(
+    _task._invoke.then((result) => {
+      try {
+        const { _invoke: invoke2, _cancel: cancel2 } = op(result);
 
-      globalCancel = cancel2;
+        globalCancel = cancel2;
 
-      return invoke2;
-    } catch (e) {
-      return just(left(e));
-    }
-  }), (reject: boolean) => globalCancel(reject));
+        return invoke2;
+      } catch (e) {
+        return just(left(e));
+      }
+    }),
+    (reject: boolean) => globalCancel(reject),
+  );
 };
 
-export const chainTaskEither = <R1, R2>(_task: TaskBase<R1>, op: (value: Either<R1>) => Task<R2>): Task<R2> => {
+export const chainTaskEither = <R1, R2>(
+  _task: TaskBase<R1>,
+  op: (value: Either<R1>) => Task<R2>,
+): Task<R2> => {
   return chainTaskMaybe(_task, (maybe) => {
     if (isJust(maybe)) {
       return op(maybe.just);
@@ -92,7 +118,10 @@ export const chainTaskEither = <R1, R2>(_task: TaskBase<R1>, op: (value: Either<
   });
 };
 
-export const chainTask = <R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>): Task<R2> => {
+export const chainTask = <R, R2>(
+  _task: TaskBase<R>,
+  op: (value: R) => Task<R2>,
+): Task<R2> => {
   return chainTaskEither(_task, (either) => {
     if (isRight(either)) {
       return op(either.right);
@@ -102,11 +131,16 @@ export const chainTask = <R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>)
   });
 };
 
-export const resolveTask = <R>({ _invoke }: TaskBase<R>): Promise<Maybe<Either<R>>> => _invoke;
+export const resolveTask = <R>({
+  _invoke,
+}: TaskBase<R>): Promise<Maybe<Either<R>>> => _invoke;
 export const cancelTask = <R>({ _cancel }: TaskBase<R>): void => _cancel(false);
 export const rejectTask = <R>({ _cancel }: TaskBase<R>): void => _cancel(true);
 
-export const task = <R>(_invoke: Promise<Maybe<Either<R>>>, _cancel: (reject: boolean) => void): Task<R> => ({
+export const task = <R>(
+  _invoke: Promise<Maybe<Either<R>>>,
+  _cancel: (reject: boolean) => void,
+): Task<R> => ({
   _invoke,
   _cancel,
 
@@ -125,8 +159,16 @@ export const task = <R>(_invoke: Promise<Maybe<Either<R>>>, _cancel: (reject: bo
   resolve: () => resolveTask({ _invoke, _cancel }),
   cancel: () => cancelTask({ _invoke, _cancel }),
   reject: () => rejectTask({ _invoke, _cancel }),
-})
+});
 
-export const resolvedTask = <R>(value: R): Task<R> => task(Promise.resolve(just(right(value))), () => {});
-export const rejectedTask = <R>(error: any): Task<R> => task(Promise.resolve(just(left(error))), () => {});
-export const cancelledTask = <R>(): Task<R> => task(Promise.resolve(nothing()), () => {});
+export const resolvedTask = <R>(value: R): Task<R> => {
+  return task(Promise.resolve(just(right(value))), () => {});
+};
+
+export const rejectedTask = <R>(error: any): Task<R> => {
+  return task(Promise.resolve(just(left(error))), () => {});
+};
+
+export const cancelledTask = <R>(): Task<R> => {
+  return task(Promise.resolve(nothing()), () => {});
+};

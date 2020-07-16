@@ -14,7 +14,7 @@ export type Just<R> = {
    * chain applied to 'just value' returns 'op(value)'
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
-}
+};
 
 export type Nothing = {
   readonly kind: 'nothing';
@@ -31,11 +31,11 @@ export type Nothing = {
    * chain applied to 'nothing' always returns 'nothing'
    */
   chain(): Nothing;
-}
+};
 
 /**
  * Genric Maybe monad
- * 
+ *
  * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
  */
@@ -43,7 +43,7 @@ export type Maybe<R> = (Just<R> | Nothing) & {
   /**
    * Maybe peeker
    * @param op callback function to be called with underlying value
-   * 
+   *
    * Returns copy of self no matter whether callback was called or not
    */
   tap(op: (value: R) => void): Maybe<R>;
@@ -51,7 +51,7 @@ export type Maybe<R> = (Just<R> | Nothing) & {
   /**
    * Maybe fmap transformer
    * @param op transformer function for the underlying value
-   * 
+   *
    * Returns 'nothing' without invoking transformer if wrapped value is already 'nothing'
    */
   fmap<R2>(op: (value: R) => R2): Maybe<R2>;
@@ -59,7 +59,7 @@ export type Maybe<R> = (Just<R> | Nothing) & {
   /**
    * Chain multiple functions returning Maybe
    * @param op transformer function for the underlying value which can also return nothing
-   * 
+   *
    * @example
    * ```typescript
    * // test(just(42))  - just 21
@@ -104,9 +104,9 @@ export const nothing = (): Nothing => ({
 /**
  * Pattern mathching for 'just'
  * @param maybe wrapped value (or absence of it)
- * 
+ *
  * Returns 'true' in case wrapped value exists (and resolves argument type to be 'Just')
- * 
+ *
  * @example
  * ```typescript
  * if (isJust(maybe)) {
@@ -114,48 +114,55 @@ export const nothing = (): Nothing => ({
  * }
  * ```
  */
-export const isJust = <R>(maybe: Maybe<R>): maybe is Just<R> => maybe.kind === 'just';
+export const isJust = <R>(maybe: Maybe<R>): maybe is Just<R> => {
+  return maybe.kind === 'just';
+};
 
 /**
  * Pattern mathching for 'nothing'
  * @param maybe wrapped value (or absence of it)
- * 
+ *
  * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
  */
-export const isNothing = <R>(maybe: Maybe<R>): maybe is Nothing => maybe.kind === 'nothing';
+export const isNothing = <R>(maybe: Maybe<R>): maybe is Nothing => {
+  return maybe.kind === 'nothing';
+};
 
 /**
  * Maybe peeker (standalone version)
  * @param maybe wrapped value (or absence of it)
  * @param op callback function to be called with underlying value
- * 
+ *
  * Returns copy of self no matter whether callback was called or not
  * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
  */
-export const tapMaybe = <R>(maybe: Maybe<R>, op: (value: R) => void): Maybe<R> => {
-  return maybe.tap(op);
-};
+export const tapMaybe = <R>(
+  maybe: Maybe<R>,
+  op: (value: R) => void,
+): Maybe<R> => maybe.tap(op);
 
 /**
  * Maybe fmap transformer (standalone version)
  * @param maybe wrapped value (or absence of it)
  * @param op transformer function for the underlying value
- * 
+ *
  * Returns 'nothing' without invoking transformer if wrapped value is already 'nothing'
  * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
  */
-export const fmapMaybe = <R, R2>(maybe: Maybe<R>, op: (value: R) => R2): Maybe<R2> => {
-  return maybe.fmap(op);
-};
+export const fmapMaybe = <R, R2>(
+  maybe: Maybe<R>,
+  op: (value: R) => R2,
+): Maybe<R2> => maybe.fmap(op);
 
 /**
  * Chain multiple functions returning Maybe (standalone version)
  * @param maybe wrapped value (or absence of it)
  * @param op transformer function for the underlying value which can also return nothing
- * 
+ *
  * Subsequent functions would not be invoked if Maybe resolves to 'Nothing'
  * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
  */
-export const chainMaybe = <R, R2>(maybe: Maybe<R>, op: (value: R) => Maybe<R2>): Maybe<R2> => {
-  return maybe.chain(op);
-};
+export const chainMaybe = <R, R2>(
+  maybe: Maybe<R>,
+  op: (value: R) => Maybe<R2>,
+): Maybe<R2> => maybe.chain(op);

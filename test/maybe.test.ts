@@ -1,4 +1,13 @@
-import { just, isJust, nothing, isNothing, Maybe, fmapMaybe, chainMaybe, tapMaybe } from '../src';
+import {
+  just,
+  isJust,
+  nothing,
+  isNothing,
+  Maybe,
+  fmapMaybe,
+  chainMaybe,
+  tapMaybe,
+} from '../src';
 
 describe('just("data")', () => {
   // So typescript does not make assumptions about actual type

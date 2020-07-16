@@ -1,4 +1,13 @@
-import { Either, right, isRight, left, isLeft, fmapEither, chainEither, tapEither } from '../src';
+import {
+  Either,
+  right,
+  isRight,
+  left,
+  isLeft,
+  fmapEither,
+  chainEither,
+  tapEither,
+} from '../src';
 
 describe('right("data")', () => {
   // So typescript does not make assumptions about actual type

@@ -11,7 +11,7 @@ export type Right<R> = {
    * chain applied to 'right value' returns 'op(value)'
    */
   chain<R2, L>(op: (value: R) => Either<R2, L>): Either<R2, L>;
-}
+};
 
 export type Left<L> = {
   readonly kind: 'left';
@@ -26,11 +26,11 @@ export type Left<L> = {
    * chain applied to 'left error' always returns 'left error'
    */
   chain(): Left<L>;
-}
+};
 
 /**
  * Genric Either monad
- * 
+ *
  * As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
  * Used throughout the library to represent the result of failable operations, namely failed tasks
  */
@@ -40,7 +40,7 @@ export type Either<R, L = any> = (Left<L> | Right<R>) & {
   /**
    * Either fmap transformer
    * @param op transformer function for the underlying value
-   * 
+   *
    * Returns 'left error' without invoking transformer if wrapped value is already 'left error'
    */
   fmap<R2>(op: (value: R) => R2): Either<R2, L>;
@@ -48,7 +48,7 @@ export type Either<R, L = any> = (Left<L> | Right<R>) & {
   /**
    * Chain multiple functions returning Either
    * @param op transformer function for the underlying value which can also return 'left'
-   * 
+   *
    * @example
    * ```typescript
    * // test(right(42))  - right 21
@@ -92,14 +92,17 @@ export const left = <L = any>(error: L): Left<L> => ({
   chain: () => left(error),
 });
 
-export const tapEither = <R1, L1>(either: Either<R1, L1>, op: (value: R1) => void): Either<R1, L1> => {
-  return either.tap(op);
-};
+export const tapEither = <R1, L1>(
+  either: Either<R1, L1>,
+  op: (value: R1) => void,
+): Either<R1, L1> => either.tap(op);
 
-export const fmapEither = <R1, R2, L1>(either: Either<R1, L1>, op: (value: R1) => R2): Either<R2, L1> => {
-  return either.fmap(op);
-};
+export const fmapEither = <R1, R2, L1>(
+  either: Either<R1, L1>,
+  op: (value: R1) => R2,
+): Either<R2, L1> => either.fmap(op);
 
-export const chainEither = <R1, R2, L1, L2>(either: Either<R1, L1>, op: (value: R1) => Either<R2, L2>): Either<R2, L1 | L2> => {
-  return either.chain(op);
-};
+export const chainEither = <R1, R2, L1, L2>(
+  either: Either<R1, L1>,
+  op: (value: R1) => Either<R2, L2>,
+): Either<R2, L1 | L2> => either.chain(op);
