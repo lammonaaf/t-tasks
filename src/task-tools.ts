@@ -1,6 +1,6 @@
 import { Maybe, just, nothing, isJust, isNothing } from './maybe';
 import { Either, right, left, isRight } from './either';
-import { Task, task, resolvedTask, chainTaskEither, chainTask, fmapTask, fmapTaskMaybe, resolveTask, cancelTask, rejectTask } from './task';
+import { Task, task, resolvedTask, chainTaskEither, chainTask, fmapTask, fmapTaskMaybe, resolveTask, cancelTask, rejectTask, tapTaskMaybe } from './task';
 
 export type Result<R> = PromiseLike<R> | R;
 
@@ -167,12 +167,10 @@ export const timeoutTask = (delay: number): Task<void> => {
   });
 }
 
-export const onCancelled = <T>(task: Task<T>, callback: () => void): Task<T> => fmapTaskMaybe(task, (value) => {
+export const onCancelled = <T>(task: Task<T>, callback: () => void): Task<T> => tapTaskMaybe(task, (value) => {
   if (isNothing(value)) {
     callback();
   }
-
-  return value;
 });
 
 export const catchTask = <T, R>(task: Task<T>, handler: () => Task<R>): Task<T | R> => chainTaskEither(task, (value) => {
