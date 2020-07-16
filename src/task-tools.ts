@@ -13,6 +13,8 @@ export type TaskType<TT extends Task<any>> = ResultType<TT['_invoke']> extends M
 export type ResultCreatorType<TT extends (...args: any[]) => Result<any>> = ResultType<ReturnType<TT>>;
 export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
 
+export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (...args: A) => Generator<TT, R, TaskType<TT>> | AsyncGenerator<TT, R, TaskType<TT>>;
+
 export function liftResult<R>(from: Result<R>): Task<R> {
   const stub = (_?: Result<Maybe<Either<R>>> | undefined) => {};
 
@@ -45,9 +47,9 @@ export function liftResultCreator<A extends any[], R>(
 }
 
 export const generateTask = <TT extends Task<any>, R>(
-  from: () => Generator<TT, R, TaskType<TT>> | AsyncGenerator<TT, R, TaskType<TT>>,
+  generator: TaskGenerator<[], TT, R>,
 ): Task<R> => {
-  const iterator = from();
+  const iterator = generator();
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => next.done ? (
     resolvedTask<R>(next.value)
