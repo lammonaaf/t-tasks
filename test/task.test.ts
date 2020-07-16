@@ -25,6 +25,69 @@ describe('tasks', () => {
     expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   }, 1000);
 
+  it('taps 42', async () => {
+    const callback = jest.fn((_: number) => {})
+
+    const taskCreator = jest.fn(() => delayedValueTask(42, 500).tap(callback));
+    const startTime = time();
+
+    const task = taskCreator();
+
+    await task.resolve();
+
+    expectTime(startTime, 500);
+
+    expect(taskCreator).toBeCalledTimes(1);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(42);
+  }, 1000);
+
+  it('taps 42', async () => {
+    const callback = jest.fn((_: number) => {})
+
+    const taskCreator = jest.fn(() => delayedValueTask(42, 500).tapEither((result) => {
+      expect(isRight(result)).toBeTruthy();
+
+      callback(isRight(result) ? result.right : -1);
+    }));
+    const startTime = time();
+
+    const task = taskCreator();
+
+    await task.resolve();
+
+    expectTime(startTime, 500);
+
+    expect(taskCreator).toBeCalledTimes(1);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(42);
+  }, 1000);
+
+  it('taps 42', async () => {
+    const callback = jest.fn((_: number) => {})
+
+    const taskCreator = jest.fn(() => delayedValueTask(42, 500).tapMaybe((result) => {
+      expect(isJust(result)).toBeTruthy();
+      expect(isJust(result) && isRight(result.just)).toBeTruthy();
+
+      callback(isJust(result) && isRight(result.just) ? result.just.right : -1);
+    }));
+    const startTime = time();
+
+    const task = taskCreator();
+
+    await task.resolve();
+
+    expectTime(startTime, 500);
+
+    expect(taskCreator).toBeCalledTimes(1);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(42);
+  }, 1000);
+
   it('fail externally in 200ms', async () => {
     const taskCreator = jest.fn(() => delayedValueTask(42, 500));
     const startTime = time();

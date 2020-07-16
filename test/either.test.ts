@@ -1,4 +1,4 @@
-import { Either, right, isRight, left, isLeft, fmapEither, chainEither } from '../src';
+import { Either, right, isRight, left, isLeft, fmapEither, chainEither, tapEither } from '../src';
 
 describe('right("data")', () => {
   // So typescript does not make assumptions about actual type
@@ -10,6 +10,24 @@ describe('right("data")', () => {
 
   it('contains "data"', () => {
     expect(isRight(subject) && subject.right === 'data').toBeTruthy();
+  });
+
+  it('taps "data"', () => {
+    const callback = jest.fn((_: string) => {});
+
+    subject.tap(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
+  });
+
+  it('taps "data"', () => {
+    const callback = jest.fn((_: string) => {});
+
+    tapEither(subject, callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
   });
 
   it('transforms to length 4', () => {
@@ -59,6 +77,14 @@ describe('left(false)', () => {
 
   it('contains false', () => {
     expect(isLeft(subject) && subject.left === false).toBeTruthy();
+  });
+
+  it('does not tap', () => {
+    const callback = jest.fn((_: string) => {});
+
+    subject.tap(callback);
+
+    expect(callback).not.toBeCalled();
   });
 
   it('transforms to left(false)', () => {
