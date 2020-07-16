@@ -6,30 +6,18 @@ import {
   castResult,
   repeatTask,
   limitTask,
-  catchTask,
-  onCancelled,
   parallelTask,
   sequenceTask,
   castTask,
   castResultCreator,
 } from '../src/task-tools';
-import {
-  isJust,
-  isNothing,
-  isRight,
-  isLeft,
-  rejectedTask,
-  resolvedTask,
-  Task,
-} from '../src';
+import { isJust, isNothing, isRight, isLeft, resolvedTask, Task } from '../src';
 
 const time = () => performance.now();
 const measureTime = (last: number) => time() - last;
-const expectTime = (last: number, limit: number) =>
-  expect(Math.abs(measureTime(last) - limit)).toBeLessThan(50);
+const expectTime = (last: number, limit: number) => expect(Math.abs(measureTime(last) - limit)).toBeLessThan(50);
 
-const delayedValueTask = <R>(value: R, delay: number) =>
-  timeoutTask(delay).fmap(() => value);
+const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
 
 describe('tasks', () => {
   it('return 42 in 500ms', async () => {
@@ -46,66 +34,13 @@ describe('tasks', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   }, 1000);
 
   it('taps 42', async () => {
     const callback = jest.fn((_: number) => {});
 
     const taskCreator = jest.fn(() => delayedValueTask(42, 500).tap(callback));
-    const startTime = time();
-
-    const task = taskCreator();
-
-    await task.resolve();
-
-    expectTime(startTime, 500);
-
-    expect(taskCreator).toBeCalledTimes(1);
-
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith(42);
-  }, 1000);
-
-  it('taps 42', async () => {
-    const callback = jest.fn((_: number) => {});
-
-    const taskCreator = jest.fn(() =>
-      delayedValueTask(42, 500).tapEither((result) => {
-        expect(isRight(result)).toBeTruthy();
-
-        callback(isRight(result) ? result.right : -1);
-      }),
-    );
-    const startTime = time();
-
-    const task = taskCreator();
-
-    await task.resolve();
-
-    expectTime(startTime, 500);
-
-    expect(taskCreator).toBeCalledTimes(1);
-
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith(42);
-  }, 1000);
-
-  it('taps 42', async () => {
-    const callback = jest.fn((_: number) => {});
-
-    const taskCreator = jest.fn(() =>
-      delayedValueTask(42, 500).tapMaybe((result) => {
-        expect(isJust(result)).toBeTruthy();
-        expect(isJust(result) && isRight(result.just)).toBeTruthy();
-
-        callback(
-          isJust(result) && isRight(result.just) ? result.just.right : -1,
-        );
-      }),
-    );
     const startTime = time();
 
     const task = taskCreator();
@@ -181,9 +116,7 @@ describe('tasks', () => {
 describe('chainTask', () => {
   it('return 4 in 700ms', async () => {
     const firstTaskCreator = jest.fn(() => delayedValueTask('data', 400));
-    const secondTaskCreator = jest.fn((value: string) =>
-      delayedValueTask(value.length, 300),
-    );
+    const secondTaskCreator = jest.fn((value: string) => delayedValueTask(value.length, 300));
     const startTime = time();
 
     const task = firstTaskCreator().chain(secondTaskCreator);
@@ -197,16 +130,12 @@ describe('chainTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(4);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(4);
   }, 1000);
 
   it('cancel on first step in 200ms', async () => {
     const firstTaskCreator = jest.fn(() => delayedValueTask('data', 400));
-    const secondTaskCreator = jest.fn((value: string) =>
-      delayedValueTask(value.length, 300),
-    );
+    const secondTaskCreator = jest.fn((value: string) => delayedValueTask(value.length, 300));
     const startTime = time();
 
     const task = firstTaskCreator().chain(secondTaskCreator);
@@ -225,9 +154,7 @@ describe('chainTask', () => {
 
   it('cancel on second step in 500ms', async () => {
     const firstTaskCreator = jest.fn(() => delayedValueTask('data', 400));
-    const secondTaskCreator = jest.fn((value: string) =>
-      delayedValueTask(value.length, 300),
-    );
+    const secondTaskCreator = jest.fn((value: string) => delayedValueTask(value.length, 300));
     const startTime = time();
 
     const task = firstTaskCreator().chain(secondTaskCreator);
@@ -246,9 +173,7 @@ describe('chainTask', () => {
 
   it('fail externally on first step in 200ms', async () => {
     const firstTaskCreator = jest.fn(() => delayedValueTask('data', 400));
-    const secondTaskCreator = jest.fn((value: string) =>
-      delayedValueTask(value.length, 300),
-    );
+    const secondTaskCreator = jest.fn((value: string) => delayedValueTask(value.length, 300));
 
     const startTime = time();
 
@@ -269,9 +194,7 @@ describe('chainTask', () => {
 
   it('fail externally on second step in 500ms', async () => {
     const firstTaskCreator = jest.fn(() => delayedValueTask('data', 400));
-    const secondTaskCreator = jest.fn((value: string) =>
-      delayedValueTask(value.length, 300),
-    );
+    const secondTaskCreator = jest.fn((value: string) => delayedValueTask(value.length, 300));
 
     const startTime = time();
 
@@ -299,9 +222,7 @@ describe('chainTask', () => {
         return value;
       }),
     );
-    const secondTaskCreator = jest.fn((value: string) =>
-      delayedValueTask(value.length, 300),
-    );
+    const secondTaskCreator = jest.fn((value: string) => delayedValueTask(value.length, 300));
 
     const startTime = time();
 
@@ -373,23 +294,12 @@ describe('chainTask', () => {
     const startTime = time();
 
     const task = delayedValueTask('data', 400)
-      .fmapEither((value) => {
-        callback();
-
-        return value;
+      .tap(callback)
+      .tapRejected(callback)
+      .chainRejected(() => {
+        return delayedValueTask(5, 300);
       })
-      .chainEither((value) => {
-        if (isRight(value)) {
-          return delayedValueTask(value.right.length, 300);
-        } else {
-          return delayedValueTask(5, 300);
-        }
-      })
-      .fmap((value) => {
-        callback();
-
-        return value;
-      });
+      .tap(callback);
 
     setTimeout(() => task.reject(), 200);
 
@@ -400,9 +310,7 @@ describe('chainTask', () => {
     expect(callback).toBeCalledTimes(2);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(5);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
   }, 1000);
 
   it('chain ignoring internal errors on first step', async () => {
@@ -410,26 +318,16 @@ describe('chainTask', () => {
     const startTime = time();
 
     const task = delayedValueTask('data', 200)
-      .fmapEither((value) => {
+      .tap((value) => {
         throw new Error('Failed');
 
         // eslint-disable-next-line no-unreachable
-        callback();
-
-        return value;
+        callback(value);
       })
-      .chainEither((value) => {
-        if (isRight(value)) {
-          return delayedValueTask(value.right.length, 300);
-        } else {
-          return delayedValueTask(5, 300);
-        }
+      .chainRejected(() => {
+        return delayedValueTask(5, 300);
       })
-      .fmap((value) => {
-        callback();
-
-        return value;
-      });
+      .tap(callback);
 
     const result = await task.resolve();
 
@@ -438,9 +336,7 @@ describe('chainTask', () => {
     expect(callback).toBeCalledTimes(1);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(5);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
   }, 1000);
 
   it('chain ignoring cancel on first step', async () => {
@@ -448,27 +344,12 @@ describe('chainTask', () => {
     const startTime = time();
 
     const task = delayedValueTask('data', 400)
-      .fmapMaybe((value) => {
-        callback();
-
-        return value;
+      .tap(callback)
+      .tapCanceled(callback)
+      .chainCanceled(() => {
+        return delayedValueTask(7, 300);
       })
-      .chainMaybe((value) => {
-        if (isJust(value)) {
-          if (isRight(value.just)) {
-            return delayedValueTask(value.just.right.length, 300);
-          } else {
-            return rejectedTask(value.just.left);
-          }
-        } else {
-          return delayedValueTask(7, 300);
-        }
-      })
-      .fmap((value) => {
-        callback();
-
-        return value;
-      });
+      .tap(callback);
 
     setTimeout(() => task.cancel(), 200);
 
@@ -479,15 +360,12 @@ describe('chainTask', () => {
     expect(callback).toBeCalledTimes(2);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(7);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(7);
   }, 1000);
 });
 
 describe('generateTask', () => {
-  const delayedValueTask = <R>(value: R, delay: number) =>
-    timeoutTask(delay).fmap(() => value);
+  const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
 
   it('return 4 in 700ms', async () => {
     const callback = jest.fn();
@@ -498,9 +376,7 @@ describe('generateTask', () => {
 
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 300),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
 
       callback();
 
@@ -514,9 +390,7 @@ describe('generateTask', () => {
     expect(callback).toBeCalledTimes(2);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(4);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(4);
   }, 1000);
 
   it('cancel on first step in 200ms', async () => {
@@ -528,9 +402,7 @@ describe('generateTask', () => {
 
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 300),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
 
       callback();
 
@@ -556,9 +428,7 @@ describe('generateTask', () => {
 
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 300),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
 
       callback();
 
@@ -584,9 +454,7 @@ describe('generateTask', () => {
 
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 300),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
 
       callback();
 
@@ -613,9 +481,7 @@ describe('generateTask', () => {
 
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 300),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
 
       callback();
 
@@ -645,9 +511,7 @@ describe('generateTask', () => {
       // eslint-disable-next-line no-unreachable
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 300),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
 
       callback();
 
@@ -672,9 +536,7 @@ describe('generateTask', () => {
 
       callback();
 
-      const value2 = castResult<number>(
-        yield delayedValueTask(value1.length, 100),
-      );
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 100));
 
       throw new Error('Failed');
 
@@ -723,9 +585,7 @@ describe('generateTask', () => {
     expect(callback).toBeCalledTimes(2);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(5);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
   }, 1000);
 
   it('chain ignoring internal errors on first step', async () => {
@@ -735,8 +595,7 @@ describe('generateTask', () => {
     const task = generateTask(function*() {
       let value1: number;
       try {
-        value1 = castTask<Task<string>>(yield delayedValueTask('data', 200))
-          .length;
+        value1 = castTask<Task<string>>(yield delayedValueTask('data', 200)).length;
 
         throw new Error('Failed');
 
@@ -745,9 +604,7 @@ describe('generateTask', () => {
       } catch (error) {
         callback();
 
-        value1 = castResultCreator<() => number>(
-          yield delayedValueTask(5, 100),
-        );
+        value1 = castResultCreator<() => number>(yield delayedValueTask(5, 100));
       }
 
       callback();
@@ -762,9 +619,7 @@ describe('generateTask', () => {
     expect(callback).toBeCalledTimes(2);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(5);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
   }, 1000);
 });
 
@@ -792,9 +647,7 @@ describe('liftResult', () => {
     expect(callback).toBeCalledTimes(1);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 
   it('fail externally in 200ms', async () => {
@@ -903,9 +756,7 @@ describe('liftResultCreator', () => {
     expect(callback).toBeCalledTimes(1);
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 });
 
@@ -942,9 +793,7 @@ describe('repeatTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 });
 
@@ -987,9 +836,7 @@ describe('limitTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 });
 
@@ -1006,7 +853,7 @@ describe('catchTask', () => {
 
     const startTime = time();
 
-    const task = catchTask(taskCreator(), () => resolvedTask(65));
+    const task = taskCreator().chainRejected(() => resolvedTask(65));
 
     const result = await task.resolve();
 
@@ -1016,9 +863,7 @@ describe('catchTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(65);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(65);
   });
 
   it('succeed in 500ms', async () => {
@@ -1030,7 +875,7 @@ describe('catchTask', () => {
 
     const startTime = time();
 
-    const task = catchTask(taskCreator(), () => resolvedTask(65));
+    const task = taskCreator().chainRejected(() => resolvedTask(65));
 
     const result = await task.resolve();
 
@@ -1040,9 +885,7 @@ describe('catchTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 });
 
@@ -1050,9 +893,11 @@ describe('onCanceled', () => {
   it('succeed in 500ms', async () => {
     const callback = jest.fn();
     const resultCreator = jest.fn(() => 42);
-    const taskCreator = jest.fn(() =>
-      onCancelled(timeoutTask(500).fmap(resultCreator), callback),
-    );
+    const taskCreator = jest.fn(() => {
+      return timeoutTask(500)
+        .fmap(resultCreator)
+        .tapCanceled(callback);
+    });
 
     const startTime = time();
 
@@ -1068,17 +913,17 @@ describe('onCanceled', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual(42);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 
   it('cancel in 300ms', async () => {
     const callback = jest.fn();
     const resultCreator = jest.fn(() => 42);
-    const taskCreator = jest.fn(() =>
-      onCancelled(timeoutTask(500).fmap(resultCreator), callback),
-    );
+    const taskCreator = jest.fn(() => {
+      return timeoutTask(500)
+        .fmap(resultCreator)
+        .tapCanceled(callback);
+    });
 
     const startTime = time();
 
@@ -1128,9 +973,7 @@ describe('parallelTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual([40, 41, 42]);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual([40, 41, 42]);
   });
 
   it('cancel in 300ms', async () => {
@@ -1265,9 +1108,7 @@ describe('sequenceTask', () => {
 
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
-    expect(
-      isJust(result) && isRight(result.just) ? result.just.right : -1,
-    ).toEqual([40, 41, 42]);
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual([40, 41, 42]);
   });
 
   it('cancel in 500ms', async () => {

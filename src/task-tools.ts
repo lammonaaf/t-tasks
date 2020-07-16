@@ -1,18 +1,6 @@
-import { Maybe, just, nothing, isJust, isNothing } from './maybe';
+import { Maybe, just, nothing, isJust } from './maybe';
 import { Either, right, left, isRight } from './either';
-import {
-  Task,
-  task,
-  resolvedTask,
-  chainTaskEither,
-  chainTask,
-  fmapTask,
-  fmapTaskMaybe,
-  resolveTask,
-  cancelTask,
-  rejectTask,
-  tapTaskMaybe,
-} from './task';
+import { Task, task, resolvedTask, Cancelable } from './task';
 
 export type Result<R> = PromiseLike<R> | R;
 
@@ -20,31 +8,22 @@ export type ResultCreator<A extends any[], R> = (...args: A) => Result<R>;
 export type TaskCreator<A extends any[], R> = (...args: A) => Task<R>;
 
 export type ResultType<T> = T extends PromiseLike<infer U> ? U : T;
-export type TaskType<TT extends Task<any>> = ResultType<
-  TT['_invoke']
-> extends Maybe<Either<infer U>>
-  ? U
-  : never;
+export type TaskType<TT extends Task<any>> = ResultType<TT['_invoke']> extends Cancelable<infer U> ? U : never;
 
-export type ResultCreatorType<
-  TT extends (...args: any[]) => Result<any>
-> = ResultType<ReturnType<TT>>;
-
-export type TaskCreatorType<
-  TT extends (...args: any[]) => Task<any>
-> = TaskType<ReturnType<TT>>;
+export type ResultCreatorType<TT extends (...args: any[]) => Result<any>> = ResultType<ReturnType<TT>>;
+export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
 
 export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (
   ...args: A
 ) => Generator<TT, R, TaskType<TT>> | AsyncGenerator<TT, R, TaskType<TT>>;
 
 export function liftResult<R>(from: Result<R>): Task<R> {
-  const stub = (_?: Result<Maybe<Either<R>>> | undefined) => {};
+  const stub = (_?: Result<Cancelable<R>> | undefined) => {};
 
   let globalResolve = stub;
 
   return task(
-    new Promise<Maybe<Either<R>>>((resolve) => {
+    new Promise<Maybe<Either<R, any>>>((resolve) => {
       globalResolve = resolve;
 
       Promise.resolve(from).then(
@@ -69,98 +48,70 @@ export function liftResult<R>(from: Result<R>): Task<R> {
   );
 }
 
-export function liftResultCreator<A extends any[], R>(
-  creator: ResultCreator<A, R>,
-): TaskCreator<A, R> {
+export function liftResultCreator<A extends any[], R>(creator: ResultCreator<A, R>): TaskCreator<A, R> {
   return (...args: A) => liftResult(creator(...args));
 }
 
-export const generateTask = <TT extends Task<any>, R>(
-  generator: TaskGenerator<[], TT, R>,
-): Task<R> => {
+export const generateTask = <TT extends Task<any>, R>(generator: TaskGenerator<[], TT, R>): Task<R> => {
   const iterator = generator();
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
     return next.done
       ? resolvedTask<R>(next.value)
-      : chainTaskEither(next.value, (v: Either<TaskType<TT>>) => {
-          return isRight(v)
-            ? chainTask(
-                liftResult(
-                  Promise.resolve().then(() => iterator.next(v.right)),
-                ),
-                sequentor,
-              )
-            : chainTask(
-                liftResult(
-                  Promise.resolve().then(() => iterator.throw(v.left)),
-                ),
-                sequentor,
-              );
-        });
+      : next.value
+          .chain((value: TaskType<TT>) => {
+            return liftResult(Promise.resolve().then(() => iterator.next(value))).chain(sequentor);
+          })
+          .chainRejected((error: any) => {
+            return liftResult(Promise.resolve().then(() => iterator.throw(error))).chain(sequentor);
+          });
   };
 
-  return chainTask(
-    liftResult(Promise.resolve().then(() => iterator.next())),
-    sequentor,
-  );
+  return liftResult(Promise.resolve().then(() => iterator.next())).chain(sequentor);
 };
 
-export function castResult<
-  TT extends Result<any>,
-  R extends ResultType<TT> = any
->(arg: R): ResultType<TT> {
+export function castResult<TT extends Result<any>, R extends ResultType<TT> = any>(arg: R): ResultType<TT> {
   return arg as ResultType<TT>;
 }
 
-export function castTask<TT extends Task<any>, R extends TaskType<TT> = any>(
-  arg: R,
-): TaskType<TT> {
+export function castTask<TT extends Task<any>, R extends TaskType<TT> = any>(arg: R): TaskType<TT> {
   return arg as TaskType<TT>;
 }
 
-export function castResultCreator<
-  TT extends ResultCreator<any[], any>,
-  R extends ResultCreatorType<TT> = any
->(arg: R): ResultCreatorType<TT> {
+export function castResultCreator<TT extends ResultCreator<any[], any>, R extends ResultCreatorType<TT> = any>(
+  arg: R,
+): ResultCreatorType<TT> {
   return arg as ResultCreatorType<TT>;
 }
 
-export function castTaskCreator<
-  TT extends TaskCreator<any[], any>,
-  R extends TaskCreatorType<TT> = any
->(arg: R): TaskCreatorType<TT> {
+export function castTaskCreator<TT extends TaskCreator<any[], any>, R extends TaskCreatorType<TT> = any>(
+  arg: R,
+): TaskCreatorType<TT> {
   return arg as TaskCreatorType<TT>;
 }
 
-export function sequenceTask<TT extends TaskCreator<any, any>>(
-  tasks: TT[],
-): Task<TaskCreatorType<TT>[]> {
+export function sequenceTask<TT extends TaskCreator<any, any>>(tasks: TT[]): Task<TaskCreatorType<TT>[]> {
   return tasks.reduce((prev, task) => {
-    return chainTask(prev, (list) => {
-      return fmapTask(task(), (value) => list.concat(value));
+    return prev.chain((list) => {
+      return task().fmap((value) => list.concat(value));
     });
   }, resolvedTask<TaskCreatorType<TT>[]>([]));
 }
 
-export function parallelTask<TT extends TaskCreator<any, any>>(
-  taskCreators: TT[],
-): Task<TaskCreatorType<TT>[]> {
-  const stub = (
-    _?: Result<Maybe<Either<TaskCreatorType<TT>[]>>> | undefined,
-  ) => {};
+export function parallelTask<TT extends TaskCreator<any, any>>(taskCreators: TT[]): Task<TaskCreatorType<TT>[]> {
+  const stub = (_?: Result<Cancelable<TaskCreatorType<TT>[]>> | undefined) => {};
 
   let globalResolve = stub;
 
   const tasks = taskCreators.map((creator) => creator());
 
   return task(
-    new Promise<Maybe<Either<TaskCreatorType<TT>[]>>>((resolve) => {
+    new Promise<Cancelable<TaskCreatorType<TT>[]>>((resolve) => {
       globalResolve = resolve;
 
       Promise.all(
         tasks.map((task) => {
-          return resolveTask<TaskCreatorType<TT>>(task).then((result) => {
+          return task.resolve().then((result) => {
             if (isJust(result)) {
               if (isRight(result.just)) {
                 return result.just.right;
@@ -196,7 +147,7 @@ export function parallelTask<TT extends TaskCreator<any, any>>(
       }
       globalResolve = stub;
 
-      tasks.forEach(cancelTask);
+      tasks.forEach((task) => task.cancel());
     },
   );
 }
@@ -204,12 +155,12 @@ export function parallelTask<TT extends TaskCreator<any, any>>(
 export const timeoutTask = (delay: number): Task<void> => {
   let handler: NodeJS.Timeout;
 
-  const stub = (_?: Result<Maybe<Either<void>>> | undefined) => {};
+  const stub = (_?: Result<Cancelable<void>> | undefined) => {};
 
   let globalResolve = stub;
 
   return task(
-    new Promise<Maybe<Either<void>>>((resolve) => {
+    new Promise<Cancelable<void>>((resolve) => {
       globalResolve = resolve;
 
       handler = setTimeout(() => {
@@ -231,45 +182,17 @@ export const timeoutTask = (delay: number): Task<void> => {
   );
 };
 
-export const onCancelled = <T>(
-  task: Task<T>,
-  callback: () => void,
-): Task<T> => {
-  return tapTaskMaybe(task, (value) => {
-    if (isNothing(value)) {
-      callback();
-    }
-  });
-};
-
-export const catchTask = <T, R>(
-  task: Task<T>,
-  handler: () => Task<R>,
-): Task<T | R> => {
-  return chainTaskEither(task, (value) => {
-    if (isRight(value)) {
-      return resolvedTask<T | R>(value.right);
-    }
-
-    return handler();
-  });
-};
-
 export const limitTask = <T>(task: Task<T>, limit: Task<void>): Task<T> => {
-  const mappedLimit = fmapTask(limit, () => rejectTask(task));
-  const mappedTask = fmapTaskMaybe(task, (value) => {
-    cancelTask(mappedLimit);
-
-    return value;
-  });
+  const mappedLimit = limit.tap(() => task.reject());
+  const mappedTask = task
+    .tap(() => mappedLimit.cancel())
+    .tapCanceled(() => mappedLimit.cancel())
+    .tapRejected(() => mappedLimit.cancel());
 
   return mappedTask;
 };
 
-export const repeatTask = <T>(
-  taskCreator: () => Task<T>,
-  repeatCreator: () => Task<void>,
-) => {
+export const repeatTask = <T>(taskCreator: () => Task<T>, repeatCreator: () => Task<void>) => {
   return generateTask(function*() {
     let result: Maybe<T> = nothing();
 
@@ -279,7 +202,7 @@ export const repeatTask = <T>(
       } catch (error) {
         yield repeatCreator();
       }
-    } while (isNothing(result));
+    } while (!isJust(result));
 
     return result.just;
   });

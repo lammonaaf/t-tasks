@@ -1,13 +1,4 @@
-import {
-  just,
-  isJust,
-  nothing,
-  isNothing,
-  Maybe,
-  fmapMaybe,
-  chainMaybe,
-  tapMaybe,
-} from '../src';
+import { just, isJust, nothing, isNothing, Maybe } from '../src';
 
 describe('just("data")', () => {
   // So typescript does not make assumptions about actual type
@@ -25,15 +16,6 @@ describe('just("data")', () => {
     const callback = jest.fn((_: string) => {});
 
     subject.tap(callback);
-
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
-  });
-
-  it('taps "data"', () => {
-    const callback = jest.fn((_: string) => {});
-
-    tapMaybe(subject, callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith('data');
@@ -88,24 +70,6 @@ describe('nothing()', () => {
 
   it('chains to nothing', () => {
     const mapped = subject.chain(() => nothing());
-
-    expect(isNothing(mapped)).toBeTruthy();
-  });
-
-  it('transforms to Nothing', () => {
-    const mapped = fmapMaybe(subject, (value) => value.length);
-
-    expect(isNothing(mapped)).toBeTruthy();
-  });
-
-  it('chains to nothing', () => {
-    const mapped = chainMaybe(subject, (value) => just(value.length));
-
-    expect(isNothing(mapped)).toBeTruthy();
-  });
-
-  it('chains to nothing', () => {
-    const mapped = chainMaybe(subject, () => nothing());
 
     expect(isNothing(mapped)).toBeTruthy();
   });

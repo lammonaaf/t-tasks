@@ -1,7 +1,21 @@
-export type Right<R> = {
+export interface RightBase<R> {
   readonly kind: 'right';
   readonly right: R;
+}
 
+export interface LeftBase<L> {
+  readonly kind: 'left';
+  readonly left: L;
+}
+
+export type EitherBase<R, L> = Right<R> | Left<L>;
+
+/**
+ * Right (correct) value
+ *
+ * Either monad specialization representing a right (correct) result
+ */
+export interface Right<R> extends RightBase<R> {
   tap(op: (value: R) => void): Right<R>;
   /**
    * fmap applied to 'right value' returns 'right op(value)'
@@ -10,13 +24,19 @@ export type Right<R> = {
   /**
    * chain applied to 'right value' returns 'op(value)'
    */
-  chain<R2, L>(op: (value: R) => Either<R2, L>): Either<R2, L>;
-};
+  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2>;
 
-export type Left<L> = {
-  readonly kind: 'left';
-  readonly left: L;
+  tapLeft(): Right<R>;
+  fmapLeft(): Right<R>;
+  chainLeft(): Right<R>;
+}
 
+/**
+ * Right (erroneous) value
+ *
+ * Either monad specialization representing a left (erroneous) result
+ */
+export interface Left<L> extends LeftBase<L> {
   tap(): Left<L>;
   /**
    * fmap applied to 'left error' always returns 'left error'
@@ -26,7 +46,11 @@ export type Left<L> = {
    * chain applied to 'left error' always returns 'left error'
    */
   chain(): Left<L>;
-};
+
+  tapLeft(op: (error: L) => void): Left<L>;
+  fmapLeft<R2>(op: (error: L) => R2): Right<R2>;
+  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R2, L2>;
+}
 
 /**
  * Genric Either monad
@@ -34,7 +58,7 @@ export type Left<L> = {
  * As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
  * Used throughout the library to represent the result of failable operations, namely failed tasks
  */
-export type Either<R, L = any> = (Left<L> | Right<R>) & {
+export type Either<R, L> = EitherBase<R, L> & {
   tap(op: (value: R) => void): Either<R, L>;
 
   /**
@@ -61,48 +85,93 @@ export type Either<R, L = any> = (Left<L> | Right<R>) & {
    * }
    * ```
    */
-  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L | L2>;
+  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2> | Left<L>;
+
+  tapLeft(op: (error: L) => void): Either<R, L>;
+  fmapLeft<R2>(op: (error: L) => R2): Right<R> | Right<R2>;
+  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Right<R> | Either<R2, L2>;
 };
 
-export const isRight = <R, L>(either: Either<R, L>): either is Right<R> => {
+export function isRight<R>(either: Either<R, any>): either is Right<R> {
   return either.kind === 'right';
-};
+}
 
-export const isLeft = <R, L>(either: Either<R, L>): either is Left<L> => {
+export function isLeft<L>(either: Either<any, L>): either is Left<L> {
   return either.kind === 'left';
-};
+}
 
-export const right = <R>(value: R): Right<R> => ({
-  kind: 'right',
-  right: value,
-  tap: (op) => {
-    op(value);
+class RightClass<R> implements Right<R> {
+  readonly kind = 'right';
 
-    return right(value);
-  },
-  fmap: (op) => right(op(value)),
-  chain: (op) => op(value),
-});
+  constructor(readonly right: R) {}
 
-export const left = <L = any>(error: L): Left<L> => ({
-  kind: 'left',
-  left: error,
-  tap: () => left(error),
-  fmap: () => left(error),
-  chain: () => left(error),
-});
+  tap(op: (value: R) => void) {
+    op(this.right);
 
-export const tapEither = <R1, L1>(
-  either: Either<R1, L1>,
-  op: (value: R1) => void,
-): Either<R1, L1> => either.tap(op);
+    return this;
+  }
+  /**
+   * fmap applied to 'right value' returns 'right op(value)'
+   */
+  fmap<R2>(op: (value: R) => R2) {
+    return right(op(this.right));
+  }
+  /**
+   * chain applied to 'right value' returns 'op(value)'
+   */
+  chain<R2, L2>(op: (value: R) => Either<R2, L2>) {
+    return op(this.right);
+  }
 
-export const fmapEither = <R1, R2, L1>(
-  either: Either<R1, L1>,
-  op: (value: R1) => R2,
-): Either<R2, L1> => either.fmap(op);
+  tapLeft() {
+    return this;
+  }
+  fmapLeft() {
+    return this;
+  }
+  chainLeft() {
+    return this;
+  }
+}
 
-export const chainEither = <R1, R2, L1, L2>(
-  either: Either<R1, L1>,
-  op: (value: R1) => Either<R2, L2>,
-): Either<R2, L1 | L2> => either.chain(op);
+class LeftClass<L> implements Left<L> {
+  readonly kind = 'left';
+
+  constructor(readonly left: L) {}
+
+  tap() {
+    return this;
+  }
+  /**
+   * fmap applied to 'left error' always returns 'left error'
+   */
+  fmap() {
+    return this;
+  }
+  /**
+   * chain applied to 'left error' always returns 'left error'
+   */
+  chain() {
+    return this;
+  }
+
+  tapLeft(op: (error: L) => void) {
+    op(this.left);
+
+    return this;
+  }
+  fmapLeft<R2>(op: (error: L) => R2) {
+    return right(op(this.left));
+  }
+  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>) {
+    return op(this.left);
+  }
+}
+
+export function right<R>(value: R): Right<R> {
+  return new RightClass<R>(value);
+}
+
+export function left<L>(error: L): Left<L> {
+  return new LeftClass<L>(error);
+}

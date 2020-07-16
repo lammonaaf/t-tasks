@@ -1,7 +1,25 @@
-export type Just<R> = {
+/**
+ * Just a value of type R
+ *
+ * Maybe monad specialization representing an existing value
+ */
+export interface JustBase<R> {
   readonly kind: 'just';
   readonly just: R;
+}
 
+/**
+ * Nothing
+ *
+ * Maybe monad specialiation representing an absence of any value
+ */
+export interface NothingBase {
+  readonly kind: 'nothing';
+}
+
+export type MaybeBase<R> = JustBase<R> | NothingBase;
+
+export interface Just<R> extends JustBase<R> {
   /**
    * tap applied to 'just value' returns 'just value'
    */
@@ -14,11 +32,13 @@ export type Just<R> = {
    * chain applied to 'just value' returns 'op(value)'
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
-};
 
-export type Nothing = {
-  readonly kind: 'nothing';
+  tapNothing(): Just<R>;
+  fmapNothing(): Just<R>;
+  chainNothing(): Just<R>;
+}
 
+export interface Nothing extends NothingBase {
   /**
    * tap applied to 'nothing' always returns 'nothing'
    */
@@ -31,7 +51,11 @@ export type Nothing = {
    * chain applied to 'nothing' always returns 'nothing'
    */
   chain(): Nothing;
-};
+
+  tapNothing(op: () => void): Nothing;
+  fmapNothing<R2>(op: () => R2): Just<R2>;
+  chainNothing<R2>(op: () => Maybe<R2>): Maybe<R2>;
+}
 
 /**
  * Genric Maybe monad
@@ -39,7 +63,7 @@ export type Nothing = {
  * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
  */
-export type Maybe<R> = (Just<R> | Nothing) & {
+export type Maybe<R> = MaybeBase<R> & {
   /**
    * Maybe peeker
    * @param op callback function to be called with underlying value
@@ -73,33 +97,106 @@ export type Maybe<R> = (Just<R> | Nothing) & {
    * ```
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
+
+  tapNothing(op: () => void): Maybe<R>;
+  fmapNothing<R2>(op: () => R2): Just<R2> | Just<R>;
+  chainNothing<R2>(op: () => Maybe<R2>): Just<R> | Maybe<R2>;
 };
+
+class JustClass<R> implements Just<R> {
+  readonly kind = 'just';
+
+  constructor(readonly just: R) {}
+
+  /**
+   * tap applied to 'just value' returns 'just value'
+   */
+  tap(op: (value: R) => void) {
+    op(this.just);
+
+    return this;
+  }
+
+  /**
+   * fmap applied to 'just value' returns 'just op(value)'
+   */
+  fmap<R2>(op: (value: R) => R2) {
+    return just(op(this.just));
+  }
+
+  /**
+   * chain applied to 'just value' returns 'op(value)'
+   */
+  chain<R2>(op: (value: R) => Maybe<R2>) {
+    return op(this.just);
+  }
+
+  tapNothing() {
+    return this;
+  }
+
+  fmapNothing() {
+    return this;
+  }
+
+  chainNothing() {
+    return this;
+  }
+}
+
+class NothingClass implements Nothing {
+  readonly kind = 'nothing';
+
+  /**
+   * tap applied to 'nothing' always returns 'nothing'
+   */
+  tap() {
+    return this;
+  }
+
+  /**
+   * fmap applied to 'nothing' always returns 'nothing'
+   */
+  fmap() {
+    return this;
+  }
+
+  /**
+   * chain applied to 'nothing' always returns 'nothing'
+   */
+  chain() {
+    return this;
+  }
+
+  tapNothing(op: () => void) {
+    op();
+
+    return this;
+  }
+
+  fmapNothing<R2>(op: () => R2) {
+    return just(op());
+  }
+
+  chainNothing<R2>(op: () => Maybe<R2>) {
+    return op();
+  }
+}
 
 /**
  * Non-empty monad constructor
  * @param value underlying value
  */
-export const just = <R>(value: R): Just<R> => ({
-  kind: 'just',
-  just: value,
-  tap: (op) => {
-    op(value);
-
-    return just(value);
-  },
-  fmap: (op) => just(op(value)),
-  chain: (op) => op(value),
-});
+export function just<R>(value: R): Just<R> {
+  return new JustClass<R>(value);
+}
 
 /**
  * Empty monad constructor
  */
-export const nothing = (): Nothing => ({
-  kind: 'nothing',
-  tap: () => nothing(),
-  fmap: () => nothing(),
-  chain: () => nothing(),
-});
+export function nothing(): Nothing {
+  return new NothingClass();
+}
 
 /**
  * Pattern mathching for 'just'
@@ -114,9 +211,9 @@ export const nothing = (): Nothing => ({
  * }
  * ```
  */
-export const isJust = <R>(maybe: Maybe<R>): maybe is Just<R> => {
+export function isJust<T>(maybe: Maybe<T>): maybe is Just<T> {
   return maybe.kind === 'just';
-};
+}
 
 /**
  * Pattern mathching for 'nothing'
@@ -124,45 +221,6 @@ export const isJust = <R>(maybe: Maybe<R>): maybe is Just<R> => {
  *
  * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
  */
-export const isNothing = <R>(maybe: Maybe<R>): maybe is Nothing => {
+export function isNothing<T>(maybe: Maybe<T>): maybe is Nothing {
   return maybe.kind === 'nothing';
-};
-
-/**
- * Maybe peeker (standalone version)
- * @param maybe wrapped value (or absence of it)
- * @param op callback function to be called with underlying value
- *
- * Returns copy of self no matter whether callback was called or not
- * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
- */
-export const tapMaybe = <R>(
-  maybe: Maybe<R>,
-  op: (value: R) => void,
-): Maybe<R> => maybe.tap(op);
-
-/**
- * Maybe fmap transformer (standalone version)
- * @param maybe wrapped value (or absence of it)
- * @param op transformer function for the underlying value
- *
- * Returns 'nothing' without invoking transformer if wrapped value is already 'nothing'
- * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
- */
-export const fmapMaybe = <R, R2>(
-  maybe: Maybe<R>,
-  op: (value: R) => R2,
-): Maybe<R2> => maybe.fmap(op);
-
-/**
- * Chain multiple functions returning Maybe (standalone version)
- * @param maybe wrapped value (or absence of it)
- * @param op transformer function for the underlying value which can also return nothing
- *
- * Subsequent functions would not be invoked if Maybe resolves to 'Nothing'
- * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
- */
-export const chainMaybe = <R, R2>(
-  maybe: Maybe<R>,
-  op: (value: R) => Maybe<R2>,
-): Maybe<R2> => maybe.chain(op);
+}
