@@ -2,6 +2,9 @@ export type Just<R> = {
   readonly kind: 'just';
   readonly just: R;
 
+  /**
+   * tap applied to 'just value' returns 'just value'
+   */
   tap(op: (value: R) => void): Just<R>;
   /**
    * fmap applied to 'just value' returns 'just op(value)'
@@ -16,6 +19,9 @@ export type Just<R> = {
 export type Nothing = {
   readonly kind: 'nothing';
 
+  /**
+   * tap applied to 'nothing' always returns 'nothing'
+   */
   tap(): Nothing;
   /**
    * fmap applied to 'nothing' always returns 'nothing'
@@ -34,6 +40,12 @@ export type Nothing = {
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
  */
 export type Maybe<R> = (Just<R> | Nothing) & {
+  /**
+   * Maybe peeker
+   * @param op callback function to be called with underlying value
+   * 
+   * Returns copy of self no matter whether callback was called or not
+   */
   tap(op: (value: R) => void): Maybe<R>;
 
   /**
@@ -112,18 +124,26 @@ export const isJust = <R>(maybe: Maybe<R>): maybe is Just<R> => maybe.kind === '
  */
 export const isNothing = <R>(maybe: Maybe<R>): maybe is Nothing => maybe.kind === 'nothing';
 
+/**
+ * Maybe peeker (standalone version)
+ * @param maybe wrapped value (or absence of it)
+ * @param op callback function to be called with underlying value
+ * 
+ * Returns copy of self no matter whether callback was called or not
+ * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
+ */
 export const tapMaybe = <R>(maybe: Maybe<R>, op: (value: R) => void): Maybe<R> => {
   return maybe.tap(op);
 };
 
 /**
-   * Maybe fmap transformer (standalone version)
-   * @param maybe wrapped value (or absence of it)
-   * @param op transformer function for the underlying value
-   * 
-   * Returns 'nothing' without invoking transformer if wrapped value is already 'nothing'
-   * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
-   */
+ * Maybe fmap transformer (standalone version)
+ * @param maybe wrapped value (or absence of it)
+ * @param op transformer function for the underlying value
+ * 
+ * Returns 'nothing' without invoking transformer if wrapped value is already 'nothing'
+ * As infix notation is not possible in TS and writing composable functions is awkward anyways, using dot-version is recommended
+ */
 export const fmapMaybe = <R, R2>(maybe: Maybe<R>, op: (value: R) => R2): Maybe<R2> => {
   return maybe.fmap(op);
 };
