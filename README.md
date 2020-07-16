@@ -1,3 +1,5 @@
+![CI](https://github.com/lammonaaf/t-ask/workflows/CI/badge.svg?branch=master)
+
 # T-Ask task library
 
 This project is intended to solve the issue of promise canceling && external failing in a semi-functional way.
