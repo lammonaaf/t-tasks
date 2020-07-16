@@ -1,5 +1,5 @@
-import { timeoutTask, generateTask, liftResult, liftResultCreator, castResult, repeatTask, limitTask, catchTask, onCancelled, parallelTask, sequenceTask } from '../src/task-tools';
-import { isJust, isNothing, isRight, isLeft, rejectedTask, resolvedTask } from '../src';
+import { timeoutTask, generateTask, liftResult, liftResultCreator, castResult, repeatTask, limitTask, catchTask, onCancelled, parallelTask, sequenceTask, castTask, castResultCreator } from '../src/task-tools';
+import { isJust, isNothing, isRight, isLeft, rejectedTask, resolvedTask, Task } from '../src';
 
 const time = () => performance.now();
 const measureTime = (last: number) => time() - last;
@@ -642,7 +642,7 @@ describe('generateTask', () => {
     const task = generateTask(function* () {
       let value1: number;
       try {
-        value1 = castResult<string>(yield delayedValueTask('data', 200)).length;
+        value1 = castTask<Task<string>>(yield delayedValueTask('data', 200)).length;
 
         throw new Error('Failed');
       
@@ -650,7 +650,7 @@ describe('generateTask', () => {
       } catch (error) {
         callback();
 
-        value1 = castResult<number>(yield delayedValueTask(5, 100));
+        value1 = castResultCreator<() => number>(yield delayedValueTask(5, 100));
       }
       
       callback();
