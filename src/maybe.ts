@@ -9,7 +9,7 @@ export interface JustBase<R> {
 }
 
 /**
- * Nothing
+ * Absolutely Nothing
  *
  * Maybe monad specialiation representing an absence of any value
  */
@@ -17,11 +17,17 @@ export interface NothingBase {
   readonly kind: 'nothing';
 }
 
+/**
+ * Maybe data type: either Just a value of type R or Nothing
+ */
 export type MaybeBase<R> = JustBase<R> | NothingBase;
 
+/**
+ * Maybe monad interface for "Just" specialization
+ */
 export interface Just<R> extends JustBase<R> {
   /**
-   * tap applied to 'just value' returns 'just value'
+   * tap applied to 'just value' returns self invoking op(value) in process
    */
   tap(op: (value: R) => void): Just<R>;
   /**
@@ -32,12 +38,23 @@ export interface Just<R> extends JustBase<R> {
    * chain applied to 'just value' returns 'op(value)'
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
-
+  /**
+   * tapNothing applied to 'just value' returns self without invoking callback
+   */
   tapNothing(): Just<R>;
+  /**
+   * fmapNothing applied to 'just value' returns self
+   */
   fmapNothing(): Just<R>;
+  /**
+   * chainNothing applied to 'just value' returns self
+   */
   chainNothing(): Just<R>;
 }
 
+/**
+ * Maybe monad interface for "Nothing" specialization
+ */
 export interface Nothing extends NothingBase {
   /**
    * tap applied to 'nothing' always returns 'nothing'
@@ -51,14 +68,22 @@ export interface Nothing extends NothingBase {
    * chain applied to 'nothing' always returns 'nothing'
    */
   chain(): Nothing;
-
+  /**
+   * tapNothing applied to 'nothing' returns self invoking op() in process
+   */
   tapNothing(op: () => void): Nothing;
+  /**
+   * fmapNothing applied to 'nothing' returns just(op())
+   */
   fmapNothing<R2>(op: () => R2): Just<R2>;
+  /**
+   * chainNothing applied to 'nothing' returns op()
+   */
   chainNothing<R2>(op: () => Maybe<R2>): Maybe<R2>;
 }
 
 /**
- * Genric Maybe monad
+ * Genric Maybe monad interfaces
  *
  * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
@@ -98,12 +123,34 @@ export type Maybe<R> = MaybeBase<R> & {
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
 
+  /**
+   * Inverse maybe peeker
+   * @param op callback function to be called in case of 'nothing'
+   *
+   * Returns copy of self no matter whether callback was called or not
+   */
   tapNothing(op: () => void): Maybe<R>;
 
-  // fmapNothing<R2>(op: () => R2): Just<R2> | Just<R>; // this version of typings compiles 4 times faster
+  /**
+   * inverse maybe fmap transformer
+   * @param op transformer function to be called in case of 'nothing'
+   *
+   * Returns self without invoking transformer if wrapped value is not 'nothing', effectively acting as a fallback method
+   *
+   * @note ```typescript
+   * fmapNothing<R2>(op: () => R2): Just<R2> | Just<R>; // this version of typings compiles 4 times faster
+   * ```
+   */
   fmapNothing<R2>(op: () => R2): Just<R | R2>;
 
-  // chainNothing<R2>(op: () => Maybe<R2>): Just<R> | Maybe<R2>; // this version of typings compiles 4 times faster
+  /**
+   * Chain fallback also returning Maybe
+   * @param op transformer function to be called in case of nothing
+   *
+   * @note ```typescript
+   * chainNothing<R2>(op: () => Maybe<R2>): Just<R> | Maybe<R2>; // this version of typings compiles 4 times faster
+   * ```
+   */
   chainNothing<R2>(op: () => Maybe<R2>): Maybe<R | R2>;
 };
 
@@ -112,25 +159,16 @@ class JustClass<R> implements Just<R> {
 
   constructor(readonly just: R) {}
 
-  /**
-   * tap applied to 'just value' returns 'just value'
-   */
   tap(op: (value: R) => void) {
     op(this.just);
 
     return this;
   }
 
-  /**
-   * fmap applied to 'just value' returns 'just op(value)'
-   */
   fmap<R2>(op: (value: R) => R2) {
     return just(op(this.just));
   }
 
-  /**
-   * chain applied to 'just value' returns 'op(value)'
-   */
   chain<R2>(op: (value: R) => Maybe<R2>) {
     return op(this.just);
   }
@@ -151,23 +189,14 @@ class JustClass<R> implements Just<R> {
 class NothingClass implements Nothing {
   readonly kind = 'nothing';
 
-  /**
-   * tap applied to 'nothing' always returns 'nothing'
-   */
   tap() {
     return this;
   }
 
-  /**
-   * fmap applied to 'nothing' always returns 'nothing'
-   */
   fmap() {
     return this;
   }
 
-  /**
-   * chain applied to 'nothing' always returns 'nothing'
-   */
   chain() {
     return this;
   }
