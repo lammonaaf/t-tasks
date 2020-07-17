@@ -99,8 +99,12 @@ export type Maybe<R> = MaybeBase<R> & {
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
 
   tapNothing(op: () => void): Maybe<R>;
-  fmapNothing<R2>(op: () => R2): Just<R2> | Just<R>;
-  chainNothing<R2>(op: () => Maybe<R2>): Just<R> | Maybe<R2>;
+
+  // fmapNothing<R2>(op: () => R2): Just<R2> | Just<R>; // this version of typings compiles 4 times faster
+  fmapNothing<R2>(op: () => R2): Just<R | R2>;
+
+  // chainNothing<R2>(op: () => Maybe<R2>): Just<R> | Maybe<R2>; // this version of typings compiles 4 times faster
+  chainNothing<R2>(op: () => Maybe<R2>): Maybe<R | R2>;
 };
 
 class JustClass<R> implements Just<R> {
@@ -211,7 +215,7 @@ export function nothing(): Nothing {
  * }
  * ```
  */
-export function isJust<T>(maybe: Maybe<T>): maybe is Just<T> {
+export function isJust<R, TT extends Maybe<R>>(maybe: TT): maybe is Just<R> & TT {
   return maybe.kind === 'just';
 }
 
@@ -221,6 +225,6 @@ export function isJust<T>(maybe: Maybe<T>): maybe is Just<T> {
  *
  * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
  */
-export function isNothing<T>(maybe: Maybe<T>): maybe is Nothing {
+export function isNothing<TT extends Maybe<any>>(maybe: TT): maybe is Nothing & TT {
   return maybe.kind === 'nothing';
 }

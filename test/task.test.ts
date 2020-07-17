@@ -73,6 +73,44 @@ describe('tasks', () => {
     expect(isJust(result) && isLeft(result.just)).toBeTruthy();
   }, 1000);
 
+  it('fallbacks externally in 200ms', async () => {
+    const taskCreator = jest.fn(() => delayedValueTask(42, 500).fmapRejected(() => 63));
+    const startTime = time();
+
+    const task = taskCreator();
+
+    setTimeout(() => task.reject(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(taskCreator).toBeCalledTimes(1);
+
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(63);
+  }, 1000);
+
+  it('fallbacks cancel in 200ms', async () => {
+    const taskCreator = jest.fn(() => delayedValueTask(42, 500).fmapCanceled(() => 64));
+    const startTime = time();
+
+    const task = taskCreator();
+
+    setTimeout(() => task.cancel(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(taskCreator).toBeCalledTimes(1);
+
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(64);
+  }, 1000);
+
   it('fail internally in 200ms', async () => {
     const taskCreator = jest.fn(() =>
       delayedValueTask(42, 200).fmap((value) => {
@@ -311,6 +349,75 @@ describe('chainTask', () => {
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
     expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
+  }, 1000);
+
+  it('chain ignoring cancel on first step', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = delayedValueTask('data', 400)
+      .tap(callback)
+      .tapCanceled(callback)
+      .chainCanceled(() => {
+        return delayedValueTask(5, 300);
+      })
+      .tap(callback);
+
+    setTimeout(() => task.cancel(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 500);
+
+    expect(callback).toBeCalledTimes(2);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(5);
+  }, 1000);
+
+  it('chain without fallback on first step', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = delayedValueTask('data', 400)
+      .tap(callback)
+      .tapCanceled(callback)
+      .chainCanceled(() => {
+        return delayedValueTask(5, 200);
+      })
+      .tap(callback);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 400);
+
+    expect(callback).toBeCalledTimes(2);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just)).toBeTruthy();
+    expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual('data');
+  }, 1000);
+
+  it('chain without fallback on first step', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = delayedValueTask('data', 400)
+      .tap(callback)
+      .tapRejected(callback)
+      .chainCanceled(() => {
+        return delayedValueTask(5, 200);
+      })
+      .tapRejected(callback);
+
+    setTimeout(() => task.reject(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(callback).toBeCalledTimes(2);
+    expect(isJust(result)).toBeTruthy();
+    expect(isJust(result) && isLeft(result.just)).toBeTruthy();
   }, 1000);
 
   it('chain ignoring internal errors on first step', async () => {
@@ -837,6 +944,27 @@ describe('limitTask', () => {
     expect(isJust(result)).toBeTruthy();
     expect(isJust(result) && isRight(result.just)).toBeTruthy();
     expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
+  });
+
+  it('cancel in 500ms', async () => {
+    const resultCreator = jest.fn(() => 42);
+    const taskCreator = jest.fn(() => timeoutTask(500).fmap(resultCreator));
+
+    const startTime = time();
+
+    const task = limitTask(taskCreator(), timeoutTask(700));
+
+    setTimeout(() => task.cancel(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(taskCreator).toBeCalledTimes(1);
+    expect(resultCreator).toBeCalledTimes(0);
+    expect(resultCreator).toReturnTimes(0);
+
+    expect(isNothing(result)).toBeTruthy();
   });
 });
 

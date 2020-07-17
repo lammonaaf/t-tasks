@@ -27,6 +27,12 @@ describe('just("data")', () => {
     expect(isJust(mapped) && mapped.just === 4).toBeTruthy();
   });
 
+  it('does not fallback', () => {
+    const mapped = subject.fmapNothing(() => 6);
+
+    expect(isJust(mapped) && mapped.just === 'data').toBeTruthy();
+  });
+
   it('chains to length 4', () => {
     const mapped = subject.chain((value) => just(value.length));
 
@@ -38,6 +44,12 @@ describe('just("data")', () => {
 
     expect(isNothing(mapped)).toBeTruthy();
   });
+
+  it('doues not fallback chain', () => {
+    const mapped = subject.chainNothing(() => just(6));
+
+    expect(isJust(mapped) && mapped.just === 'data').toBeTruthy();
+  });
 });
 
 describe('nothing()', () => {
@@ -48,18 +60,24 @@ describe('nothing()', () => {
     expect(isNothing(subject)).toBeTruthy();
   });
 
-  it('does not tap', () => {
-    const callback = jest.fn((_: string) => {});
+  it('taps nothing', () => {
+    const callback = jest.fn(() => {});
 
-    subject.tap(callback);
+    subject.tapNothing(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toBeCalled();
   });
 
   it('transforms to Nothing', () => {
     const mapped = subject.fmap((value) => value.length);
 
     expect(isNothing(mapped)).toBeTruthy();
+  });
+
+  it('fallbacks to just 6', () => {
+    const mapped = subject.fmapNothing(() => 6);
+
+    expect(isJust(mapped) && mapped.just === 6).toBeTruthy();
   });
 
   it('chains to nothing', () => {
@@ -72,5 +90,11 @@ describe('nothing()', () => {
     const mapped = subject.chain(() => nothing());
 
     expect(isNothing(mapped)).toBeTruthy();
+  });
+
+  it('fallback chains to just 6', () => {
+    const mapped = subject.chainNothing(() => just(6));
+
+    expect(isJust(mapped) && mapped.just === 6).toBeTruthy();
   });
 });

@@ -85,11 +85,16 @@ export type Either<R, L> = EitherBase<R, L> & {
    * }
    * ```
    */
-  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2> | Left<L>;
+  // chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2> | Left<L>; // this version of typings compiles 4 times faster
+  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L | L2>;
 
   tapLeft(op: (error: L) => void): Either<R, L>;
-  fmapLeft<R2>(op: (error: L) => R2): Right<R> | Right<R2>;
-  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Right<R> | Either<R2, L2>;
+
+  // fmapLeft<R2>(op: (error: L) => R2): Right<R> | Right<R2>; // this version of typings compiles 4 times faster
+  fmapLeft<R2>(op: (error: L) => R2): Right<R | R2>;
+
+  // chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Right<R> | Either<R2, L2>; // this version of typings compiles 4 times faster
+  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
 };
 
 export function isRight<R>(either: Either<R, any>): either is Right<R> {
