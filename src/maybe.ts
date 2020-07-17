@@ -1,7 +1,7 @@
 /**
  * Just a value of type R
  *
- * Maybe monad specialization representing an existing value
+ * Maybe data type specialization representing an existing value
  */
 export interface JustBase<R> {
   readonly kind: 'just';
@@ -11,7 +11,7 @@ export interface JustBase<R> {
 /**
  * Absolutely Nothing
  *
- * Maybe monad specialiation representing an absence of any value
+ * Maybe data type specialiation representing an absence of any value
  */
 export interface NothingBase {
   readonly kind: 'nothing';
@@ -39,15 +39,15 @@ export interface Just<R> extends JustBase<R> {
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
   /**
-   * tapNothing applied to 'just value' returns self without invoking callback
+   * tapNothing applied to 'just value' returns self not invoking callback
    */
   tapNothing(): Just<R>;
   /**
-   * fmapNothing applied to 'just value' returns self
+   * fmapNothing applied to 'just value' returns self not invoking transformer
    */
   fmapNothing(): Just<R>;
   /**
-   * chainNothing applied to 'just value' returns self
+   * chainNothing applied to 'just value' returns self not invoking transformer
    */
   chainNothing(): Just<R>;
 }
@@ -57,15 +57,15 @@ export interface Just<R> extends JustBase<R> {
  */
 export interface Nothing extends NothingBase {
   /**
-   * tap applied to 'nothing' always returns 'nothing'
+   * tap applied to 'nothing' returns self not invoking callback
    */
   tap(): Nothing;
   /**
-   * fmap applied to 'nothing' always returns 'nothing'
+   * fmap applied to 'nothing' returns self not invoking transformer
    */
   fmap(): Nothing;
   /**
-   * chain applied to 'nothing' always returns 'nothing'
+   * chain applied to 'nothing' returns self not invoking transformer
    */
   chain(): Nothing;
   /**
@@ -83,7 +83,7 @@ export interface Nothing extends NothingBase {
 }
 
 /**
- * Genric Maybe monad interfaces
+ * Genric Maybe monad interface
  *
  * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
@@ -164,23 +164,18 @@ class JustClass<R> implements Just<R> {
 
     return this;
   }
-
   fmap<R2>(op: (value: R) => R2) {
     return just(op(this.just));
   }
-
   chain<R2>(op: (value: R) => Maybe<R2>) {
     return op(this.just);
   }
-
   tapNothing() {
     return this;
   }
-
   fmapNothing() {
     return this;
   }
-
   chainNothing() {
     return this;
   }
@@ -192,25 +187,20 @@ class NothingClass implements Nothing {
   tap() {
     return this;
   }
-
   fmap() {
     return this;
   }
-
   chain() {
     return this;
   }
-
   tapNothing(op: () => void) {
     op();
 
     return this;
   }
-
   fmapNothing<R2>(op: () => R2) {
     return just(op());
   }
-
   chainNothing<R2>(op: () => Maybe<R2>) {
     return op();
   }

@@ -37,9 +37,9 @@ export function liftResult<R>(from: Result<R>): Task<R> {
         },
       );
     }),
-    (fail: boolean) => {
-      if (fail) {
-        globalResolve(just(left(new Error('Task cancelled'))));
+    (reject?: { error: any }) => {
+      if (reject) {
+        globalResolve(just(left(reject.error)));
       } else {
         globalResolve(nothing());
       }
@@ -139,9 +139,9 @@ export function parallelTask<TT extends TaskCreator<any, any>>(taskCreators: TT[
         },
       );
     }),
-    (fail: boolean) => {
-      if (fail) {
-        globalResolve(just(left(new Error('Task cancelled'))));
+    (reject?: { error: any }) => {
+      if (reject) {
+        globalResolve(just(left(reject.error)));
       } else {
         globalResolve(nothing());
       }
@@ -169,9 +169,9 @@ export const timeoutTask = (delay: number): Task<void> => {
         globalResolve = stub;
       }, delay);
     }),
-    (fail: boolean) => {
-      if (fail) {
-        globalResolve(just(left(new Error('Task cancelled'))));
+    (reject?: { error: any }) => {
+      if (reject) {
+        globalResolve(just(left(reject.error)));
       } else {
         globalResolve(nothing());
       }
@@ -183,7 +183,7 @@ export const timeoutTask = (delay: number): Task<void> => {
 };
 
 export const limitTask = <T>(task: Task<T>, limit: Task<void>): Task<T> => {
-  const mappedLimit = limit.tap(() => task.reject());
+  const mappedLimit = limit.tap(() => task.cancel());
   const mappedTask = task
     .tap(() => mappedLimit.cancel())
     .tapCanceled(() => mappedLimit.cancel())

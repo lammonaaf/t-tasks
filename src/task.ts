@@ -1,30 +1,90 @@
 import { Maybe, just, isJust, nothing } from './maybe';
 import { Either, right, isRight, left } from './either';
 
+/**
+ * Shortcut for monadic Either type, where erroneous value is of type any
+ */
 export type Rejectable<R> = Either<R, any>;
+/**
+ * Shortcut for underlying task result type
+ */
 export type Cancelable<R> = Maybe<Either<R, any>>;
 
+/**
+ * Task data type consisting of promise and cancel function
+ */
 export interface TaskBase<R> {
   readonly _invoke: Promise<Cancelable<R>>;
-  readonly _cancel: (reject: boolean) => void;
+  readonly _cancel: (reject?: { error: any }) => void;
 }
 
+/**
+ * Task monad interface
+ */
 export interface Task<R> extends TaskBase<R> {
+  /**
+   * Invoke callback when task is cancelled (and only then)
+   * @param op callback to invoke
+   */
   tapCanceled(op: () => void): Task<R>;
+  /**
+   * Invoke callback when task is rejected (and only then)
+   * @param op callback to invoke
+   */
   tapRejected(op: (error: any) => void): Task<R>;
+  /**
+   * Invoke callback when task is resolved (and only then)
+   * @param op callback to invoke
+   */
   tap(op: (value: R) => void): Task<R>;
-
+  /**
+   * Invoke transformer when task is cancelled (and only then) and return it's result instead
+   * @param op transformer to invoke
+   * @returns task returning fallback result in case of cancelation
+   */
   fmapCanceled<R2>(op: () => R2): Task<R | R2>;
+  /**
+   * Invoke transformer when task is rejected (and only then) and return it's result instead
+   * @param op transformer to invoke
+   * @returns task returning fallback result in case of failure
+   */
   fmapRejected<R2>(op: (error: any) => R2): Task<R | R2>;
+  /**
+   * Invoke transformer when task is resolved (and only then) and return it's result instead
+   * @param op transformer to invoke
+   * @returns task returning transformer result
+   */
   fmap<R2>(op: (value: R) => R2): Task<R2>;
-
+  /**
+   * Invoke transformer when task is cancelled (and only then) and continue execution with it's result
+   * @param op transformer to invoke
+   * @returns task chaining to fallback task in case of cancelation
+   */
   chainCanceled<R2>(op: () => Task<R2>): Task<R | R2>;
+  /**
+   * Invoke transformer when task is rejected (and only then) and continue execution with it's result
+   * @param op transformer to invoke
+   * @returns task chaining to fallback task in case of failure
+   */
   chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>;
+  /**
+   * Invoke transformer when task is resolved (and only then) and continue execution with it's result
+   * @param op transformer to invoke
+   * @returns task chaining to transformer result task
+   */
   chain<R2>(op: (value: R) => Task<R2>): Task<R2>;
-
+  /**
+   * Return underlying promise in order to await result
+   */
   resolve: () => Promise<Cancelable<R>>;
+  /**
+   * Invoke underlying canel method without error
+   */
   cancel: () => void;
-  reject: () => void;
+  /**
+   * Invoke underlying canel method with error
+   */
+  reject: (error: any) => void;
 }
 
 function fmapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
@@ -92,10 +152,10 @@ function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) =>
 
         return invoke2;
       } catch (e) {
-        return just<Rejectable<R2>>(left<any>(e));
+        return just(left(e));
       }
     }),
-    (reject: boolean) => globalCancel(reject),
+    (reject?: { error: any }) => globalCancel(reject),
   );
 }
 
@@ -144,7 +204,7 @@ function chainTaskRejected<R, R2>(_task: TaskBase<R>, op: (error: any) => Task<R
 }
 
 class TaskClass<R> implements Task<R> {
-  constructor(readonly _invoke: Promise<Maybe<Either<R, any>>>, readonly _cancel: (reject: boolean) => void) {}
+  constructor(readonly _invoke: Promise<Maybe<Either<R, any>>>, readonly _cancel: (reject?: { error: any }) => void) {}
 
   tapCanceled(op: () => void) {
     return tapTaskCanceled(this, op);
@@ -180,14 +240,14 @@ class TaskClass<R> implements Task<R> {
     return this._invoke;
   }
   cancel() {
-    return this._cancel(false);
+    return this._cancel();
   }
-  reject() {
-    return this._cancel(true);
+  reject(error: any) {
+    return this._cancel({ error });
   }
 }
 
-export const task = <R>(_invoke: Promise<Cancelable<R>>, _cancel: (reject: boolean) => void): Task<R> => {
+export const task = <R>(_invoke: Promise<Cancelable<R>>, _cancel: (reject?: { error: any }) => void): Task<R> => {
   return new TaskClass<R>(_invoke, _cancel);
 };
 

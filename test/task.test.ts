@@ -61,7 +61,7 @@ describe('tasks', () => {
 
     const task = taskCreator();
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -79,7 +79,7 @@ describe('tasks', () => {
 
     const task = taskCreator();
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -217,7 +217,7 @@ describe('chainTask', () => {
 
     const task = firstTaskCreator().chain(secondTaskCreator);
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -238,7 +238,7 @@ describe('chainTask', () => {
 
     const task = firstTaskCreator().chain(secondTaskCreator);
 
-    setTimeout(() => task.reject(), 500);
+    setTimeout(() => task.reject(new Error('Provoked')), 500);
 
     const result = await task.resolve();
 
@@ -339,7 +339,7 @@ describe('chainTask', () => {
       })
       .tap(callback);
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -409,7 +409,7 @@ describe('chainTask', () => {
       })
       .tapRejected(callback);
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -568,7 +568,7 @@ describe('generateTask', () => {
       return value2;
     });
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -595,7 +595,7 @@ describe('generateTask', () => {
       return value2;
     });
 
-    setTimeout(() => task.reject(), 500);
+    setTimeout(() => task.reject(new Error('Provoked')), 500);
 
     const result = await task.resolve();
 
@@ -683,7 +683,7 @@ describe('generateTask', () => {
       return value1;
     });
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -773,7 +773,7 @@ describe('liftResult', () => {
       return value;
     });
 
-    setTimeout(() => task.reject(), 200);
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
 
     const result = await task.resolve();
 
@@ -905,7 +905,7 @@ describe('repeatTask', () => {
 });
 
 describe('limitTask', () => {
-  it('fail in 200ms', async () => {
+  it('cancel in 200ms', async () => {
     const resultCreator = jest.fn(() => 42);
     const taskCreator = jest.fn(() => timeoutTask(500).fmap(resultCreator));
 
@@ -921,8 +921,7 @@ describe('limitTask', () => {
     expect(resultCreator).toBeCalledTimes(0);
     expect(resultCreator).toReturnTimes(0);
 
-    expect(isJust(result)).toBeTruthy();
-    expect(isJust(result) && isLeft(result.just)).toBeTruthy();
+    expect(isNothing(result)).toBeTruthy();
   });
 
   it('succeed in 500ms', async () => {
@@ -946,7 +945,7 @@ describe('limitTask', () => {
     expect(isJust(result) && isRight(result.just) ? result.just.right : -1).toEqual(42);
   });
 
-  it('cancel in 500ms', async () => {
+  it('cancel in 200ms', async () => {
     const resultCreator = jest.fn(() => 42);
     const taskCreator = jest.fn(() => timeoutTask(500).fmap(resultCreator));
 
@@ -965,6 +964,27 @@ describe('limitTask', () => {
     expect(resultCreator).toReturnTimes(0);
 
     expect(isNothing(result)).toBeTruthy();
+  });
+
+  it('fail in 200ms', async () => {
+    const resultCreator = jest.fn(() => 42);
+    const taskCreator = jest.fn(() => timeoutTask(500).fmap(resultCreator));
+
+    const startTime = time();
+
+    const task = limitTask(taskCreator(), timeoutTask(700));
+
+    setTimeout(() => task.reject(new Error('Provoked')), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(taskCreator).toBeCalledTimes(1);
+    expect(resultCreator).toBeCalledTimes(0);
+    expect(resultCreator).toReturnTimes(0);
+
+    expect(isJust(result) && isLeft(result.just)).toBeTruthy();
   });
 });
 
@@ -1151,7 +1171,7 @@ describe('parallelTask', () => {
 
     const task = parallelTask([taskCreator, taskCreator, taskCreator]);
 
-    setTimeout(() => task.reject(), 300);
+    setTimeout(() => task.reject(new Error('Provoked')), 300);
 
     const result = await task.resolve();
 
@@ -1286,7 +1306,7 @@ describe('sequenceTask', () => {
 
     const task = sequenceTask([taskCreator, taskCreator, taskCreator]);
 
-    setTimeout(() => task.reject(), 500);
+    setTimeout(() => task.reject(new Error('Provoked')), 500);
 
     const result = await task.resolve();
 

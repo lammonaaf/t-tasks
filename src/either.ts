@@ -1,21 +1,35 @@
+/**
+ * Right (correct) value of type R
+ *
+ * Either data type specialization representing a correct value
+ */
 export interface RightBase<R> {
   readonly kind: 'right';
   readonly right: R;
 }
 
+/**
+ * Left (erroneous) value of type L
+ *
+ * Either data type specialization representing an erroneous value
+ */
 export interface LeftBase<L> {
   readonly kind: 'left';
   readonly left: L;
 }
 
+/**
+ * Either data type: either Right value of type R or Left value of type L
+ */
 export type EitherBase<R, L> = Right<R> | Left<L>;
 
 /**
- * Right (correct) value
- *
- * Either monad specialization representing a right (correct) result
+ * Either monad interface for "Right" specialization
  */
 export interface Right<R> extends RightBase<R> {
+  /**
+   * tap applied to 'right value' returns self invoking op(value) in process
+   */
   tap(op: (value: R) => void): Right<R>;
   /**
    * fmap applied to 'right value' returns 'right op(value)'
@@ -25,40 +39,63 @@ export interface Right<R> extends RightBase<R> {
    * chain applied to 'right value' returns 'op(value)'
    */
   chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2>;
-
+  /**
+   * tapLeft applied to 'right value' returns self not invoking callback
+   */
   tapLeft(): Right<R>;
+  /**
+   * fmapLeft applied to 'right value' returns self not invoking callback
+   */
   fmapLeft(): Right<R>;
+  /**
+   * chainLeft applied to 'right value' returns self not invoking callback
+   */
   chainLeft(): Right<R>;
 }
 
 /**
- * Right (erroneous) value
- *
- * Either monad specialization representing a left (erroneous) result
+ * Either monad interface for "Left" specialization
  */
 export interface Left<L> extends LeftBase<L> {
+  /**
+   * tap applied to 'left error' returns self not invoking callback
+   */
   tap(): Left<L>;
   /**
-   * fmap applied to 'left error' always returns 'left error'
+   * fmap applied to 'left error' returns self not invoking transformer
    */
   fmap(): Left<L>;
   /**
-   * chain applied to 'left error' always returns 'left error'
+   * chain applied to 'left error' returns self not invoking transformer
    */
   chain(): Left<L>;
-
+  /**
+   * tapLeft applied to 'left error' returns self invoking op(error) in process
+   */
   tapLeft(op: (error: L) => void): Left<L>;
+  /**
+   * fmapLeft applied to 'left error' returns 'just op(error)'
+   */
   fmapLeft<R2>(op: (error: L) => R2): Right<R2>;
+  /**
+   * chainLeft applied to 'left error' returns 'op(error)'
+   */
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R2, L2>;
 }
 
 /**
- * Genric Either monad
+ * Genric Either monad interface
  *
  * As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
  * Used throughout the library to represent the result of failable operations, namely failed tasks
  */
 export type Either<R, L> = EitherBase<R, L> & {
+  /**
+   * Either peeker
+   * @param op callback function to be called with underlying value
+   *
+   * Returns copy of self no matter whether callback was called or not
+   */
   tap(op: (value: R) => void): Either<R, L>;
 
   /**
@@ -84,26 +121,48 @@ export type Either<R, L> = EitherBase<R, L> & {
    *   });
    * }
    * ```
+   *
+   * @note
+   * ```typescript
+   * chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2> | Left<L>; // this version of typings compiles 4 times faster
+   * ```
    */
-  // chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2> | Left<L>; // this version of typings compiles 4 times faster
   chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L | L2>;
 
+  /**
+   * Inverse either peeker
+   * @param op callback function to be called with underlying value
+   *
+   * Returns copy of self no matter whether callback was called or not
+   */
   tapLeft(op: (error: L) => void): Either<R, L>;
 
-  // fmapLeft<R2>(op: (error: L) => R2): Right<R> | Right<R2>; // this version of typings compiles 4 times faster
+  /**
+   * Inverse either fmap tranformer
+   * @param op callback function to be called with underlying error
+   *
+   * Returns self without invoking transformer if wrapped value is not 'left error', effectively acting as a fallback method
+   *
+   * @note
+   * ```typescript
+   * fmapLeft<R2>(op: (error: L) => R2): Right<R> | Right<R2>; // this version of typings compiles 4 times faster
+   * ```
+   */
   fmapLeft<R2>(op: (error: L) => R2): Right<R | R2>;
 
-  // chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Right<R> | Either<R2, L2>; // this version of typings compiles 4 times faster
+  /**
+   * Chain fallback also returning Either
+   * @param op callback function to be called with underlying error
+   *
+   * Returns self without invoking transformer if wrapped value is not 'left error', effectively acting as a fallback method
+   *
+   * @note
+   * ```typescript
+   * chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Right<R> | Either<R2, L2>; // this version of typings compiles 4 times faster
+   * ```
+   */
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
 };
-
-export function isRight<R>(either: Either<R, any>): either is Right<R> {
-  return either.kind === 'right';
-}
-
-export function isLeft<L>(either: Either<any, L>): either is Left<L> {
-  return either.kind === 'left';
-}
 
 class RightClass<R> implements Right<R> {
   readonly kind = 'right';
@@ -115,19 +174,12 @@ class RightClass<R> implements Right<R> {
 
     return this;
   }
-  /**
-   * fmap applied to 'right value' returns 'right op(value)'
-   */
   fmap<R2>(op: (value: R) => R2) {
     return right(op(this.right));
   }
-  /**
-   * chain applied to 'right value' returns 'op(value)'
-   */
   chain<R2, L2>(op: (value: R) => Either<R2, L2>) {
     return op(this.right);
   }
-
   tapLeft() {
     return this;
   }
@@ -147,19 +199,12 @@ class LeftClass<L> implements Left<L> {
   tap() {
     return this;
   }
-  /**
-   * fmap applied to 'left error' always returns 'left error'
-   */
   fmap() {
     return this;
   }
-  /**
-   * chain applied to 'left error' always returns 'left error'
-   */
   chain() {
     return this;
   }
-
   tapLeft(op: (error: L) => void) {
     op(this.left);
 
@@ -173,10 +218,45 @@ class LeftClass<L> implements Left<L> {
   }
 }
 
+/**
+ * Right monad constructor
+ * @param value underlying value
+ */
 export function right<R>(value: R): Right<R> {
   return new RightClass<R>(value);
 }
 
+/**
+ * Left monad constructor
+ * @param error underlying error
+ */
 export function left<L>(error: L): Left<L> {
   return new LeftClass<L>(error);
+}
+
+/**
+ * Pattern mathching for 'right'
+ * @param either 'right value' or 'left error'
+ *
+ * Returns 'true' in case either is right (and resolves argument type to be 'right value')
+ *
+ * @example
+ * ```typescript
+ * if (isRight(either)) {
+ *   console.log(either.rigth)
+ * }
+ * ```
+ */
+export function isRight<R, TT extends Either<R, any>>(either: TT): either is Right<R> & TT {
+  return either.kind === 'right';
+}
+
+/**
+ * Pattern mathching for 'left'
+ * @param either 'right value' or 'left error'
+ *
+ * Returns 'true' in case either is left (and resolves argument type to be 'left error')
+ */
+export function isLeft<L, TT extends Either<any, L>>(either: TT): either is Left<L> & TT {
+  return either.kind === 'left';
 }
