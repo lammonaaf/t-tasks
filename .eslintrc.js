@@ -22,7 +22,8 @@ module.exports = {
     }],
     "prettier/prettier": ["error", {
       "arrowParens": "always",
-      "trailingComma": "all"
+      "trailingComma": "all",
+      "printWidth": 120,
     }]
   }
 }
