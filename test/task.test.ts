@@ -478,8 +478,10 @@ describe('generateTask', () => {
     const callback = jest.fn();
     const startTime = time();
 
-    const task = generateTask(function*() {
-      const value1 = castResult<string>(yield delayedValueTask('data', 400));
+    const task = generateTask(async function*() {
+      const source = await new Promise<string>((resolve) => setTimeout(() => resolve('data'), 100));
+
+      const value1 = castResult<string>(yield delayedValueTask(source, 300));
 
       callback();
 
@@ -504,8 +506,38 @@ describe('generateTask', () => {
     const callback = jest.fn();
     const startTime = time();
 
-    const task = generateTask(function*() {
-      const value1 = castResult<string>(yield delayedValueTask('data', 400));
+    const task = generateTask(async function*() {
+      const source = await new Promise<string>((resolve) => setTimeout(() => resolve('data'), 100));
+
+      const value1 = castResult<string>(yield delayedValueTask(source, 300));
+
+      callback();
+
+      const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
+
+      callback();
+
+      return value2;
+    });
+
+    setTimeout(() => task.cancel(), 200);
+
+    const result = await task.resolve();
+
+    expectTime(startTime, 200);
+
+    expect(callback).toBeCalledTimes(0);
+    expect(isNothing(result)).toBeTruthy();
+  }, 1000);
+
+  it('cancel on first step in 300ms', async () => {
+    const callback = jest.fn();
+    const startTime = time();
+
+    const task = generateTask(async function*() {
+      const source = await new Promise<string>((resolve) => setTimeout(() => resolve('data'), 300));
+
+      const value1 = castResult<string>(yield delayedValueTask(source, 100));
 
       callback();
 

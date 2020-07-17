@@ -9,13 +9,21 @@ export type Rejectable<R> = Either<R, any>;
  * Shortcut for underlying task result type
  */
 export type Cancelable<R> = Maybe<Either<R, any>>;
+/**
+ * Shortcut for a task promise type
+ */
+export type TaskInvoke<R> = Promise<Cancelable<R>>;
+/**
+ * Shortcut for a task cancelation function type
+ */
+export type TaskCancel = (reject?: { error: any }) => void;
 
 /**
  * Task data type consisting of promise and cancel function
  */
 export interface TaskBase<R> {
-  readonly _invoke: Promise<Cancelable<R>>;
-  readonly _cancel: (reject?: { error: any }) => void;
+  readonly _invoke: TaskInvoke<R>;
+  readonly _cancel: TaskCancel;
 }
 
 /**
@@ -76,7 +84,7 @@ export interface Task<R> extends TaskBase<R> {
   /**
    * Return underlying promise in order to await result
    */
-  resolve: () => Promise<Cancelable<R>>;
+  resolve: () => TaskInvoke<R>;
   /**
    * Invoke underlying canel method without error
    */
@@ -86,6 +94,44 @@ export interface Task<R> extends TaskBase<R> {
    */
   reject: (error: any) => void;
 }
+
+/**
+ * Task monad constructor
+ * @param _invoke promise defining task execution
+ * @param _cancel cancelation function
+ *
+ * If reject object is passed to cancelation function the task is considered to be rejected from outside
+ */
+export const task = <R>(_invoke: TaskInvoke<R>, _cancel: TaskCancel): Task<R> => {
+  return new TaskClass<R>(_invoke, _cancel);
+};
+
+/**
+ * Invariant task constructor creating resolved task from plain value
+ * @param value value to be returned upon awaiting
+ */
+export function resolvedTask<R>(value: R) {
+  return task<R>(Promise.resolve(just(right(value))), () => {});
+}
+
+/**
+ * Invariant task constructor creating rejected task from error value
+ * @param error error to be returned upon awaiting
+ */
+export function rejectedTask<R>(error: any) {
+  return task<R>(Promise.resolve(just(left(error))), () => {});
+}
+
+/**
+ * Invariant task constructor creating canceled task
+ */
+export function cancelledTask<R>() {
+  return task<R>(Promise.resolve(nothing()), () => {});
+}
+
+/// --------------------------------------------------------------------------------------
+/// Private section
+/// --------------------------------------------------------------------------------------
 
 function fmapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
   return task(
@@ -204,7 +250,7 @@ function chainTaskRejected<R, R2>(_task: TaskBase<R>, op: (error: any) => Task<R
 }
 
 class TaskClass<R> implements Task<R> {
-  constructor(readonly _invoke: Promise<Maybe<Either<R, any>>>, readonly _cancel: (reject?: { error: any }) => void) {}
+  constructor(readonly _invoke: TaskInvoke<R>, readonly _cancel: TaskCancel) {}
 
   tapCanceled(op: () => void) {
     return tapTaskCanceled(this, op);
@@ -245,20 +291,4 @@ class TaskClass<R> implements Task<R> {
   reject(error: any) {
     return this._cancel({ error });
   }
-}
-
-export const task = <R>(_invoke: Promise<Cancelable<R>>, _cancel: (reject?: { error: any }) => void): Task<R> => {
-  return new TaskClass<R>(_invoke, _cancel);
-};
-
-export function resolvedTask<R>(value: R) {
-  return task<R>(Promise.resolve(just(right(value))), () => {});
-}
-
-export function rejectedTask<R>(error: any) {
-  return task<R>(Promise.resolve(just(left(error))), () => {});
-}
-
-export function cancelledTask<R>() {
-  return task<R>(Promise.resolve(nothing()), () => {});
 }

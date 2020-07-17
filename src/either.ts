@@ -164,6 +164,53 @@ export type Either<R, L> = EitherBase<R, L> & {
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
 };
 
+/**
+ * Right monad constructor
+ * @param value underlying value
+ */
+export function right<R>(value: R): Right<R> {
+  return new RightClass<R>(value);
+}
+
+/**
+ * Left monad constructor
+ * @param error underlying error
+ */
+export function left<L>(error: L): Left<L> {
+  return new LeftClass<L>(error);
+}
+
+/**
+ * Pattern mathching for 'right'
+ * @param either 'right value' or 'left error'
+ *
+ * Returns 'true' in case either is right (and resolves argument type to be 'right value')
+ *
+ * @example
+ * ```typescript
+ * if (isRight(either)) {
+ *   console.log(either.rigth)
+ * }
+ * ```
+ */
+export function isRight<R, TT extends Either<R, any>>(either: TT): either is Right<R> & TT {
+  return either.kind === 'right';
+}
+
+/**
+ * Pattern mathching for 'left'
+ * @param either 'right value' or 'left error'
+ *
+ * Returns 'true' in case either is left (and resolves argument type to be 'left error')
+ */
+export function isLeft<L, TT extends Either<any, L>>(either: TT): either is Left<L> & TT {
+  return either.kind === 'left';
+}
+
+/// --------------------------------------------------------------------------------------
+/// Private section
+/// --------------------------------------------------------------------------------------
+
 class RightClass<R> implements Right<R> {
   readonly kind = 'right';
 
@@ -216,47 +263,4 @@ class LeftClass<L> implements Left<L> {
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>) {
     return op(this.left);
   }
-}
-
-/**
- * Right monad constructor
- * @param value underlying value
- */
-export function right<R>(value: R): Right<R> {
-  return new RightClass<R>(value);
-}
-
-/**
- * Left monad constructor
- * @param error underlying error
- */
-export function left<L>(error: L): Left<L> {
-  return new LeftClass<L>(error);
-}
-
-/**
- * Pattern mathching for 'right'
- * @param either 'right value' or 'left error'
- *
- * Returns 'true' in case either is right (and resolves argument type to be 'right value')
- *
- * @example
- * ```typescript
- * if (isRight(either)) {
- *   console.log(either.rigth)
- * }
- * ```
- */
-export function isRight<R, TT extends Either<R, any>>(either: TT): either is Right<R> & TT {
-  return either.kind === 'right';
-}
-
-/**
- * Pattern mathching for 'left'
- * @param either 'right value' or 'left error'
- *
- * Returns 'true' in case either is left (and resolves argument type to be 'left error')
- */
-export function isLeft<L, TT extends Either<any, L>>(either: TT): either is Left<L> & TT {
-  return either.kind === 'left';
 }

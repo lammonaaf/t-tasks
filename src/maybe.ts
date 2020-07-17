@@ -154,6 +154,52 @@ export type Maybe<R> = MaybeBase<R> & {
   chainNothing<R2>(op: () => Maybe<R2>): Maybe<R | R2>;
 };
 
+/**
+ * Non-empty monad constructor
+ * @param value underlying value
+ */
+export function just<R>(value: R): Just<R> {
+  return new JustClass<R>(value);
+}
+
+/**
+ * Empty monad constructor
+ */
+export function nothing(): Nothing {
+  return new NothingClass();
+}
+
+/**
+ * Pattern mathching for 'just'
+ * @param maybe wrapped value (or absence of it)
+ *
+ * Returns 'true' in case wrapped value exists (and resolves argument type to be 'Just')
+ *
+ * @example
+ * ```typescript
+ * if (isJust(maybe)) {
+ *   console.log(maybe.just)
+ * }
+ * ```
+ */
+export function isJust<R, TT extends Maybe<R>>(maybe: TT): maybe is Just<R> & TT {
+  return maybe.kind === 'just';
+}
+
+/**
+ * Pattern mathching for 'nothing'
+ * @param maybe wrapped value (or absence of it)
+ *
+ * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
+ */
+export function isNothing<TT extends Maybe<any>>(maybe: TT): maybe is Nothing & TT {
+  return maybe.kind === 'nothing';
+}
+
+/// --------------------------------------------------------------------------------------
+/// Private section
+/// --------------------------------------------------------------------------------------
+
 class JustClass<R> implements Just<R> {
   readonly kind = 'just';
 
@@ -204,46 +250,4 @@ class NothingClass implements Nothing {
   chainNothing<R2>(op: () => Maybe<R2>) {
     return op();
   }
-}
-
-/**
- * Non-empty monad constructor
- * @param value underlying value
- */
-export function just<R>(value: R): Just<R> {
-  return new JustClass<R>(value);
-}
-
-/**
- * Empty monad constructor
- */
-export function nothing(): Nothing {
-  return new NothingClass();
-}
-
-/**
- * Pattern mathching for 'just'
- * @param maybe wrapped value (or absence of it)
- *
- * Returns 'true' in case wrapped value exists (and resolves argument type to be 'Just')
- *
- * @example
- * ```typescript
- * if (isJust(maybe)) {
- *   console.log(maybe.just)
- * }
- * ```
- */
-export function isJust<R, TT extends Maybe<R>>(maybe: TT): maybe is Just<R> & TT {
-  return maybe.kind === 'just';
-}
-
-/**
- * Pattern mathching for 'nothing'
- * @param maybe wrapped value (or absence of it)
- *
- * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
- */
-export function isNothing<TT extends Maybe<any>>(maybe: TT): maybe is Nothing & TT {
-  return maybe.kind === 'nothing';
 }
