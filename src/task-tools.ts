@@ -50,9 +50,9 @@ export function liftResult<R>(from: Result<R>): Task<R> {
         },
       );
     }),
-    (reject?: { error: any }) => {
-      if (reject) {
-        globalResolve(just(left(reject.error)));
+    (error: Maybe<any>) => {
+      if (isJust(error)) {
+        globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
       }
@@ -225,9 +225,9 @@ export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]
         },
       );
     }),
-    (reject?: { error: any }) => {
-      if (reject) {
-        globalResolve(just(left(reject.error)));
+    (error: Maybe<any>) => {
+      if (isJust(error)) {
+        globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
       }
@@ -270,9 +270,9 @@ export const timeoutTask = (delay: number): Task<void> => {
         globalResolve = stub;
       }, delay);
     }),
-    (reject?: { error: any }) => {
-      if (reject) {
-        globalResolve(just(left(reject.error)));
+    (error: Maybe<any>) => {
+      if (isJust(error)) {
+        globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
       }

@@ -11,13 +11,79 @@ import {
   castTask,
   castResultCreator,
 } from '../src/task-tools';
-import { isJust, isNothing, isRight, isLeft, resolvedTask, Task } from '../src';
+import { isJust, isNothing, isRight, isLeft, resolvedTask, Task, rejectedTask, canceledTask } from '../src';
 
 const time = () => performance.now();
 const measureTime = (last: number) => time() - last;
 const expectTime = (last: number, limit: number) => expect(Math.abs(measureTime(last) - limit)).toBeLessThan(50);
 
 const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
+
+describe('resolvedTask()', () => {
+  it('creates Task<> containing specified data', async () => {
+    const task = resolvedTask('data');
+
+    const result1 = await task.resolve();
+
+    expect(isJust(result1) && isRight(result1.just) && result1.just.right === 'data').toBeTruthy();
+
+    task.cancel();
+
+    const result2 = await task.resolve();
+
+    expect(isJust(result2) && isRight(result2.just) && result2.just.right === 'data').toBeTruthy();
+
+    task.reject(new Error('Provoked'));
+
+    const result3 = await task.resolve();
+
+    expect(isJust(result3) && isRight(result3.just) && result3.just.right === 'data').toBeTruthy();
+  });
+});
+
+describe('rejectedTask()', () => {
+  it('creates Task<> containing specified error', async () => {
+    const task = rejectedTask('some-string-error');
+
+    const result1 = await task.resolve();
+
+    expect(isJust(result1) && isLeft(result1.just) && result1.just.left === 'some-string-error').toBeTruthy();
+
+    task.cancel();
+
+    const result2 = await task.resolve();
+
+    expect(isJust(result2) && isLeft(result2.just) && result2.just.left === 'some-string-error').toBeTruthy();
+
+    task.reject('some-other-error');
+
+    const result3 = await task.resolve();
+
+    expect(isJust(result3) && isLeft(result3.just) && result3.just.left === 'some-string-error').toBeTruthy();
+  });
+});
+
+describe('canceledTask()', () => {
+  it('creates Task<> containing nothing', async () => {
+    const task = canceledTask();
+
+    const result1 = await task.resolve();
+
+    expect(isNothing(result1)).toBeTruthy();
+
+    task.cancel();
+
+    const result2 = await task.resolve();
+
+    expect(isNothing(result2)).toBeTruthy();
+
+    task.reject('some-other-error');
+
+    const result3 = await task.resolve();
+
+    expect(isNothing(result3)).toBeTruthy();
+  });
+});
 
 describe('tasks', () => {
   it('return 42 in 500ms', async () => {
