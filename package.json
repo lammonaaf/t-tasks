@@ -39,7 +39,7 @@
     "typescript": "^3.9.6"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/lammonaaf/t-tasks.git"
-  }  
+    "type": "git",
+    "url": "https://github.com/lammonaaf/t-tasks.git"
+  }
 }

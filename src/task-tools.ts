@@ -110,7 +110,7 @@ export function liftResultCreator<A extends any[], R>(creator: ResultCreator<A, 
  * });
  * ```
  */
-export const generateTask = <TT extends Task<any>, R>(generator: TaskGenerator<[], TT, R>): Task<R> => {
+export function generateTask<TT extends Task<any>, R>(generator: TaskGenerator<[], TT, R>): Task<R> {
   const iterator = generator();
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
@@ -126,7 +126,7 @@ export const generateTask = <TT extends Task<any>, R>(generator: TaskGenerator<[
   };
 
   return liftResult(Promise.resolve().then(() => iterator.next())).chain(sequentor);
-};
+}
 
 /**
  * Cast helper
@@ -253,7 +253,7 @@ export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]
  * console.log("It's past 1 second and here's a value:", value)
  * ```
  */
-export const timeoutTask = (delay: number): Task<void> => {
+export function timeoutTask(delay: number) {
   let handler: NodeJS.Timeout;
 
   const stub = (_?: Result<Cancelable<void>> | undefined) => {};
@@ -281,12 +281,12 @@ export const timeoutTask = (delay: number): Task<void> => {
       clearTimeout(handler);
     },
   );
-};
+}
 
 /**
  * Under construction
  */
-export const limitTask = <T>(task: Task<T>, limit: Task<void>): Task<T> => {
+export function limitTask<T>(task: Task<T>, limit: Task<void>) {
   const mappedLimit = limit.tap(() => task.cancel());
   const mappedTask = task
     .tap(() => mappedLimit.cancel())
@@ -294,12 +294,12 @@ export const limitTask = <T>(task: Task<T>, limit: Task<void>): Task<T> => {
     .tapRejected(() => mappedLimit.cancel());
 
   return mappedTask;
-};
+}
 
 /**
  * Under construction
  */
-export const repeatTask = <T>(taskCreator: () => Task<T>, repeatCreator: () => Task<void>) => {
+export function repeatTask<T>(taskCreator: () => Task<T>, repeatCreator: () => Task<void>) {
   return generateTask(function*() {
     let result: Maybe<T> = nothing();
 
@@ -313,4 +313,4 @@ export const repeatTask = <T>(taskCreator: () => Task<T>, repeatCreator: () => T
 
     return result.just;
   });
-};
+}
