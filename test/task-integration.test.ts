@@ -17,7 +17,7 @@ import { just, right, left, nothing, rejectedTask, resolvedTask, Task } from '..
 
 const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
 const delayedValuePromise = async <R>(value: R, delay: number) => {
-  return new Promise<R>((resolve) => setTimeout(() => resolve(value), delay));
+  return new Promise((resolve) => setTimeout(resolve, delay)).then(() => value);
 };
 
 describe('basic scenarios', () => {

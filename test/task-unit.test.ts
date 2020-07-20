@@ -64,6 +64,22 @@ describe('rejectedTask()', () => {
 
     expect(result).toStrictEqual(just(left('some-error')));
   });
+
+  it('creates non-fmappable Task', async () => {
+    const task = rejectedTask('some-error').fmap(() => 'some-data');
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(just(left('some-error')));
+  });
+
+  it('creates non-chainable Task', async () => {
+    const task = rejectedTask('some-error').chain(() => resolvedTask('some-data'));
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(just(left('some-error')));
+  });
 });
 
 describe('canceledTask()', () => {
@@ -79,6 +95,22 @@ describe('canceledTask()', () => {
     const task = canceledTask();
 
     task.reject('some-error');
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(nothing());
+  });
+
+  it('creates non-fmappable Task', async () => {
+    const task = canceledTask().fmap(() => 'some-data');
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(nothing());
+  });
+
+  it('creates non-chainable Task', async () => {
+    const task = canceledTask().chain(() => resolvedTask('some-data'));
 
     const result = await task.resolve();
 
