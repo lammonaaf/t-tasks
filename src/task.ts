@@ -16,7 +16,7 @@ export type TaskInvoke<R> = Promise<Cancelable<R>>;
 /**
  * Shortcut for a task cancelation function type
  */
-export type TaskCancel = (reject?: { error: any }) => void;
+export type TaskCancel = (error: Maybe<any>) => void;
 
 /**
  * Task data type consisting of promise and cancel function
@@ -31,7 +31,7 @@ export interface TaskBase<R> {
  */
 export interface Task<R> extends TaskBase<R> {
   /**
-   * Invoke callback when task is cancelled (and only then)
+   * Invoke callback when task is canceled (and only then)
    * @param op callback to invoke
    */
   tapCanceled(op: () => void): Task<R>;
@@ -46,7 +46,7 @@ export interface Task<R> extends TaskBase<R> {
    */
   tap(op: (value: R) => void): Task<R>;
   /**
-   * Invoke transformer when task is cancelled (and only then) and return it's result instead
+   * Invoke transformer when task is canceled (and only then) and return it's result instead
    * @param op transformer to invoke
    * @returns task returning fallback result in case of cancelation
    */
@@ -64,7 +64,7 @@ export interface Task<R> extends TaskBase<R> {
    */
   fmap<R2>(op: (value: R) => R2): Task<R2>;
   /**
-   * Invoke transformer when task is cancelled (and only then) and continue execution with it's result
+   * Invoke transformer when task is canceled (and only then) and continue execution with it's result
    * @param op transformer to invoke
    * @returns task chaining to fallback task in case of cancelation
    */
@@ -125,7 +125,7 @@ export function rejectedTask<R>(error: any) {
 /**
  * Invariant task constructor creating canceled task
  */
-export function cancelledTask<R>() {
+export function canceledTask<R>() {
   return task<R>(Promise.resolve(nothing()), () => {});
 }
 
@@ -201,7 +201,7 @@ function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) =>
         return just(left(e));
       }
     }),
-    (reject?: { error: any }) => globalCancel(reject),
+    (error: Maybe<any>) => globalCancel(error),
   );
 }
 
@@ -210,7 +210,7 @@ function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) =
     if (isJust(maybe)) {
       return op(maybe.just);
     } else {
-      return cancelledTask<R2>();
+      return canceledTask<R2>();
     }
   });
 }
@@ -286,9 +286,9 @@ class TaskClass<R> implements Task<R> {
     return this._invoke;
   }
   cancel() {
-    return this._cancel();
+    return this._cancel(nothing());
   }
   reject(error: any) {
-    return this._cancel({ error });
+    return this._cancel(just(error));
   }
 }

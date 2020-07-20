@@ -13,9 +13,7 @@ export type TaskType<TT extends Task<any>> = ResultType<TT['_invoke']> extends C
 export type ResultCreatorType<TT extends (...args: any[]) => Result<any>> = ResultType<ReturnType<TT>>;
 export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
 
-export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (
-  ...args: A
-) => Generator<TT, R, TaskType<TT>> | AsyncGenerator<TT, R, TaskType<TT>>;
+export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (...args: A) => Generator<TT, R, TaskType<TT>>;
 
 /**
  * Lift from plain value/promise to task resolving to that value
@@ -50,9 +48,9 @@ export function liftResult<R>(from: Result<R>): Task<R> {
         },
       );
     }),
-    (reject?: { error: any }) => {
-      if (reject) {
-        globalResolve(just(left(reject.error)));
+    (error: Maybe<any>) => {
+      if (isJust(error)) {
+        globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
       }
@@ -110,23 +108,19 @@ export function liftResultCreator<A extends any[], R>(creator: ResultCreator<A, 
  * });
  * ```
  */
-export const generateTask = <TT extends Task<any>, R>(generator: TaskGenerator<[], TT, R>): Task<R> => {
+export function generateTask<TT extends Task<any>, R>(generator: TaskGenerator<[], TT, R>): Task<R> {
   const iterator = generator();
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
     return next.done
-      ? resolvedTask<R>(next.value)
+      ? resolvedTask(next.value)
       : next.value
-          .chain((value: TaskType<TT>) => {
-            return liftResult(Promise.resolve().then(() => iterator.next(value))).chain(sequentor);
-          })
-          .chainRejected((error: any) => {
-            return liftResult(Promise.resolve().then(() => iterator.throw(error))).chain(sequentor);
-          });
+          .chain((value) => sequentor(iterator.next(value)))
+          .chainRejected((error) => sequentor(iterator.throw(error)));
   };
 
-  return liftResult(Promise.resolve().then(() => iterator.next())).chain(sequentor);
-};
+  return resolvedTask(undefined).chain(() => sequentor(iterator.next()));
+}
 
 /**
  * Cast helper
@@ -225,9 +219,9 @@ export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]
         },
       );
     }),
-    (reject?: { error: any }) => {
-      if (reject) {
-        globalResolve(just(left(reject.error)));
+    (error: Maybe<any>) => {
+      if (isJust(error)) {
+        globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
       }
@@ -253,7 +247,7 @@ export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]
  * console.log("It's past 1 second and here's a value:", value)
  * ```
  */
-export const timeoutTask = (delay: number): Task<void> => {
+export function timeoutTask(delay: number) {
   let handler: NodeJS.Timeout;
 
   const stub = (_?: Result<Cancelable<void>> | undefined) => {};
@@ -270,9 +264,9 @@ export const timeoutTask = (delay: number): Task<void> => {
         globalResolve = stub;
       }, delay);
     }),
-    (reject?: { error: any }) => {
-      if (reject) {
-        globalResolve(just(left(reject.error)));
+    (error: Maybe<any>) => {
+      if (isJust(error)) {
+        globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
       }
@@ -281,12 +275,12 @@ export const timeoutTask = (delay: number): Task<void> => {
       clearTimeout(handler);
     },
   );
-};
+}
 
 /**
  * Under construction
  */
-export const limitTask = <T>(task: Task<T>, limit: Task<void>): Task<T> => {
+export function limitTask<T>(task: Task<T>, limit: Task<void>) {
   const mappedLimit = limit.tap(() => task.cancel());
   const mappedTask = task
     .tap(() => mappedLimit.cancel())
@@ -294,12 +288,12 @@ export const limitTask = <T>(task: Task<T>, limit: Task<void>): Task<T> => {
     .tapRejected(() => mappedLimit.cancel());
 
   return mappedTask;
-};
+}
 
 /**
  * Under construction
  */
-export const repeatTask = <T>(taskCreator: () => Task<T>, repeatCreator: () => Task<void>) => {
+export function repeatTask<T>(taskCreator: () => Task<T>, repeatCreator: () => Task<void>) {
   return generateTask(function*() {
     let result: Maybe<T> = nothing();
 
@@ -313,4 +307,4 @@ export const repeatTask = <T>(taskCreator: () => Task<T>, repeatCreator: () => T
 
     return result.just;
   });
-};
+}
