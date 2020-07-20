@@ -13,9 +13,7 @@ export type TaskType<TT extends Task<any>> = ResultType<TT['_invoke']> extends C
 export type ResultCreatorType<TT extends (...args: any[]) => Result<any>> = ResultType<ReturnType<TT>>;
 export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
 
-export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (
-  ...args: A
-) => Generator<TT, R, TaskType<TT>> | AsyncGenerator<TT, R, TaskType<TT>>;
+export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (...args: A) => Generator<TT, R, TaskType<TT>>;
 
 /**
  * Lift from plain value/promise to task resolving to that value
@@ -115,17 +113,13 @@ export function generateTask<TT extends Task<any>, R>(generator: TaskGenerator<[
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
     return next.done
-      ? resolvedTask<R>(next.value)
+      ? resolvedTask(next.value)
       : next.value
-          .chain((value: TaskType<TT>) => {
-            return liftResult(Promise.resolve().then(() => iterator.next(value))).chain(sequentor);
-          })
-          .chainRejected((error: any) => {
-            return liftResult(Promise.resolve().then(() => iterator.throw(error))).chain(sequentor);
-          });
+          .chain((value) => sequentor(iterator.next(value)))
+          .chainRejected((error) => sequentor(iterator.throw(error)));
   };
 
-  return liftResult(Promise.resolve().then(() => iterator.next())).chain(sequentor);
+  return resolvedTask(undefined).chain(() => sequentor(iterator.next()));
 }
 
 /**
