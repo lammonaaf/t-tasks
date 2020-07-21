@@ -41,5 +41,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/lammonaaf/t-tasks.git"
-  }
+  },
+  "keywords": ["tasks", "flow", "monad", "cancelable"]
 }
