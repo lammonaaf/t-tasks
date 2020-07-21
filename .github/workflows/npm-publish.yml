@@ -57,6 +57,7 @@ jobs:
         with:
           node-version: 12.x
           registry-url: https://registry.npmjs.org/
+      - run: yarn install --frozen-lockfile
       - run: yarn publish
         env:
           CI: true
@@ -71,6 +72,7 @@ jobs:
         with:
           node-version: 12.x
           registry-url: https://npm.pkg.github.com/
+      - run: yarn install --frozen-lockfile
       - run: yarn publish
         env:
           CI: true
