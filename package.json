@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -41,5 +41,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/lammonaaf/t-tasks.git"
-  }
+  },
+  "keywords": ["tasks", "flow", "monad", "cancelable"]
 }
