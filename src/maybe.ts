@@ -182,7 +182,7 @@ export function nothing(): Nothing {
  * }
  * ```
  */
-export function isJust<R, TT extends Maybe<R>>(maybe: TT): maybe is Just<R> & TT {
+export function isJust<R>(maybe: Maybe<R>): maybe is Just<R> {
   return maybe.kind === 'just';
 }
 
@@ -192,7 +192,7 @@ export function isJust<R, TT extends Maybe<R>>(maybe: TT): maybe is Just<R> & TT
  *
  * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
  */
-export function isNothing<TT extends Maybe<any>>(maybe: TT): maybe is Nothing & TT {
+export function isNothing(maybe: Maybe<any>): maybe is Nothing {
   return maybe.kind === 'nothing';
 }
 

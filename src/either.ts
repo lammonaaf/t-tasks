@@ -193,7 +193,7 @@ export function left<L>(error: L): Left<L> {
  * }
  * ```
  */
-export function isRight<R, TT extends Either<R, any>>(either: TT): either is Right<R> & TT {
+export function isRight<R>(either: Either<R, any>): either is Right<R> {
   return either.kind === 'right';
 }
 
@@ -203,7 +203,7 @@ export function isRight<R, TT extends Either<R, any>>(either: TT): either is Rig
  *
  * Returns 'true' in case either is left (and resolves argument type to be 'left error')
  */
-export function isLeft<L, TT extends Either<any, L>>(either: TT): either is Left<L> & TT {
+export function isLeft<L>(either: Either<any, L>): either is Left<L> {
   return either.kind === 'left';
 }
 
