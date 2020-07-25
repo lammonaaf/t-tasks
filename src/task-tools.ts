@@ -2,22 +2,20 @@ import { Maybe, just, nothing, isJust } from './maybe';
 import { right, left, isRight } from './either';
 import { Task, task, resolvedTask, Cancelable } from './task';
 
-export type Result<R> = PromiseLike<R> | R;
+export type PromiseFunction<A extends any[], R> = (...args: A) => PromiseLike<R>;
+export type TaskFunction<A extends any[], R> = (...args: A) => Task<R>;
 
-export type ResultCreator<A extends any[], R> = (...args: A) => Result<R>;
-export type TaskCreator<A extends any[], R> = (...args: A) => Task<R>;
+export type PromiseType<T extends PromiseLike<any>> = T extends PromiseLike<infer U> ? U : never;
+export type TaskType<TT extends Task<any>> = PromiseType<TT['_invoke']> extends Cancelable<infer U> ? U : never;
 
-export type ResultType<T> = T extends PromiseLike<infer U> ? U : T;
-export type TaskType<TT extends Task<any>> = ResultType<TT['_invoke']> extends Cancelable<infer U> ? U : never;
-
-export type ResultCreatorType<TT extends (...args: any[]) => Result<any>> = ResultType<ReturnType<TT>>;
-export type TaskCreatorType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
+export type PromiseFunctionType<TT extends (...args: any[]) => PromiseLike<any>> = PromiseType<ReturnType<TT>>;
+export type TaskFunctionType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
 
 export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (...args: A) => Generator<TT, R, TaskType<TT>>;
 
 /**
  * Lift from plain value/promise to task resolving to that value
- * @param from promise or plain value to be resolved
+ * @param promise promise or plain value to be resolved
  *
  * Userfull for converting promises to tasks
  * If converted task is canceled or failed externally return value will be ignored without side-effects
@@ -28,8 +26,8 @@ export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (...args: 
  * const task = liftTask(someAsyncOperation('someData')).fmap((result) => result.length);
  * ```
  */
-export function liftResult<R>(from: Result<R>): Task<R> {
-  const stub = (_?: Result<Cancelable<R>> | undefined) => {};
+export function liftPromise<R>(promise: PromiseLike<R>): Task<R> {
+  const stub = (_?: Cancelable<R> | PromiseLike<Cancelable<R>> | undefined) => {};
 
   let globalResolve = stub;
 
@@ -37,7 +35,7 @@ export function liftResult<R>(from: Result<R>): Task<R> {
     new Promise<Cancelable<R>>((resolve) => {
       globalResolve = resolve;
 
-      Promise.resolve(from).then(
+      promise.then(
         (value) => {
           globalResolve(just(right(value)));
           globalResolve = stub;
@@ -61,26 +59,26 @@ export function liftResult<R>(from: Result<R>): Task<R> {
 
 /**
  * Lift from function returning value/promise to function returning task resolving to that value
- * @param creator function returning promise or plain value to be resolved
+ * @param promiseFunction function returning promise or plain value to be resolved
  *
- * Userfull for converting exising async functions to task creators for further use
+ * Userfull for converting exising async functions to task functions for further use
  *
  * @see liftTask
  *
  * @example
  * ```typescript
- * const taskCreator = liftTaskCreator(someAsyncOperation);
+ * const taskFunction = liftPromiseFunction(someAsyncOperation);
  *
- * const task = taskCreator('someData').fmap((result) => result.length);
+ * const task = taskFunction('someData').fmap((result) => result.length);
  * ```
  */
-export function liftResultCreator<A extends any[], R>(creator: ResultCreator<A, R>): TaskCreator<A, R> {
-  return (...args: A) => liftResult(creator(...args));
+export function liftPromiseFunction<A extends any[], R>(promiseFunction: PromiseFunction<A, R>): TaskFunction<A, R> {
+  return (...args: A) => liftPromise(promiseFunction(...args));
 }
 
 /**
  * Create compound task from generator function
- * @param generator (optionally async) generator function
+ * @param taskGenerator (optionally async) generator function
  *
  * Applying yield to task within the generator function awaits task and returns underlying value in case of success
  *
@@ -97,9 +95,9 @@ export function liftResultCreator<A extends any[], R>(creator: ResultCreator<A, 
  *   try {
  *     const source = await getData();
  *
- *     const value1 = castResult<string>(yield delayedValueTask(source, 400));
+ *     const value1 = castPromise<string>(yield delayedValueTask(source, 400));
  *
- *     const value2 = castResult<number>(yield delayedValueTask(value1.length, 300));
+ *     const value2 = castPromise<number>(yield delayedValueTask(value1.length, 300));
  *
  *     return value2;
  *   } catch (e) {
@@ -108,8 +106,8 @@ export function liftResultCreator<A extends any[], R>(creator: ResultCreator<A, 
  * });
  * ```
  */
-export function generateTask<TT extends Task<any>, R>(generator: TaskGenerator<[], TT, R>): Task<R> {
-  const iterator = generator();
+export function generateTask<TT extends Task<any>, R>(taskGenerator: TaskGenerator<[], TT, R>): Task<R> {
+  const iterator = taskGenerator();
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
     return next.done
@@ -122,13 +120,17 @@ export function generateTask<TT extends Task<any>, R>(generator: TaskGenerator<[
   return resolvedTask(undefined).chain(() => sequentor(iterator.next()));
 }
 
+export function cast<T, R extends T = any>(arg: R): T {
+  return arg as T;
+}
+
 /**
  * Cast helper
  * @param arg plain value of some compatible type
  * @returns arg casted to the type of specified promise or plain value type
  */
-export function castResult<TT extends Result<any>, R extends ResultType<TT> = any>(arg: R): ResultType<TT> {
-  return arg as ResultType<TT>;
+export function castPromise<TT extends PromiseLike<any>, R extends PromiseType<TT> = any>(arg: R): PromiseType<TT> {
+  return arg as PromiseType<TT>;
 }
 
 /**
@@ -145,10 +147,10 @@ export function castTask<TT extends Task<any>, R extends TaskType<TT> = any>(arg
  * @param arg plain value of some compatible type
  * @returns arg casted to the return type of specified function returning promise or plain value
  */
-export function castResultCreator<TT extends ResultCreator<any[], any>, R extends ResultCreatorType<TT> = any>(
+export function castPromiseFunction<TT extends PromiseFunction<any[], any>, R extends PromiseFunctionType<TT> = any>(
   arg: R,
-): ResultCreatorType<TT> {
-  return arg as ResultCreatorType<TT>;
+): PromiseFunctionType<TT> {
+  return arg as PromiseFunctionType<TT>;
 }
 
 /**
@@ -156,37 +158,39 @@ export function castResultCreator<TT extends ResultCreator<any[], any>, R extend
  * @param arg plain value of some compatible type
  * @returns arg casted to the reoslve type of specified function returning task
  */
-export function castTaskCreator<TT extends TaskCreator<any[], any>, R extends TaskCreatorType<TT> = any>(
+export function castTaskFunction<TT extends TaskFunction<any[], any>, R extends TaskFunctionType<TT> = any>(
   arg: R,
-): TaskCreatorType<TT> {
-  return arg as TaskCreatorType<TT>;
+): TaskFunctionType<TT> {
+  return arg as TaskFunctionType<TT>;
 }
 
 /**
  * Chain multiple tasks one after another
- * @param taskCreators list of task creators (without arguments)
+ * @param taskFunctions list of task functions (without arguments)
  * @returns composite task invoring every task in order and resolving to the list of results
  */
-export function sequenceTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]): Task<TaskCreatorType<TT>[]> {
-  return taskCreators.reduce((prev, taskCreator) => {
+export function sequenceTask<TT extends TaskFunction<[], any>>(taskFunctions: TT[]): Task<TaskFunctionType<TT>[]> {
+  return taskFunctions.reduce((prev, taskFunction) => {
     return prev.chain((list) => {
-      return taskCreator().fmap((value) => list.concat(value));
+      return taskFunction().fmap((value) => list.concat(value));
     });
-  }, resolvedTask<TaskCreatorType<TT>[]>([]));
+  }, resolvedTask<TaskFunctionType<TT>[]>([]));
 }
 
 /**
  * Under construction
  */
-export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]): Task<TaskCreatorType<TT>[]> {
-  const stub = (_?: Result<Cancelable<TaskCreatorType<TT>[]>> | undefined) => {};
+export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT[]): Task<TaskFunctionType<TT>[]> {
+  const stub = (
+    _?: Cancelable<TaskFunctionType<TT>[]> | PromiseLike<Cancelable<TaskFunctionType<TT>[]>> | undefined,
+  ) => {};
 
   let globalResolve = stub;
 
-  const tasks = taskCreators.map((creator) => creator());
+  const tasks = taskFunctions.map((taskFunction) => taskFunction());
 
   return task(
-    new Promise<Cancelable<TaskCreatorType<TT>[]>>((resolve) => {
+    new Promise<Cancelable<TaskFunctionType<TT>[]>>((resolve) => {
       globalResolve = resolve;
 
       Promise.all(
@@ -242,7 +246,7 @@ export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]
  * ```typescript
  * const delayedValueTask = <T>(value: T, delay: number) => timeoutTask(delay).fmap(() => value);
  *
- * const value = castResult<number>(yield delayedValueTask(42, 1000));
+ * const value = castPromise<number>(yield delayedValueTask(42, 1000));
  *
  * console.log("It's past 1 second and here's a value:", value)
  * ```
@@ -250,7 +254,7 @@ export function parallelTask<TT extends TaskCreator<[], any>>(taskCreators: TT[]
 export function timeoutTask(delay: number) {
   let handler: NodeJS.Timeout;
 
-  const stub = (_?: Result<Cancelable<void>> | undefined) => {};
+  const stub = (_?: Cancelable<void> | PromiseLike<Cancelable<void>> | undefined) => {};
 
   let globalResolve = stub;
 
@@ -293,15 +297,15 @@ export function limitTask<T>(task: Task<T>, limit: Task<void>) {
 /**
  * Under construction
  */
-export function repeatTask<T>(taskCreator: () => Task<T>, repeatCreator: () => Task<void>) {
+export function repeatTask<T>(taskFunction: TaskFunction<[], T>, repeatFunction: TaskFunction<[], void>) {
   return generateTask(function*() {
     let result: Maybe<T> = nothing();
 
     do {
       try {
-        result = just(castTaskCreator<typeof taskCreator>(yield taskCreator()));
+        result = just(castTaskFunction<typeof taskFunction>(yield taskFunction()));
       } catch (error) {
-        yield repeatCreator();
+        yield repeatFunction();
       }
     } while (!isJust(result));
 

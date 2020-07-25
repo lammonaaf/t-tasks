@@ -13,7 +13,7 @@ Sometimes (for example, within React hooks) you need to cancel any ongoing async
 Keep in mind, that pure promises are still not cancelable, so the original function will still finish. In this scenario we can only elliminate side effects within task composition chain.
 
 ```typescript
-const task = liftResult(someAsyncFunction())
+const task = liftPromise(someAsyncFunction())
   .fmap((result) => {
     setSomething(result); // side-effects
   });
@@ -26,7 +26,7 @@ task.cancel(); // prevent unwanted side effects
 In this scenario if one cancels the task during first operation, the seconf one would not be initiated at all
 
 ```typescript
-const task = liftResult(someAsyncFunction())
+const task = liftPromise(someAsyncFunction())
   .chain((result1) => otherAsyncFunction(result1))
   .fmap((result2) => {
     setSomething(result); // side-effects
@@ -37,16 +37,16 @@ task.cancel(); // prevent unwanted side effects
 
 ### Chain multiple async functions via generator
 
-In this scenario is identical to the previous one except of using generator syntax. Note usage of ```castResultCreator``` it is required due to typescript being unable to predict types correctly. The library provides some ready-to use convinience casting functions, however even a ```() as Something``` is enough.
+In this scenario is identical to the previous one except of using generator syntax. Note usage of ```castPromiseFunction``` it is required due to typescript being unable to predict types correctly. The library provides some ready-to use convinience casting functions, however even a ```() as Something``` is enough.
 
 ```typescript
 const task = generateTask(function*() {
-  const result1 = castResultCreator<typeof someAsyncFunction>(
-    yield liftResult(someAsyncFunction()),
+  const result1 = castPromiseFunction<typeof someAsyncFunction>(
+    yield liftPromise(someAsyncFunction()),
   );
 
-  const result2 = castResultCreator<typeof otherAsyncFunction>(
-    yield liftResult(otherAsyncFunction(result1)),
+  const result2 = castPromiseFunction<typeof otherAsyncFunction>(
+    yield liftPromise(otherAsyncFunction(result1)),
   );
   
   setSomething(result2); // side-effects
@@ -64,8 +64,8 @@ const task = generateTask(function*() {
   let result1: number;
 
   try {
-    result1 = castResult<number>(
-      yield liftResult(someAsyncFunction()),
+    result1 = castPromise<number>(
+      yield liftPromise(someAsyncFunction()),
     );
   } catch (e) {
     console.error(e);
@@ -73,8 +73,8 @@ const task = generateTask(function*() {
     result1 = 42; // Sometimes we have to give an answer in time i guess
   }
 
-  const result2 = castResultCreator<typeof otherAsyncFunction>(
-    yield liftResult(otherAsyncFunction(result1)),
+  const result2 = castPromiseFunction<typeof otherAsyncFunction>(
+    yield liftPromise(otherAsyncFunction(result1)),
   );
   
   setSomething(result2); // side-effects
