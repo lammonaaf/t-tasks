@@ -9,19 +9,14 @@ export type Rejectable<R> = Either<R, any>;
  * Shortcut for underlying task result type
  */
 export type Cancelable<R> = Maybe<Either<R, any>>;
-/**
- * Shortcut for a task promise type
- */
-export type TaskInvoke<R> = Promise<Cancelable<R>>;
-/**
- * Shortcut for a task cancelation function type
- */
-export type TaskCancel = (error: Maybe<any>) => void;
+
+type TaskInvoke<R> = Promise<Cancelable<R>>;
+type TaskCancel = (error: Maybe<any>) => void;
 
 /**
  * Task data type consisting of promise and cancel function
  */
-export interface TaskBase<R> {
+interface TaskBase<R> {
   readonly _invoke: TaskInvoke<R>;
   readonly _cancel: TaskCancel;
 }

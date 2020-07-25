@@ -3,29 +3,10 @@
  *
  * Maybe data type specialization representing an existing value
  */
-export interface JustBase<R> {
+export interface Just<R> {
   readonly kind: 'just';
   readonly just: R;
-}
 
-/**
- * Absolutely Nothing
- *
- * Maybe data type specialiation representing an absence of any value
- */
-export interface NothingBase {
-  readonly kind: 'nothing';
-}
-
-/**
- * Maybe data type: either Just a value of type R or Nothing
- */
-export type MaybeBase<R> = JustBase<R> | NothingBase;
-
-/**
- * Maybe monad interface for "Just" specialization
- */
-export interface Just<R> extends JustBase<R> {
   /**
    * tap applied to 'just value' returns self invoking op(value) in process
    */
@@ -53,9 +34,13 @@ export interface Just<R> extends JustBase<R> {
 }
 
 /**
- * Maybe monad interface for "Nothing" specialization
+ * Absolutely Nothing
+ *
+ * Maybe data type specialiation representing an absence of any value
  */
-export interface Nothing extends NothingBase {
+export interface Nothing {
+  readonly kind: 'nothing';
+
   /**
    * tap applied to 'nothing' returns self not invoking callback
    */
@@ -88,7 +73,10 @@ export interface Nothing extends NothingBase {
  * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
  */
-export type Maybe<R> = MaybeBase<R> & {
+export interface Maybe<R> {
+  readonly kind: 'just' | 'nothing';
+  readonly just?: R;
+
   /**
    * Maybe peeker
    * @param op callback function to be called with underlying value
@@ -152,7 +140,7 @@ export type Maybe<R> = MaybeBase<R> & {
    * ```
    */
   chainNothing<R2>(op: () => Maybe<R2>): Maybe<R | R2>;
-};
+}
 
 /**
  * Non-empty monad constructor
