@@ -3,15 +3,16 @@
 import {
   timeoutTask,
   generateTask,
-  castResult,
-  liftResult,
-  liftResultCreator,
+  cast,
+  castPromise,
+  liftPromise,
+  liftPromiseFunction,
   repeatTask,
   limitTask,
   parallelTask,
   sequenceTask,
   castTask,
-  castResultCreator,
+  castPromiseFunction,
 } from '../src/task-tools';
 import { just, right, left, nothing, rejectedTask, resolvedTask, Task } from '../src';
 
@@ -799,7 +800,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = castResultCreator<() => number>(yield delayedValueTask(data.length, 200));
+      const length = castPromiseFunction<() => Promise<number>>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -851,7 +852,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = castResultCreator<() => number>(yield delayedValueTask(data.length, 200));
+      const length = castPromiseFunction<() => Promise<number>>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -887,11 +888,11 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = generateTask(function*() {
-      const data = castResult<string>(yield delayedValueTask('data', 100));
+      const data = cast<string>(yield delayedValueTask('data', 100));
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -939,11 +940,11 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = generateTask(function*() {
-      const data = castResult<string>(yield delayedValueTask('data', 100));
+      const data = castPromise<Promise<string>>(yield delayedValueTask('data', 100));
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -979,11 +980,11 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = generateTask(function*() {
-      const data = castResult<string>(yield delayedValueTask('data', 100));
+      const data = castPromise<Promise<string>>(yield delayedValueTask('data', 100));
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1034,11 +1035,11 @@ describe('generated scenarios', () => {
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
-      const data = castResult<string>(yield delayedValueTask('data', 50));
+      const data = cast<string>(yield delayedValueTask('data', 50));
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1070,7 +1071,7 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = generateTask(function*() {
-      const data = castResult<string>(
+      const data = cast<string>(
         yield delayedValueTask('data', 50).tap(() => {
           throw 'some-error';
         }),
@@ -1078,7 +1079,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1110,14 +1111,14 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = generateTask(function*() {
-      const data = castResult<string>(yield delayedValueTask('data', 100));
+      const data = cast<string>(yield delayedValueTask('data', 100));
 
       resolved(data);
 
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1149,11 +1150,11 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = generateTask(function*() {
-      const data = castResult<string>(yield delayedValueTask('data', 100));
+      const data = cast<string>(yield delayedValueTask('data', 100));
 
       resolved(data);
 
-      const length = castResult<number>(
+      const length = cast<number>(
         yield delayedValueTask(data.length, 50).tap(() => {
           throw 'some-error';
         }),
@@ -1203,7 +1204,7 @@ describe('generated scenarios', () => {
     const task = generateTask(function*() {
       let data: string;
       try {
-        data = castResult<string>(yield delayedValueTask('data', 100));
+        data = cast<string>(yield delayedValueTask('data', 100));
       } catch (e) {
         rejected(e);
 
@@ -1212,7 +1213,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1260,7 +1261,7 @@ describe('generated scenarios', () => {
     const task = generateTask(function*() {
       let data: string;
       try {
-        data = castResult<string>(
+        data = cast<string>(
           yield delayedValueTask('data', 50).tap(() => {
             throw 'some-error';
           }),
@@ -1273,7 +1274,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = castResult<number>(yield delayedValueTask(data.length, 200));
+      const length = cast<number>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1310,7 +1311,7 @@ describe('generated scenarios', () => {
   });
 });
 
-describe('liftResult scenarios', () => {
+describe('liftPromise scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1331,7 +1332,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftResult(delayedValuePromise(42, 100))
+    const task = liftPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1362,7 +1363,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftResult(delayedValuePromise(42, 100))
+    const task = liftPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1393,7 +1394,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftResult(delayedValuePromise(42, 100))
+    const task = liftPromise(delayedValuePromise(42, 100))
       .fmapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1424,7 +1425,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftResult(delayedValuePromise(42, 100))
+    const task = liftPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1455,7 +1456,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn(() => 63);
     const resolved = jest.fn();
 
-    const task = liftResult(delayedValuePromise(42, 100))
+    const task = liftPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .fmapRejected(rejected)
       .tap(resolved);
@@ -1486,7 +1487,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftResult(delayedValuePromise(42, 50))
+    const task = liftPromise(delayedValuePromise(42, 50))
       .tap(() => {
         throw 'some-error';
       })
@@ -1516,7 +1517,7 @@ describe('liftResult scenarios', () => {
     const rejected = jest.fn(() => 63);
     const resolved = jest.fn();
 
-    const task = liftResult(
+    const task = liftPromise(
       new Promise<number>((_, reject) => setTimeout(() => reject('some-error'), 50)),
     )
       .tapCanceled(canceled)
@@ -1541,7 +1542,7 @@ describe('liftResult scenarios', () => {
   });
 });
 
-describe('liftResultCreator scenarios', () => {
+describe('liftPromiseFunction scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1562,9 +1563,9 @@ describe('liftResultCreator scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const resultCreator = liftResultCreator(delayedValuePromise);
+    const promiseFunction = liftPromiseFunction(delayedValuePromise);
 
-    const task = resultCreator(42, 100)
+    const task = promiseFunction(42, 100)
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1608,7 +1609,7 @@ describe('repeatTask scenarios', () => {
   };
 
   it('resolve in 1300ms', async () => {
-    const resultCreator = jest
+    const promiseFunction = jest
       .fn(() => 45)
       .mockImplementationOnce(() => {
         throw new Error('Error 1');
@@ -1619,43 +1620,43 @@ describe('repeatTask scenarios', () => {
       .mockImplementationOnce(() => {
         return 42;
       });
-    const taskCreator = jest
-      .fn(() => timeoutTask(300).fmap(resultCreator))
-      .mockImplementationOnce(() => timeoutTask(300).fmap(resultCreator))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator));
+    const taskFunction = jest
+      .fn(() => timeoutTask(300).fmap(promiseFunction))
+      .mockImplementationOnce(() => timeoutTask(300).fmap(promiseFunction))
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction));
 
-    const task = repeatTask(taskCreator, () => timeoutTask(200));
+    const task = repeatTask(taskFunction, () => timeoutTask(200));
 
     await advanceTime(300);
 
-    expect(taskCreator).toBeCalledTimes(1);
-    expect(resultCreator).toBeCalledTimes(1);
-    expect(resultCreator).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(1);
+    expect(promiseFunction).toBeCalledTimes(1);
+    expect(promiseFunction).toReturnTimes(0);
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(2);
-    expect(resultCreator).toBeCalledTimes(1);
-    expect(resultCreator).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(2);
+    expect(promiseFunction).toBeCalledTimes(1);
+    expect(promiseFunction).toReturnTimes(0);
 
     await advanceTime(400);
 
-    expect(taskCreator).toBeCalledTimes(2);
-    expect(resultCreator).toBeCalledTimes(2);
-    expect(resultCreator).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(2);
+    expect(promiseFunction).toBeCalledTimes(2);
+    expect(promiseFunction).toReturnTimes(0);
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator).toBeCalledTimes(2);
-    expect(resultCreator).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction).toBeCalledTimes(2);
+    expect(promiseFunction).toReturnTimes(0);
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator).toBeCalledTimes(3);
-    expect(resultCreator).toReturnTimes(1);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction).toBeCalledTimes(3);
+    expect(promiseFunction).toReturnTimes(1);
 
     const result = await task.resolve();
 
@@ -1794,27 +1795,27 @@ describe('parallelTask', () => {
   };
 
   it('succeed in 600ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = parallelTask([taskCreator, taskCreator, taskCreator]);
+    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(600);
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(1);
-    expect(resultCreator2).toBeCalledTimes(1);
-    expect(resultCreator2).toReturnTimes(1);
-    expect(resultCreator3).toBeCalledTimes(1);
-    expect(resultCreator3).toReturnTimes(1);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(1);
+    expect(promiseFunction2).toBeCalledTimes(1);
+    expect(promiseFunction2).toReturnTimes(1);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(1);
 
     const result = await task.resolve();
 
@@ -1822,17 +1823,17 @@ describe('parallelTask', () => {
   });
 
   it('cancel in 300ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = parallelTask([taskCreator, taskCreator, taskCreator]);
+    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(300);
 
@@ -1840,13 +1841,13 @@ describe('parallelTask', () => {
 
     await flushPromises();
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator1).toBeCalledTimes(0);
-    expect(resultCreator1).toReturnTimes(0);
-    expect(resultCreator2).toBeCalledTimes(0);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(1);
-    expect(resultCreator3).toReturnTimes(1);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(0);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(1);
 
     const result = await task.resolve();
 
@@ -1854,17 +1855,17 @@ describe('parallelTask', () => {
   });
 
   it('fail externally in 300ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = parallelTask([taskCreator, taskCreator, taskCreator]);
+    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(300);
 
@@ -1872,13 +1873,13 @@ describe('parallelTask', () => {
 
     await flushPromises();
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator1).toBeCalledTimes(0);
-    expect(resultCreator1).toReturnTimes(0);
-    expect(resultCreator2).toBeCalledTimes(0);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(1);
-    expect(resultCreator3).toReturnTimes(1);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(0);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(1);
 
     const result = await task.resolve();
 
@@ -1886,32 +1887,32 @@ describe('parallelTask', () => {
   });
 
   it('fail internally in 400ms', async () => {
-    const resultCreator1 = jest.fn(() => {
+    const promiseFunction1 = jest.fn(() => {
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
       return 40;
     });
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = parallelTask([taskCreator, taskCreator, taskCreator]);
+    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(0);
-    expect(resultCreator2).toBeCalledTimes(0);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(1);
-    expect(resultCreator3).toReturnTimes(1);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(1);
 
     const result = await task.resolve();
 
@@ -1936,17 +1937,17 @@ describe('sequenceTask', () => {
   };
 
   it('succeed in 600ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = sequenceTask([taskCreator, taskCreator, taskCreator]);
+    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -1954,13 +1955,13 @@ describe('sequenceTask', () => {
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(3);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(1);
-    expect(resultCreator2).toBeCalledTimes(1);
-    expect(resultCreator2).toReturnTimes(1);
-    expect(resultCreator3).toBeCalledTimes(1);
-    expect(resultCreator3).toReturnTimes(1);
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(1);
+    expect(promiseFunction2).toBeCalledTimes(1);
+    expect(promiseFunction2).toReturnTimes(1);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(1);
 
     const result = await task.resolve();
 
@@ -1968,17 +1969,17 @@ describe('sequenceTask', () => {
   });
 
   it('cancel in 500ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = sequenceTask([taskCreator, taskCreator, taskCreator]);
+    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -1992,13 +1993,13 @@ describe('sequenceTask', () => {
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(2);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(1);
-    expect(resultCreator2).toBeCalledTimes(0);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(0);
-    expect(resultCreator3).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(2);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(1);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(0);
+    expect(promiseFunction3).toReturnTimes(0);
 
     const result = await task.resolve();
 
@@ -2006,17 +2007,17 @@ describe('sequenceTask', () => {
   });
 
   it('fail externally in 500ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = sequenceTask([taskCreator, taskCreator, taskCreator]);
+    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2030,13 +2031,13 @@ describe('sequenceTask', () => {
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(2);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(1);
-    expect(resultCreator2).toBeCalledTimes(0);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(0);
-    expect(resultCreator3).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(2);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(1);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(0);
+    expect(promiseFunction3).toReturnTimes(0);
 
     const result = await task.resolve();
 
@@ -2044,22 +2045,22 @@ describe('sequenceTask', () => {
   });
 
   it('fail internally in 400ms', async () => {
-    const resultCreator1 = jest.fn(() => {
+    const promiseFunction1 = jest.fn(() => {
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
       return 40;
     });
-    const resultCreator2 = jest.fn(() => 41);
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = sequenceTask([taskCreator, taskCreator, taskCreator]);
+    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2067,13 +2068,13 @@ describe('sequenceTask', () => {
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(1);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(0);
-    expect(resultCreator2).toBeCalledTimes(0);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(0);
-    expect(resultCreator3).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(1);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(0);
+    expect(promiseFunction3).toReturnTimes(0);
 
     const result = await task.resolve();
 
@@ -2081,22 +2082,22 @@ describe('sequenceTask', () => {
   });
 
   it('fail internally in 1000ms', async () => {
-    const resultCreator1 = jest.fn(() => 40);
-    const resultCreator2 = jest.fn(() => {
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => {
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
       return 41;
     });
-    const resultCreator3 = jest.fn(() => 42);
+    const promiseFunction3 = jest.fn(() => 42);
 
-    const taskCreator = jest
+    const taskFunction = jest
       .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(resultCreator1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(resultCreator2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(resultCreator3));
+      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
+      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
+      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
 
-    const task = sequenceTask([taskCreator, taskCreator, taskCreator]);
+    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2104,13 +2105,13 @@ describe('sequenceTask', () => {
 
     await advanceTime(200);
 
-    expect(taskCreator).toBeCalledTimes(2);
-    expect(resultCreator1).toBeCalledTimes(1);
-    expect(resultCreator1).toReturnTimes(1);
-    expect(resultCreator2).toBeCalledTimes(1);
-    expect(resultCreator2).toReturnTimes(0);
-    expect(resultCreator3).toBeCalledTimes(0);
-    expect(resultCreator3).toReturnTimes(0);
+    expect(taskFunction).toBeCalledTimes(2);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(1);
+    expect(promiseFunction2).toBeCalledTimes(1);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(0);
+    expect(promiseFunction3).toReturnTimes(0);
 
     const result = await task.resolve();
 

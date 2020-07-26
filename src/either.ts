@@ -3,30 +3,10 @@
  *
  * Either data type specialization representing a correct value
  */
-export interface RightBase<R> {
+export interface Right<R> {
   readonly kind: 'right';
   readonly right: R;
-}
 
-/**
- * Left (erroneous) value of type L
- *
- * Either data type specialization representing an erroneous value
- */
-export interface LeftBase<L> {
-  readonly kind: 'left';
-  readonly left: L;
-}
-
-/**
- * Either data type: either Right value of type R or Left value of type L
- */
-export type EitherBase<R, L> = Right<R> | Left<L>;
-
-/**
- * Either monad interface for "Right" specialization
- */
-export interface Right<R> extends RightBase<R> {
   /**
    * tap applied to 'right value' returns self invoking op(value) in process
    */
@@ -54,9 +34,14 @@ export interface Right<R> extends RightBase<R> {
 }
 
 /**
- * Either monad interface for "Left" specialization
+ * Left (erroneous) value of type L
+ *
+ * Either data type specialization representing an erroneous value
  */
-export interface Left<L> extends LeftBase<L> {
+export interface Left<L> {
+  readonly kind: 'left';
+  readonly left: L;
+
   /**
    * tap applied to 'left error' returns self not invoking callback
    */
@@ -84,12 +69,16 @@ export interface Left<L> extends LeftBase<L> {
 }
 
 /**
- * Genric Either monad interface
+ * Either data type: either Right value of type R or Left value of type L
  *
  * As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
  * Used throughout the library to represent the result of failable operations, namely failed tasks
  */
-export type Either<R, L> = EitherBase<R, L> & {
+export interface Either<R, L> {
+  readonly kind: 'left' | 'right';
+  readonly right?: R;
+  readonly left?: L;
+
   /**
    * Either peeker
    * @param op callback function to be called with underlying value
@@ -162,7 +151,7 @@ export type Either<R, L> = EitherBase<R, L> & {
    * ```
    */
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
-};
+}
 
 /**
  * Right monad constructor
