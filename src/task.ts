@@ -3,81 +3,97 @@ import { Either, right, isRight, left } from './either';
 
 /**
  * Shortcut for monadic Either type, where erroneous value is of type any
+ *
+ * @template R underlying type
  */
 export type Rejectable<R> = Either<R, any>;
+
 /**
  * Shortcut for underlying task result type
+ *
+ * @template R underlying type
  */
 export type Cancelable<R> = Maybe<Either<R, any>>;
 
-type TaskInvoke<R> = Promise<Cancelable<R>>;
-type TaskCancel = (error: Maybe<any>) => void;
-
-/**
- * Task data type consisting of promise and cancel function
- */
-interface TaskBase<R> {
-  readonly _invoke: TaskInvoke<R>;
-  readonly _cancel: TaskCancel;
-}
-
 /**
  * Task monad interface
+ *
+ * @template R task resolve type
  */
 export interface Task<R> extends TaskBase<R> {
   /**
    * Invoke callback when task is canceled (and only then)
+   *
    * @param op callback to invoke
+   * @returns self
    */
   tapCanceled(op: () => void): Task<R>;
   /**
    * Invoke callback when task is rejected (and only then)
+   *
    * @param op callback to invoke
+   * @returns self
    */
   tapRejected(op: (error: any) => void): Task<R>;
   /**
    * Invoke callback when task is resolved (and only then)
+   *
    * @param op callback to invoke
+   * @returns self
    */
   tap(op: (value: R) => void): Task<R>;
   /**
    * Invoke transformer when task is canceled (and only then) and return it's result instead
+   *
+   * @template R2 fallback return type
    * @param op transformer to invoke
    * @returns task returning fallback result in case of cancelation
    */
   fmapCanceled<R2>(op: () => R2): Task<R | R2>;
   /**
    * Invoke transformer when task is rejected (and only then) and return it's result instead
+   *
+   * @template R2 fallback return type
    * @param op transformer to invoke
    * @returns task returning fallback result in case of failure
    */
   fmapRejected<R2>(op: (error: any) => R2): Task<R | R2>;
   /**
    * Invoke transformer when task is resolved (and only then) and return it's result instead
+   *
+   * @template R2 transformer return type
    * @param op transformer to invoke
    * @returns task returning transformer result
    */
   fmap<R2>(op: (value: R) => R2): Task<R2>;
   /**
    * Invoke transformer when task is canceled (and only then) and continue execution with it's result
+   *
+   * @template R2 fallback task resolve type
    * @param op transformer to invoke
    * @returns task chaining to fallback task in case of cancelation
    */
   chainCanceled<R2>(op: () => Task<R2>): Task<R | R2>;
   /**
    * Invoke transformer when task is rejected (and only then) and continue execution with it's result
+   *
+   * @template R2 fallback task resolve type
    * @param op transformer to invoke
    * @returns task chaining to fallback task in case of failure
    */
   chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>;
   /**
    * Invoke transformer when task is resolved (and only then) and continue execution with it's result
+   *
+   * @template R2 transformer task resolve type
    * @param op transformer to invoke
    * @returns task chaining to transformer result task
    */
   chain<R2>(op: (value: R) => Task<R2>): Task<R2>;
   /**
    * Return underlying promise in order to await result
+   *
+   * @returns underlying promise
    */
   resolve: () => TaskInvoke<R>;
   /**
@@ -86,24 +102,32 @@ export interface Task<R> extends TaskBase<R> {
   cancel: () => void;
   /**
    * Invoke underlying canel method with error
+   *
+   * @param error error value to be injected from outside
    */
   reject: (error: any) => void;
 }
 
 /**
- * Task monad constructor
- * @param _invoke promise defining task execution
- * @param _cancel cancelation function
+ * Custom task monad constructor
  *
- * If reject object is passed to cancelation function the task is considered to be rejected from outside
+ * @template R returned task's resolve type
+ * @param invoke promise defining task execution
+ * @param cancel cancelation function
+ * @returns task resolving to resolve value of invoke
+ *
+ * @note low-level primitive for creating custom tasks, not intended for general use
  */
-export const task = <R>(_invoke: TaskInvoke<R>, _cancel: TaskCancel): Task<R> => {
-  return new TaskClass<R>(_invoke, _cancel);
-};
+export function task<R>(invoke: TaskInvoke<R>, cancel: TaskCancel): Task<R> {
+  return new TaskClass<R>(invoke, cancel);
+}
 
 /**
  * Invariant task constructor creating resolved task from plain value
+ *
+ * @template R returned task's resolve type
  * @param value value to be returned upon awaiting
+ * @returns task resolving to specified value
  */
 export function resolvedTask<R>(value: R) {
   return task<R>(Promise.resolve(just(right(value))), () => {});
@@ -111,7 +135,10 @@ export function resolvedTask<R>(value: R) {
 
 /**
  * Invariant task constructor creating rejected task from error value
+ *
+ * @template R returned task's resolve type
  * @param error error to be returned upon awaiting
+ * @returns task resolving to specified value
  */
 export function rejectedTask<R>(error: any) {
   return task<R>(Promise.resolve(just(left(error))), () => {});
@@ -119,6 +146,9 @@ export function rejectedTask<R>(error: any) {
 
 /**
  * Invariant task constructor creating canceled task
+ *
+ * @template R returned task's resolve type
+ * @returns task resolving to specified value
  */
 export function canceledTask<R>() {
   return task<R>(Promise.resolve(nothing()), () => {});
@@ -127,6 +157,14 @@ export function canceledTask<R>() {
 /// --------------------------------------------------------------------------------------
 /// Private section
 /// --------------------------------------------------------------------------------------
+
+type TaskInvoke<R> = Promise<Cancelable<R>>;
+type TaskCancel = (error: Maybe<any>) => void;
+
+interface TaskBase<R> {
+  readonly _invoke: TaskInvoke<R>;
+  readonly _cancel: TaskCancel;
+}
 
 function fmapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
   return task(

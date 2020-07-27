@@ -16,7 +16,7 @@
     "test": "tsdx test",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
-    "docs": "typedoc --out ./docs ./src"
+    "docs": "typedoc --excludeNotExported --out ./docs ./src"
   },
   "peerDependencies": {},
   "husky": {
