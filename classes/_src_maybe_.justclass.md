@@ -40,7 +40,7 @@
 
 \+ **new JustClass**(`just`: R): *[JustClass](_src_maybe_.justclass.md)*
 
-*Defined in [src/maybe.ts:192](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L192)*
+*Defined in [src/maybe.ts:192](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L192)*
 
 **Parameters:**
 
@@ -58,7 +58,7 @@ Name | Type |
 
 *Implementation of [Just](../interfaces/_src_maybe_.just.md).[just](../interfaces/_src_maybe_.just.md#readonly-just)*
 
-*Defined in [src/maybe.ts:194](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L194)*
+*Defined in [src/maybe.ts:194](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L194)*
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 *Implementation of [Just](../interfaces/_src_maybe_.just.md).[kind](../interfaces/_src_maybe_.just.md#readonly-kind)*
 
-*Defined in [src/maybe.ts:192](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L192)*
+*Defined in [src/maybe.ts:192](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L192)*
 
 ## Methods
 
@@ -76,7 +76,7 @@ ___
 
 ▸ **chain**‹**R2**›(`op`: function): *[Maybe](../interfaces/_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:204](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L204)*
+*Defined in [src/maybe.ts:204](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L204)*
 
 **Type parameters:**
 
@@ -104,7 +104,7 @@ ___
 
 *Implementation of [Just](../interfaces/_src_maybe_.just.md)*
 
-*Defined in [src/maybe.ts:213](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L213)*
+*Defined in [src/maybe.ts:213](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L213)*
 
 **Returns:** *this*
 
@@ -114,7 +114,7 @@ ___
 
 ▸ **fmap**‹**R2**›(`op`: function): *[Just](../interfaces/_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:201](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L201)*
+*Defined in [src/maybe.ts:201](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L201)*
 
 **Type parameters:**
 
@@ -142,7 +142,7 @@ ___
 
 *Implementation of [Just](../interfaces/_src_maybe_.just.md)*
 
-*Defined in [src/maybe.ts:210](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L210)*
+*Defined in [src/maybe.ts:210](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L210)*
 
 **Returns:** *this*
 
@@ -152,7 +152,7 @@ ___
 
 ▸ **tap**(`op`: function): *this*
 
-*Defined in [src/maybe.ts:196](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L196)*
+*Defined in [src/maybe.ts:196](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L196)*
 
 **Parameters:**
 
@@ -176,6 +176,6 @@ ___
 
 *Implementation of [Just](../interfaces/_src_maybe_.just.md)*
 
-*Defined in [src/maybe.ts:207](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L207)*
+*Defined in [src/maybe.ts:207](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L207)*
 
 **Returns:** *this*

@@ -27,7 +27,7 @@ Task data type consisting of promise and cancel function
 
 • **_cancel**: *[TaskCancel](../modules/_src_task_.md#taskcancel)*
 
-*Defined in [src/task.ts:21](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L21)*
+*Defined in [src/task.ts:21](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L21)*
 
 ___
 
@@ -35,4 +35,4 @@ ___
 
 • **_invoke**: *[TaskInvoke](../modules/_src_task_.md#taskinvoke)‹R›*
 
-*Defined in [src/task.ts:20](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L20)*
+*Defined in [src/task.ts:20](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L20)*

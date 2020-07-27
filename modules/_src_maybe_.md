@@ -28,7 +28,7 @@
 
 ▸ **isJust**‹**R**›(`maybe`: [Maybe](../interfaces/_src_maybe_.maybe.md)‹R›): *maybe is Just<R>*
 
-*Defined in [src/maybe.ts:173](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L173)*
+*Defined in [src/maybe.ts:173](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L173)*
 
 Pattern mathching for 'just'
 
@@ -57,7 +57,7 @@ ___
 
 ▸ **isNothing**(`maybe`: [Maybe](../interfaces/_src_maybe_.maybe.md)‹any›): *maybe is Nothing*
 
-*Defined in [src/maybe.ts:183](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L183)*
+*Defined in [src/maybe.ts:183](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L183)*
 
 Pattern mathching for 'nothing'
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **just**‹**R**›(`value`: R): *[Just](../interfaces/_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:149](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L149)*
+*Defined in [src/maybe.ts:149](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L149)*
 
 Non-empty monad constructor
 
@@ -97,7 +97,7 @@ ___
 
 ▸ **nothing**(): *[Nothing](../interfaces/_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:156](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L156)*
+*Defined in [src/maybe.ts:156](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L156)*
 
 Empty monad constructor
 

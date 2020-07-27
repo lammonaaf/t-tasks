@@ -40,7 +40,7 @@ Used throughout the library to represent the result of failable operations, name
 
 • **kind**: *"left" | "right"*
 
-*Defined in [src/either.ts:78](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L78)*
+*Defined in [src/either.ts:78](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L78)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **left**? : *L*
 
-*Defined in [src/either.ts:80](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L80)*
+*Defined in [src/either.ts:80](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L80)*
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 • **right**? : *R*
 
-*Defined in [src/either.ts:79](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L79)*
+*Defined in [src/either.ts:79](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L79)*
 
 ## Methods
 
@@ -64,7 +64,7 @@ ___
 
 ▸ **chain**‹**R2**, **L2**›(`op`: function): *[Either](_src_either_.either.md)‹R2, L | L2›*
 
-*Defined in [src/either.ts:119](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L119)*
+*Defined in [src/either.ts:119](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L119)*
 
 Chain multiple functions returning Either
 
@@ -113,7 +113,7 @@ ___
 
 ▸ **chainLeft**‹**R2**, **L2**›(`op`: function): *[Either](_src_either_.either.md)‹R | R2, L2›*
 
-*Defined in [src/either.ts:153](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L153)*
+*Defined in [src/either.ts:153](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L153)*
 
 Chain fallback also returning Either
 
@@ -152,7 +152,7 @@ ___
 
 ▸ **fmap**‹**R2**›(`op`: function): *[Either](_src_either_.either.md)‹R2, L›*
 
-*Defined in [src/either.ts:96](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L96)*
+*Defined in [src/either.ts:96](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L96)*
 
 Either fmap transformer
 
@@ -184,7 +184,7 @@ ___
 
 ▸ **fmapLeft**‹**R2**›(`op`: function): *[Right](_src_either_.right.md)‹R | R2›*
 
-*Defined in [src/either.ts:140](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L140)*
+*Defined in [src/either.ts:140](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L140)*
 
 Inverse either fmap tranformer
 
@@ -221,7 +221,7 @@ ___
 
 ▸ **tap**(`op`: function): *[Either](_src_either_.either.md)‹R, L›*
 
-*Defined in [src/either.ts:88](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L88)*
+*Defined in [src/either.ts:88](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L88)*
 
 Either peeker
 
@@ -249,7 +249,7 @@ ___
 
 ▸ **tapLeft**(`op`: function): *[Either](_src_either_.either.md)‹R, L›*
 
-*Defined in [src/either.ts:127](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L127)*
+*Defined in [src/either.ts:127](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L127)*
 
 Inverse either peeker
 

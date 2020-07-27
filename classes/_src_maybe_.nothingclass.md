@@ -33,7 +33,7 @@
 
 *Implementation of [Nothing](../interfaces/_src_maybe_.nothing.md).[kind](../interfaces/_src_maybe_.nothing.md#readonly-kind)*
 
-*Defined in [src/maybe.ts:219](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L219)*
+*Defined in [src/maybe.ts:219](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L219)*
 
 ## Methods
 
@@ -43,7 +43,7 @@
 
 *Implementation of [Nothing](../interfaces/_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:227](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L227)*
+*Defined in [src/maybe.ts:227](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L227)*
 
 **Returns:** *this*
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **chainNothing**‹**R2**›(`op`: function): *[Maybe](../interfaces/_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:238](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L238)*
+*Defined in [src/maybe.ts:238](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L238)*
 
 **Type parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 *Implementation of [Nothing](../interfaces/_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:224](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L224)*
+*Defined in [src/maybe.ts:224](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L224)*
 
 **Returns:** *this*
 
@@ -85,7 +85,7 @@ ___
 
 ▸ **fmapNothing**‹**R2**›(`op`: function): *[Just](../interfaces/_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:235](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L235)*
+*Defined in [src/maybe.ts:235](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L235)*
 
 **Type parameters:**
 
@@ -107,7 +107,7 @@ ___
 
 *Implementation of [Nothing](../interfaces/_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:221](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L221)*
+*Defined in [src/maybe.ts:221](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L221)*
 
 **Returns:** *this*
 
@@ -117,7 +117,7 @@ ___
 
 ▸ **tapNothing**(`op`: function): *this*
 
-*Defined in [src/maybe.ts:230](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L230)*
+*Defined in [src/maybe.ts:230](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L230)*
 
 **Parameters:**
 

@@ -48,7 +48,7 @@ Task monad interface
 
 *Inherited from [TaskBase](_src_task_.taskbase.md).[_cancel](_src_task_.taskbase.md#readonly-_cancel)*
 
-*Defined in [src/task.ts:21](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L21)*
+*Defined in [src/task.ts:21](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L21)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 *Inherited from [TaskBase](_src_task_.taskbase.md).[_invoke](_src_task_.taskbase.md#readonly-_invoke)*
 
-*Defined in [src/task.ts:20](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L20)*
+*Defined in [src/task.ts:20](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L20)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **cancel**: *function*
 
-*Defined in [src/task.ts:86](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L86)*
+*Defined in [src/task.ts:86](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L86)*
 
 Invoke underlying canel method without error
 
@@ -80,7 +80,7 @@ ___
 
 • **reject**: *function*
 
-*Defined in [src/task.ts:90](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L90)*
+*Defined in [src/task.ts:90](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L90)*
 
 Invoke underlying canel method with error
 
@@ -100,7 +100,7 @@ ___
 
 • **resolve**: *function*
 
-*Defined in [src/task.ts:82](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L82)*
+*Defined in [src/task.ts:82](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L82)*
 
 Return underlying promise in order to await result
 
@@ -114,7 +114,7 @@ Return underlying promise in order to await result
 
 ▸ **chain**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:78](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L78)*
+*Defined in [src/task.ts:78](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L78)*
 
 Invoke transformer when task is resolved (and only then) and continue execution with it's result
 
@@ -146,7 +146,7 @@ ___
 
 ▸ **chainCanceled**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:66](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L66)*
+*Defined in [src/task.ts:66](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L66)*
 
 Invoke transformer when task is canceled (and only then) and continue execution with it's result
 
@@ -172,7 +172,7 @@ ___
 
 ▸ **chainRejected**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:72](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L72)*
+*Defined in [src/task.ts:72](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L72)*
 
 Invoke transformer when task is rejected (and only then) and continue execution with it's result
 
@@ -204,7 +204,7 @@ ___
 
 ▸ **fmap**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:60](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L60)*
+*Defined in [src/task.ts:60](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L60)*
 
 Invoke transformer when task is resolved (and only then) and return it's result instead
 
@@ -236,7 +236,7 @@ ___
 
 ▸ **fmapCanceled**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:48](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L48)*
+*Defined in [src/task.ts:48](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L48)*
 
 Invoke transformer when task is canceled (and only then) and return it's result instead
 
@@ -262,7 +262,7 @@ ___
 
 ▸ **fmapRejected**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:54](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L54)*
+*Defined in [src/task.ts:54](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L54)*
 
 Invoke transformer when task is rejected (and only then) and return it's result instead
 
@@ -294,7 +294,7 @@ ___
 
 ▸ **tap**(`op`: function): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:42](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L42)*
+*Defined in [src/task.ts:42](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L42)*
 
 Invoke callback when task is resolved (and only then)
 
@@ -320,7 +320,7 @@ ___
 
 ▸ **tapCanceled**(`op`: function): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:32](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L32)*
+*Defined in [src/task.ts:32](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L32)*
 
 Invoke callback when task is canceled (and only then)
 
@@ -340,7 +340,7 @@ ___
 
 ▸ **tapRejected**(`op`: function): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:37](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L37)*
+*Defined in [src/task.ts:37](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L37)*
 
 Invoke callback when task is rejected (and only then)
 

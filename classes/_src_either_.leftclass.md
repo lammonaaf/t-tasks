@@ -40,7 +40,7 @@
 
 \+ **new LeftClass**(`left`: L): *[LeftClass](_src_either_.leftclass.md)*
 
-*Defined in [src/either.ts:231](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L231)*
+*Defined in [src/either.ts:231](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L231)*
 
 **Parameters:**
 
@@ -58,7 +58,7 @@ Name | Type |
 
 *Implementation of [Left](../interfaces/_src_either_.left.md).[kind](../interfaces/_src_either_.left.md#readonly-kind)*
 
-*Defined in [src/either.ts:231](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L231)*
+*Defined in [src/either.ts:231](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L231)*
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 *Implementation of [Left](../interfaces/_src_either_.left.md).[left](../interfaces/_src_either_.left.md#readonly-left)*
 
-*Defined in [src/either.ts:233](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L233)*
+*Defined in [src/either.ts:233](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L233)*
 
 ## Methods
 
@@ -78,7 +78,7 @@ ___
 
 *Implementation of [Left](../interfaces/_src_either_.left.md)*
 
-*Defined in [src/either.ts:241](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L241)*
+*Defined in [src/either.ts:241](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L241)*
 
 **Returns:** *this*
 
@@ -88,7 +88,7 @@ ___
 
 ▸ **chainLeft**‹**R2**, **L2**›(`op`: function): *[Either](../interfaces/_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:252](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L252)*
+*Defined in [src/either.ts:252](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L252)*
 
 **Type parameters:**
 
@@ -118,7 +118,7 @@ ___
 
 *Implementation of [Left](../interfaces/_src_either_.left.md)*
 
-*Defined in [src/either.ts:238](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L238)*
+*Defined in [src/either.ts:238](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L238)*
 
 **Returns:** *this*
 
@@ -128,7 +128,7 @@ ___
 
 ▸ **fmapLeft**‹**R2**›(`op`: function): *[Right](../interfaces/_src_either_.right.md)‹R2›*
 
-*Defined in [src/either.ts:249](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L249)*
+*Defined in [src/either.ts:249](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L249)*
 
 **Type parameters:**
 
@@ -156,7 +156,7 @@ ___
 
 *Implementation of [Left](../interfaces/_src_either_.left.md)*
 
-*Defined in [src/either.ts:235](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L235)*
+*Defined in [src/either.ts:235](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L235)*
 
 **Returns:** *this*
 
@@ -166,7 +166,7 @@ ___
 
 ▸ **tapLeft**(`op`: function): *this*
 
-*Defined in [src/either.ts:244](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L244)*
+*Defined in [src/either.ts:244](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L244)*
 
 **Parameters:**
 

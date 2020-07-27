@@ -48,7 +48,7 @@
 
 Ƭ **Cancelable**: *[Maybe](../interfaces/_src_maybe_.maybe.md)‹[Either](../interfaces/_src_either_.either.md)‹R, any››*
 
-*Defined in [src/task.ts:11](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L11)*
+*Defined in [src/task.ts:11](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L11)*
 
 Shortcut for underlying task result type
 
@@ -58,7 +58,7 @@ ___
 
 Ƭ **Rejectable**: *[Either](../interfaces/_src_either_.either.md)‹R, any›*
 
-*Defined in [src/task.ts:7](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L7)*
+*Defined in [src/task.ts:7](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L7)*
 
 Shortcut for monadic Either type, where erroneous value is of type any
 
@@ -68,7 +68,7 @@ ___
 
 Ƭ **TaskCancel**: *function*
 
-*Defined in [src/task.ts:14](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L14)*
+*Defined in [src/task.ts:14](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L14)*
 
 #### Type declaration:
 
@@ -86,7 +86,7 @@ ___
 
 Ƭ **TaskInvoke**: *Promise‹[Cancelable](_src_task_.md#cancelable)‹R››*
 
-*Defined in [src/task.ts:13](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L13)*
+*Defined in [src/task.ts:13](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L13)*
 
 ## Functions
 
@@ -94,7 +94,7 @@ ___
 
 ▸ **canceledTask**‹**R**›(): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:123](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L123)*
+*Defined in [src/task.ts:123](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L123)*
 
 Invariant task constructor creating canceled task
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **chainTask**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:213](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L213)*
+*Defined in [src/task.ts:213](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L213)*
 
 **Type parameters:**
 
@@ -140,7 +140,7 @@ ___
 
 ▸ **chainTaskCanceled**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:223](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L223)*
+*Defined in [src/task.ts:223](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L223)*
 
 **Type parameters:**
 
@@ -164,7 +164,7 @@ ___
 
 ▸ **chainTaskEither**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:203](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L203)*
+*Defined in [src/task.ts:203](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L203)*
 
 **Type parameters:**
 
@@ -194,7 +194,7 @@ ___
 
 ▸ **chainTaskMaybe**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:184](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L184)*
+*Defined in [src/task.ts:184](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L184)*
 
 **Type parameters:**
 
@@ -224,7 +224,7 @@ ___
 
 ▸ **chainTaskRejected**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:237](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L237)*
+*Defined in [src/task.ts:237](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L237)*
 
 **Type parameters:**
 
@@ -254,7 +254,7 @@ ___
 
 ▸ **fmapTask**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:148](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L148)*
+*Defined in [src/task.ts:148](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L148)*
 
 **Type parameters:**
 
@@ -284,7 +284,7 @@ ___
 
 ▸ **fmapTaskCanceled**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:152](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L152)*
+*Defined in [src/task.ts:152](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L152)*
 
 **Type parameters:**
 
@@ -308,7 +308,7 @@ ___
 
 ▸ **fmapTaskEither**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:144](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L144)*
+*Defined in [src/task.ts:144](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L144)*
 
 **Type parameters:**
 
@@ -338,7 +338,7 @@ ___
 
 ▸ **fmapTaskMaybe**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:131](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L131)*
+*Defined in [src/task.ts:131](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L131)*
 
 **Type parameters:**
 
@@ -368,7 +368,7 @@ ___
 
 ▸ **fmapTaskRejected**‹**R**, **R2**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:156](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L156)*
+*Defined in [src/task.ts:156](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L156)*
 
 **Type parameters:**
 
@@ -398,7 +398,7 @@ ___
 
 ▸ **rejectedTask**‹**R**›(`error`: any): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:116](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L116)*
+*Defined in [src/task.ts:116](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L116)*
 
 Invariant task constructor creating rejected task from error value
 
@@ -420,7 +420,7 @@ ___
 
 ▸ **resolvedTask**‹**R**›(`value`: R): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:108](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L108)*
+*Defined in [src/task.ts:108](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L108)*
 
 Invariant task constructor creating resolved task from plain value
 
@@ -442,7 +442,7 @@ ___
 
 ▸ **tapTask**‹**R**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:172](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L172)*
+*Defined in [src/task.ts:172](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L172)*
 
 **Type parameters:**
 
@@ -470,7 +470,7 @@ ___
 
 ▸ **tapTaskCanceled**‹**R**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:176](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L176)*
+*Defined in [src/task.ts:176](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L176)*
 
 **Type parameters:**
 
@@ -492,7 +492,7 @@ ___
 
 ▸ **tapTaskEither**‹**R**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:168](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L168)*
+*Defined in [src/task.ts:168](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L168)*
 
 **Type parameters:**
 
@@ -520,7 +520,7 @@ ___
 
 ▸ **tapTaskMaybe**‹**R**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:160](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L160)*
+*Defined in [src/task.ts:160](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L160)*
 
 **Type parameters:**
 
@@ -548,7 +548,7 @@ ___
 
 ▸ **tapTaskRejected**‹**R**›(`_task`: [TaskBase](../interfaces/_src_task_.taskbase.md)‹R›, `op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:180](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L180)*
+*Defined in [src/task.ts:180](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L180)*
 
 **Type parameters:**
 
@@ -576,7 +576,7 @@ ___
 
 ▸ **task**‹**R**›(`_invoke`: [TaskInvoke](_src_task_.md#taskinvoke)‹R›, `_cancel`: [TaskCancel](_src_task_.md#taskcancel)): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:100](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L100)*
+*Defined in [src/task.ts:100](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L100)*
 
 Task monad constructor
 

@@ -35,7 +35,7 @@ Maybe data type specialiation representing an absence of any value
 
 • **kind**: *"nothing"*
 
-*Defined in [src/maybe.ts:42](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L42)*
+*Defined in [src/maybe.ts:42](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L42)*
 
 ## Methods
 
@@ -43,7 +43,7 @@ Maybe data type specialiation representing an absence of any value
 
 ▸ **chain**(): *[Nothing](_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:55](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L55)*
+*Defined in [src/maybe.ts:55](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L55)*
 
 chain applied to 'nothing' returns self not invoking transformer
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **chainNothing**‹**R2**›(`op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:67](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L67)*
+*Defined in [src/maybe.ts:67](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L67)*
 
 chainNothing applied to 'nothing' returns op()
 
@@ -77,7 +77,7 @@ ___
 
 ▸ **fmap**(): *[Nothing](_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:51](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L51)*
+*Defined in [src/maybe.ts:51](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L51)*
 
 fmap applied to 'nothing' returns self not invoking transformer
 
@@ -89,7 +89,7 @@ ___
 
 ▸ **fmapNothing**‹**R2**›(`op`: function): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:63](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L63)*
+*Defined in [src/maybe.ts:63](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L63)*
 
 fmapNothing applied to 'nothing' returns just(op())
 
@@ -111,7 +111,7 @@ ___
 
 ▸ **tap**(): *[Nothing](_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:47](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L47)*
+*Defined in [src/maybe.ts:47](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L47)*
 
 tap applied to 'nothing' returns self not invoking callback
 
@@ -123,7 +123,7 @@ ___
 
 ▸ **tapNothing**(`op`: function): *[Nothing](_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:59](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L59)*
+*Defined in [src/maybe.ts:59](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L59)*
 
 tapNothing applied to 'nothing' returns self invoking op() in process
 

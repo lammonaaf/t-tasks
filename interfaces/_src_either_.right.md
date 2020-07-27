@@ -40,7 +40,7 @@ Either data type specialization representing a correct value
 
 • **kind**: *"right"*
 
-*Defined in [src/either.ts:7](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L7)*
+*Defined in [src/either.ts:7](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L7)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **right**: *R*
 
-*Defined in [src/either.ts:8](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L8)*
+*Defined in [src/either.ts:8](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L8)*
 
 ## Methods
 
@@ -56,7 +56,7 @@ ___
 
 ▸ **chain**‹**R2**, **L2**›(`op`: function): *[Either](_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:21](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L21)*
+*Defined in [src/either.ts:21](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L21)*
 
 chain applied to 'right value' returns 'op(value)'
 
@@ -86,7 +86,7 @@ ___
 
 ▸ **chainLeft**(): *[Right](_src_either_.right.md)‹R›*
 
-*Defined in [src/either.ts:33](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L33)*
+*Defined in [src/either.ts:33](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L33)*
 
 chainLeft applied to 'right value' returns self not invoking callback
 
@@ -98,7 +98,7 @@ ___
 
 ▸ **fmap**‹**R2**›(`op`: function): *[Right](_src_either_.right.md)‹R2›*
 
-*Defined in [src/either.ts:17](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L17)*
+*Defined in [src/either.ts:17](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L17)*
 
 fmap applied to 'right value' returns 'right op(value)'
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **fmapLeft**(): *[Right](_src_either_.right.md)‹R›*
 
-*Defined in [src/either.ts:29](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L29)*
+*Defined in [src/either.ts:29](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L29)*
 
 fmapLeft applied to 'right value' returns self not invoking callback
 
@@ -138,7 +138,7 @@ ___
 
 ▸ **tap**(`op`: function): *[Right](_src_either_.right.md)‹R›*
 
-*Defined in [src/either.ts:13](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L13)*
+*Defined in [src/either.ts:13](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L13)*
 
 tap applied to 'right value' returns self invoking op(value) in process
 
@@ -162,7 +162,7 @@ ___
 
 ▸ **tapLeft**(): *[Right](_src_either_.right.md)‹R›*
 
-*Defined in [src/either.ts:25](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L25)*
+*Defined in [src/either.ts:25](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L25)*
 
 tapLeft applied to 'right value' returns self not invoking callback
 

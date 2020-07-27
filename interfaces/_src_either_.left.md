@@ -40,7 +40,7 @@ Either data type specialization representing an erroneous value
 
 • **kind**: *"left"*
 
-*Defined in [src/either.ts:42](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L42)*
+*Defined in [src/either.ts:42](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L42)*
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 • **left**: *L*
 
-*Defined in [src/either.ts:43](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L43)*
+*Defined in [src/either.ts:43](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L43)*
 
 ## Methods
 
@@ -56,7 +56,7 @@ ___
 
 ▸ **chain**(): *[Left](_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:56](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L56)*
+*Defined in [src/either.ts:56](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L56)*
 
 chain applied to 'left error' returns self not invoking transformer
 
@@ -68,7 +68,7 @@ ___
 
 ▸ **chainLeft**‹**R2**, **L2**›(`op`: function): *[Either](_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:68](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L68)*
+*Defined in [src/either.ts:68](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L68)*
 
 chainLeft applied to 'left error' returns 'op(error)'
 
@@ -98,7 +98,7 @@ ___
 
 ▸ **fmap**(): *[Left](_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:52](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L52)*
+*Defined in [src/either.ts:52](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L52)*
 
 fmap applied to 'left error' returns self not invoking transformer
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **fmapLeft**‹**R2**›(`op`: function): *[Right](_src_either_.right.md)‹R2›*
 
-*Defined in [src/either.ts:64](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L64)*
+*Defined in [src/either.ts:64](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L64)*
 
 fmapLeft applied to 'left error' returns 'just op(error)'
 
@@ -138,7 +138,7 @@ ___
 
 ▸ **tap**(): *[Left](_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:48](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L48)*
+*Defined in [src/either.ts:48](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L48)*
 
 tap applied to 'left error' returns self not invoking callback
 
@@ -150,7 +150,7 @@ ___
 
 ▸ **tapLeft**(`op`: function): *[Left](_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:60](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L60)*
+*Defined in [src/either.ts:60](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L60)*
 
 tapLeft applied to 'left error' returns self invoking op(error) in process
 

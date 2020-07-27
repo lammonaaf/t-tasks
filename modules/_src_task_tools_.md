@@ -36,7 +36,7 @@
 
 Ƭ **PromiseFunction**: *function*
 
-*Defined in [src/task-tools.ts:5](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L5)*
+*Defined in [src/task-tools.ts:5](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L5)*
 
 #### Type declaration:
 
@@ -54,7 +54,7 @@ ___
 
 Ƭ **PromiseFunctionType**: *[PromiseType](_src_task_tools_.md#promisetype)‹ReturnType‹TT››*
 
-*Defined in [src/task-tools.ts:11](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L11)*
+*Defined in [src/task-tools.ts:11](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L11)*
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 Ƭ **PromiseType**: *T extends PromiseLike<infer U> ? U : never*
 
-*Defined in [src/task-tools.ts:8](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L8)*
+*Defined in [src/task-tools.ts:8](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L8)*
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 Ƭ **TaskFunction**: *function*
 
-*Defined in [src/task-tools.ts:6](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L6)*
+*Defined in [src/task-tools.ts:6](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L6)*
 
 #### Type declaration:
 
@@ -88,7 +88,7 @@ ___
 
 Ƭ **TaskFunctionType**: *[TaskType](_src_task_tools_.md#tasktype)‹ReturnType‹TT››*
 
-*Defined in [src/task-tools.ts:12](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L12)*
+*Defined in [src/task-tools.ts:12](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L12)*
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 Ƭ **TaskGenerator**: *function*
 
-*Defined in [src/task-tools.ts:14](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L14)*
+*Defined in [src/task-tools.ts:14](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L14)*
 
 #### Type declaration:
 
@@ -114,7 +114,7 @@ ___
 
 Ƭ **TaskType**: *PromiseType<TT["_invoke"]> extends Cancelable<infer U> ? U : never*
 
-*Defined in [src/task-tools.ts:9](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L9)*
+*Defined in [src/task-tools.ts:9](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L9)*
 
 ## Functions
 
@@ -122,7 +122,7 @@ ___
 
 ▸ **cast**‹**T**, **R**›(`arg`: R): *T*
 
-*Defined in [src/task-tools.ts:123](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L123)*
+*Defined in [src/task-tools.ts:123](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L123)*
 
 **Type parameters:**
 
@@ -144,7 +144,7 @@ ___
 
 ▸ **castPromise**‹**TT**, **R**›(`arg`: R): *[PromiseType](_src_task_tools_.md#promisetype)‹TT›*
 
-*Defined in [src/task-tools.ts:132](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L132)*
+*Defined in [src/task-tools.ts:132](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L132)*
 
 Cast helper
 
@@ -170,7 +170,7 @@ ___
 
 ▸ **castPromiseFunction**‹**TT**, **R**›(`arg`: R): *[PromiseFunctionType](_src_task_tools_.md#promisefunctiontype)‹TT›*
 
-*Defined in [src/task-tools.ts:150](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L150)*
+*Defined in [src/task-tools.ts:150](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L150)*
 
 Cast helper
 
@@ -196,7 +196,7 @@ ___
 
 ▸ **castTask**‹**TT**, **R**›(`arg`: R): *[TaskType](_src_task_tools_.md#tasktype)‹TT›*
 
-*Defined in [src/task-tools.ts:141](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L141)*
+*Defined in [src/task-tools.ts:141](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L141)*
 
 Cast helper
 
@@ -222,7 +222,7 @@ ___
 
 ▸ **castTaskFunction**‹**TT**, **R**›(`arg`: R): *[TaskFunctionType](_src_task_tools_.md#taskfunctiontype)‹TT›*
 
-*Defined in [src/task-tools.ts:161](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L161)*
+*Defined in [src/task-tools.ts:161](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L161)*
 
 Cast helper
 
@@ -248,7 +248,7 @@ ___
 
 ▸ **generateTask**‹**TT**, **R**›(`taskGenerator`: [TaskGenerator](_src_task_tools_.md#taskgenerator)‹[], TT, R›): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task-tools.ts:109](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L109)*
+*Defined in [src/task-tools.ts:109](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L109)*
 
 Create compound task from generator function
 
@@ -293,7 +293,7 @@ ___
 
 ▸ **liftPromise**‹**R**›(`promise`: PromiseLike‹R›): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task-tools.ts:29](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L29)*
+*Defined in [src/task-tools.ts:29](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L29)*
 
 Lift from plain value/promise to task resolving to that value
 
@@ -320,7 +320,7 @@ ___
 
 ▸ **liftPromiseFunction**‹**A**, **R**›(`promiseFunction`: [PromiseFunction](_src_task_tools_.md#promisefunction)‹A, R›): *[TaskFunction](_src_task_tools_.md#taskfunction)‹A, R›*
 
-*Defined in [src/task-tools.ts:75](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L75)*
+*Defined in [src/task-tools.ts:75](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L75)*
 
 Lift from function returning value/promise to function returning task resolving to that value
 
@@ -353,7 +353,7 @@ ___
 
 ▸ **limitTask**‹**T**›(`task`: [Task](../interfaces/_src_task_.task.md)‹T›, `limit`: [Task](../interfaces/_src_task_.task.md)‹void›): *[Task](../interfaces/_src_task_.task.md)‹T›*
 
-*Defined in [src/task-tools.ts:287](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L287)*
+*Defined in [src/task-tools.ts:287](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L287)*
 
 Under construction
 
@@ -376,7 +376,7 @@ ___
 
 ▸ **parallelTask**‹**TT**›(`taskFunctions`: TT[]): *[Task](../interfaces/_src_task_.task.md)‹[TaskFunctionType](_src_task_tools_.md#taskfunctiontype)‹TT›[]›*
 
-*Defined in [src/task-tools.ts:183](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L183)*
+*Defined in [src/task-tools.ts:183](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L183)*
 
 Under construction
 
@@ -398,7 +398,7 @@ ___
 
 ▸ **repeatTask**‹**T**›(`taskFunction`: [TaskFunction](_src_task_tools_.md#taskfunction)‹[], T›, `repeatFunction`: [TaskFunction](_src_task_tools_.md#taskfunction)‹[], void›): *[Task](../interfaces/_src_task_.task.md)‹T›*
 
-*Defined in [src/task-tools.ts:300](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L300)*
+*Defined in [src/task-tools.ts:300](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L300)*
 
 Under construction
 
@@ -421,7 +421,7 @@ ___
 
 ▸ **sequenceTask**‹**TT**›(`taskFunctions`: TT[]): *[Task](../interfaces/_src_task_.task.md)‹[TaskFunctionType](_src_task_tools_.md#taskfunctiontype)‹TT›[]›*
 
-*Defined in [src/task-tools.ts:172](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L172)*
+*Defined in [src/task-tools.ts:172](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L172)*
 
 Chain multiple tasks one after another
 
@@ -445,7 +445,7 @@ ___
 
 ▸ **timeoutTask**(`delay`: number): *[Task](../interfaces/_src_task_.task.md)‹void›*
 
-*Defined in [src/task-tools.ts:254](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task-tools.ts#L254)*
+*Defined in [src/task-tools.ts:254](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task-tools.ts#L254)*
 
 Generic timeout task
 

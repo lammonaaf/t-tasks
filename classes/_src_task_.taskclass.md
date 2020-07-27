@@ -46,7 +46,7 @@
 
 \+ **new TaskClass**(`_invoke`: [TaskInvoke](../modules/_src_task_.md#taskinvoke)‹R›, `_cancel`: [TaskCancel](../modules/_src_task_.md#taskcancel)): *[TaskClass](_src_task_.taskclass.md)*
 
-*Defined in [src/task.ts:247](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L247)*
+*Defined in [src/task.ts:247](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L247)*
 
 **Parameters:**
 
@@ -65,7 +65,7 @@ Name | Type |
 
 *Implementation of [Task](../interfaces/_src_task_.task.md).[_cancel](../interfaces/_src_task_.task.md#readonly-_cancel)*
 
-*Defined in [src/task.ts:248](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L248)*
+*Defined in [src/task.ts:248](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L248)*
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 *Implementation of [Task](../interfaces/_src_task_.task.md).[_invoke](../interfaces/_src_task_.task.md#readonly-_invoke)*
 
-*Defined in [src/task.ts:248](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L248)*
+*Defined in [src/task.ts:248](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L248)*
 
 ## Methods
 
@@ -83,7 +83,7 @@ ___
 
 ▸ **cancel**(): *void*
 
-*Defined in [src/task.ts:283](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L283)*
+*Defined in [src/task.ts:283](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L283)*
 
 **Returns:** *void*
 
@@ -93,7 +93,7 @@ ___
 
 ▸ **chain**‹**R2**›(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:276](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L276)*
+*Defined in [src/task.ts:276](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L276)*
 
 **Type parameters:**
 
@@ -119,7 +119,7 @@ ___
 
 ▸ **chainCanceled**‹**R2**›(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:270](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L270)*
+*Defined in [src/task.ts:270](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L270)*
 
 **Type parameters:**
 
@@ -139,7 +139,7 @@ ___
 
 ▸ **chainRejected**‹**R2**›(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:273](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L273)*
+*Defined in [src/task.ts:273](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L273)*
 
 **Type parameters:**
 
@@ -165,7 +165,7 @@ ___
 
 ▸ **fmap**‹**R2**›(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:266](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L266)*
+*Defined in [src/task.ts:266](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L266)*
 
 **Type parameters:**
 
@@ -191,7 +191,7 @@ ___
 
 ▸ **fmapCanceled**‹**R2**›(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:260](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L260)*
+*Defined in [src/task.ts:260](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L260)*
 
 **Type parameters:**
 
@@ -211,7 +211,7 @@ ___
 
 ▸ **fmapRejected**‹**R2**›(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:263](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L263)*
+*Defined in [src/task.ts:263](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L263)*
 
 **Type parameters:**
 
@@ -237,7 +237,7 @@ ___
 
 ▸ **reject**(`error`: any): *void*
 
-*Defined in [src/task.ts:286](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L286)*
+*Defined in [src/task.ts:286](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L286)*
 
 **Parameters:**
 
@@ -253,7 +253,7 @@ ___
 
 ▸ **resolve**(): *Promise‹[Maybe](../interfaces/_src_maybe_.maybe.md)‹[Either](../interfaces/_src_either_.either.md)‹R, any›››*
 
-*Defined in [src/task.ts:280](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L280)*
+*Defined in [src/task.ts:280](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L280)*
 
 **Returns:** *Promise‹[Maybe](../interfaces/_src_maybe_.maybe.md)‹[Either](../interfaces/_src_either_.either.md)‹R, any›››*
 
@@ -263,7 +263,7 @@ ___
 
 ▸ **tap**(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:256](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L256)*
+*Defined in [src/task.ts:256](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L256)*
 
 **Parameters:**
 
@@ -285,7 +285,7 @@ ___
 
 ▸ **tapCanceled**(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:250](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L250)*
+*Defined in [src/task.ts:250](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L250)*
 
 **Parameters:**
 
@@ -301,7 +301,7 @@ ___
 
 ▸ **tapRejected**(`op`: function): *[Task](../interfaces/_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:253](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/task.ts#L253)*
+*Defined in [src/task.ts:253](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/task.ts#L253)*
 
 **Parameters:**
 

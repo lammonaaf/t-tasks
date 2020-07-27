@@ -28,7 +28,7 @@
 
 ▸ **isLeft**‹**L**›(`either`: [Either](../interfaces/_src_either_.either.md)‹any, L›): *either is Left<L>*
 
-*Defined in [src/either.ts:195](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L195)*
+*Defined in [src/either.ts:195](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L195)*
 
 Pattern mathching for 'left'
 
@@ -50,7 +50,7 @@ ___
 
 ▸ **isRight**‹**R**›(`either`: [Either](../interfaces/_src_either_.either.md)‹R, any›): *either is Right<R>*
 
-*Defined in [src/either.ts:185](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L185)*
+*Defined in [src/either.ts:185](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L185)*
 
 Pattern mathching for 'right'
 
@@ -79,7 +79,7 @@ ___
 
 ▸ **left**‹**L**›(`error`: L): *[Left](../interfaces/_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:168](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L168)*
+*Defined in [src/either.ts:168](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L168)*
 
 Left monad constructor
 
@@ -101,7 +101,7 @@ ___
 
 ▸ **right**‹**R**›(`value`: R): *[Right](../interfaces/_src_either_.right.md)‹R›*
 
-*Defined in [src/either.ts:160](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/either.ts#L160)*
+*Defined in [src/either.ts:160](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L160)*
 
 Right monad constructor
 

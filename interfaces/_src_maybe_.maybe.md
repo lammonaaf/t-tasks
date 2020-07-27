@@ -37,7 +37,7 @@ Used throughout the library to represent optional return type, specifically retu
 
 • **just**? : *R*
 
-*Defined in [src/maybe.ts:78](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L78)*
+*Defined in [src/maybe.ts:78](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L78)*
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 • **kind**: *"just" | "nothing"*
 
-*Defined in [src/maybe.ts:77](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L77)*
+*Defined in [src/maybe.ts:77](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L77)*
 
 ## Methods
 
@@ -53,7 +53,7 @@ ___
 
 ▸ **chain**‹**R2**›(`op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:112](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L112)*
+*Defined in [src/maybe.ts:112](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L112)*
 
 Chain multiple functions returning Maybe
 
@@ -95,7 +95,7 @@ ___
 
 ▸ **chainNothing**‹**R2**›(`op`: function): *[Maybe](_src_maybe_.maybe.md)‹R | R2›*
 
-*Defined in [src/maybe.ts:142](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L142)*
+*Defined in [src/maybe.ts:142](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L142)*
 
 Chain fallback also returning Maybe
 
@@ -123,7 +123,7 @@ ___
 
 ▸ **fmap**‹**R2**›(`op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:94](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L94)*
+*Defined in [src/maybe.ts:94](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L94)*
 
 Maybe fmap transformer
 
@@ -155,7 +155,7 @@ ___
 
 ▸ **fmapNothing**‹**R2**›(`op`: function): *[Just](_src_maybe_.just.md)‹R | R2›*
 
-*Defined in [src/maybe.ts:132](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L132)*
+*Defined in [src/maybe.ts:132](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L132)*
 
 inverse maybe fmap transformer
 
@@ -185,7 +185,7 @@ ___
 
 ▸ **tap**(`op`: function): *[Maybe](_src_maybe_.maybe.md)‹R›*
 
-*Defined in [src/maybe.ts:86](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L86)*
+*Defined in [src/maybe.ts:86](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L86)*
 
 Maybe peeker
 
@@ -213,7 +213,7 @@ ___
 
 ▸ **tapNothing**(`op`: function): *[Maybe](_src_maybe_.maybe.md)‹R›*
 
-*Defined in [src/maybe.ts:120](https://github.com/lammonaaf/t-tasks/blob/f271a8d/src/maybe.ts#L120)*
+*Defined in [src/maybe.ts:120](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/maybe.ts#L120)*
 
 Inverse maybe peeker
 
