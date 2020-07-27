@@ -1,4 +1,7 @@
 theme: jekyll-theme-slate
 include:
+  - "classes"
+  - "interfaces"
+  - "modues"
   - "_*_.md"
   - "_*_.*.md"
