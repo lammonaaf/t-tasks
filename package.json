@@ -1,5 +1,5 @@
 {
-  "version": "0.6.1",
+  "version": "0.7.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -41,6 +41,7 @@
     "typedoc-plugin-markdown": "^2.3.1",
     "typescript": "^3.9.6"
   },
+  "homepage": "https://lammonaaf.github.io/t-tasks",
   "repository": {
     "type": "git",
     "url": "https://github.com/lammonaaf/t-tasks.git"
