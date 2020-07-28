@@ -1,25 +1,96 @@
-import { Maybe, just, nothing, isJust } from './maybe';
-import { right, left, isRight } from './either';
+import { Maybe, just, nothing } from './maybe';
+import { right, left } from './either';
 import { Task, task, resolvedTask, Cancelable } from './task';
 
+/**
+ * Function returning Promise (async function)
+ *
+ * @template A argument types
+ * @template R returned promise resolve type
+ */
 export type PromiseFunction<A extends any[], R> = (...args: A) => PromiseLike<R>;
-export type TaskFunction<A extends any[], R> = (...args: A) => Task<R>;
-
-export type PromiseType<T extends PromiseLike<any>> = T extends PromiseLike<infer U> ? U : never;
-export type TaskType<TT extends Task<any>> = PromiseType<TT['_invoke']> extends Cancelable<infer U> ? U : never;
-
-export type PromiseFunctionType<TT extends (...args: any[]) => PromiseLike<any>> = PromiseType<ReturnType<TT>>;
-export type TaskFunctionType<TT extends (...args: any[]) => Task<any>> = TaskType<ReturnType<TT>>;
-
-export type TaskGenerator<A extends any[], TT extends Task<any>, R> = (...args: A) => Generator<TT, R, TaskType<TT>>;
 
 /**
- * Lift from plain value/promise to task resolving to that value
- * @param promise promise or plain value to be resolved
+ * Function returning Task
+ *
+ * @template A argument types
+ * @template R returned task resolve type
+ */
+export type TaskFunction<A extends any[], R> = (...args: A) => Task<R>;
+
+/**
+ * Resolve type of a promise
+ *
+ * @template TT promise type
+ */
+export type PromiseType<TT extends PromiseLike<any>> = TT extends PromiseLike<infer U> ? U : never;
+
+/**
+ * Resolve type of a task
+ *
+ * @template TT task type
+ */
+export type TaskType<TT extends Task<any>> = PromiseType<TT['_invoke']> extends Cancelable<infer U> ? U : never;
+
+/**
+ * Resolve type of a promise returned by function
+ *
+ * @template TT promsie function Type
+ */
+export type PromiseFunctionType<TT extends PromiseFunction<any[], any>> = PromiseType<ReturnType<TT>>;
+
+/**
+ * Resolve type of a task returned by function
+ *
+ * @template TT task function Type
+ */
+export type TaskFunctionType<TT extends TaskFunction<any[], any>> = TaskType<ReturnType<TT>>;
+
+/**
+ * Task generator
+ *
+ * @template TT yielded task type
+ * @template R returned task resolve type
+ *
+ * @example
+ * ```typescript
+ * const generatorFunction = function*(): TaskGenerator<Task<string>, number> {
+ *   const v = cast<string>(yield someTaskFunction());
+ *
+ *   return v.length;
+ * };
+ * ```
+ */
+export type TaskGenerator<TT extends Task<any>, R> = Generator<TT, R, TaskType<TT>>;
+
+/**
+ * Function returning task generator (generator function)
+ *
+ * @template A argument types
+ * @template TT yielded task type
+ * @template R returned task resolve type
+ *
+ * @example
+ * ```typescript
+ * const generatorFunction: TaskGeneratorFunction<[], Task<string>, number> = function*() {
+ *   const v = cast<string>(yield someTaskFunction());
+ *
+ *   return v.length;
+ * };
+ * ```
+ */
+export type TaskGeneratorFunction<A extends any[], TT extends Task<any>, R> = (...args: A) => TaskGenerator<TT, R>;
+
+/**
+ * Lift from promise to task resolving to that promise result
  *
  * Userfull for converting promises to tasks
  * If converted task is canceled or failed externally return value will be ignored without side-effects
- * All tasks are no-trowing by default, any occured errors are returned as Either:Left
+ * All tasks are no-trowing by default, any occured errors are returned as Left<any>
+ *
+ * @template R returned task resolve type
+ * @param promise promise to be resolved
+ * @returns task resolving to specified promise value
  *
  * @example
  * ```typescript
@@ -38,16 +109,14 @@ export function liftPromise<R>(promise: PromiseLike<R>): Task<R> {
       promise.then(
         (value) => {
           globalResolve(just(right(value)));
-          globalResolve = stub;
         },
         (error) => {
           globalResolve(just(left(error)));
-          globalResolve = stub;
         },
       );
     }),
     (error: Maybe<any>) => {
-      if (isJust(error)) {
+      if (error.isJust()) {
         globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
@@ -59,10 +128,13 @@ export function liftPromise<R>(promise: PromiseLike<R>): Task<R> {
 
 /**
  * Lift from function returning value/promise to function returning task resolving to that value
- * @param promiseFunction function returning promise or plain value to be resolved
  *
  * Userfull for converting exising async functions to task functions for further use
  *
+ * @template A returned function's argument types
+ * @template R returned function's result task's resolve type
+ * @param promiseFunction function returning promise or plain value to be resolved
+ * @returns task function wrapping specified promise function
  * @see liftTask
  *
  * @example
@@ -78,24 +150,26 @@ export function liftPromiseFunction<A extends any[], R>(promiseFunction: Promise
 
 /**
  * Create compound task from generator function
- * @param taskGenerator (optionally async) generator function
  *
  * Applying yield to task within the generator function awaits task and returns underlying value in case of success
- *
+
  * In case of failure an error is thrown and may be caught by try-catch
  *
  * If error is not caught the task is interrupted and returns 'just left error' immediately. In case of cancelation the task is interrupted and returns 'nothing' immediately
+ *
+ * @template TT yielded task type
+ * @template R returned task resolve type
+ * @param taskGeneratorFunction task generator function
+ * @returns task resolving to generator's return type
  *
  * @note compound task execution is interrupted only at yield statements, so despite returning immediately any promise-based chains would continue running until the first yield
  * @note due to type unpredictability you HAVE to cast yield result to avoid werid type issues. Some helper functions for casting are provided
  *
  * @example
  * ```typescript
- * const task = generateTask(async function*() {
+ * const task = generateTask(function*() {
  *   try {
- *     const source = await getData();
- *
- *     const value1 = castPromise<string>(yield delayedValueTask(source, 400));
+ *     const value1 = castPromise<string>(yield delayedValueTask('data', 400));
  *
  *     const value2 = castPromise<number>(yield delayedValueTask(value1.length, 300));
  *
@@ -106,46 +180,146 @@ export function liftPromiseFunction<A extends any[], R>(promiseFunction: Promise
  * });
  * ```
  */
-export function generateTask<TT extends Task<any>, R>(taskGenerator: TaskGenerator<[], TT, R>): Task<R> {
-  const iterator = taskGenerator();
+export function generateTask<TT extends Task<any>, R>(
+  taskGeneratorFunction: TaskGeneratorFunction<[], TT, R>,
+): Task<R> {
+  const generator = taskGeneratorFunction();
 
   const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
     return next.done
       ? resolvedTask(next.value)
       : next.value
-          .chain((value) => sequentor(iterator.next(value)))
-          .chainRejected((error) => sequentor(iterator.throw(error)));
+          .chain((value) => sequentor(generator.next(value)))
+          .chainRejected((error) => sequentor(generator.throw(error)));
   };
 
-  return resolvedTask(undefined).chain(() => sequentor(iterator.next()));
+  return resolvedTask(undefined).chain(() => sequentor(generator.next()));
 }
 
+/**
+ * Generic timeout task
+ *
+ * Userfull for creating delays in task chains or implementing limiting tasks
+ *
+ * @param delay duration in ms after that the task resolves to void
+ * @returns task resolving to void (undefined) after specified delay
+ *
+ * @example
+ * ```typescript
+ * const delayedValueTask = <T>(value: T, delay: number) => timeoutTask(delay).fmap(() => value);
+ * // ... //
+ * const value = castPromise<number>(yield delayedValueTask(42, 1000));
+ *
+ * console.log("It's past 1 second and here's a value:", value)
+ * ```
+ */
+export function timeoutTask(delay: number) {
+  let handler: NodeJS.Timeout;
+
+  const stub = (_?: Cancelable<void> | PromiseLike<Cancelable<void>> | undefined) => {};
+
+  let globalResolve = stub;
+
+  return task(
+    new Promise<Cancelable<void>>((resolve) => {
+      globalResolve = resolve;
+
+      handler = setTimeout(() => {
+        globalResolve(just(right(undefined)));
+
+        globalResolve = stub;
+      }, delay);
+    }),
+    (error: Maybe<any>) => {
+      if (error.isJust()) {
+        globalResolve(just(left(error.just)));
+      } else {
+        globalResolve(nothing());
+      }
+      globalResolve = stub;
+
+      clearTimeout(handler);
+    },
+  );
+}
+
+/**
+ * Cast helper (with plain type specified)
+ *
+ * Useful when an exact type of the expression is short and well-known
+ *
+ * @template T target type
+ * @template R source type
+ * @param arg plain value of compatible type
+ * @returns arg casted to the specified type
+ *
+ * @example
+ * ```typescript
+ * const result = cast<string>(yield someTaskFunction());
+ * ```
+ */
 export function cast<T, R extends T = any>(arg: R): T {
   return arg as T;
 }
 
 /**
- * Cast helper
- * @param arg plain value of some compatible type
- * @returns arg casted to the type of specified promise or plain value type
+ * Cast helper (with promise type specified)
+ *
+ * Useful with ```typeof``` when promise is provided
+ *
+ * @template TT target promise type
+ * @template R source type
+ * @param arg plain value of compatible type
+ * @returns arg casted to the specified promise's resolve type
+ *
+ * @example
+ * ```typescript
+ * const promise = somePromiseFunction();
+ * // ... //
+ * const result = castPromise<typeof promise>(yield liftPromise(promise));
+ * ```
  */
 export function castPromise<TT extends PromiseLike<any>, R extends PromiseType<TT> = any>(arg: R): PromiseType<TT> {
   return arg as PromiseType<TT>;
 }
 
 /**
- * Cast helper
- * @param arg plain value of some compatible type
- * @returns arg casted to the reoslve type of specified task type
+ * Cast helper (with task type specified)
+ *
+ * Useful with ```typeof``` when task is provided
+ *
+ * @template TT target task type
+ * @template R source type
+ * @param arg plain value of compatible type
+ * @returns arg casted to the specified task's resolve type
+ *
+ * @example
+ * ```typescript
+ * const task = someTaskFunction();
+ * // ... //
+ * const result = castTask<typeof task>(yield task);
+ * ```
  */
 export function castTask<TT extends Task<any>, R extends TaskType<TT> = any>(arg: R): TaskType<TT> {
   return arg as TaskType<TT>;
 }
 
 /**
- * Cast helper
- * @param arg plain value of some compatible type
- * @returns arg casted to the return type of specified function returning promise or plain value
+ * Cast helper (with promise function type specified)
+ *
+ * Useful with ```typeof``` when an async function is lifted to task in-place
+ *
+ * @template TT type of promise function resolving to target type
+ * @template R source type
+ * @param arg plain value of compatible type
+ * @returns arg casted to the return type of specified function's returned promise
+ *
+ * @example
+ * ```typescript
+ * const result = castPromiseFunction<typeof somePromiseFunction>(
+ *   yield liftPromise(somePromiseFunction()),
+ * );
+ * ```
  */
 export function castPromiseFunction<TT extends PromiseFunction<any[], any>, R extends PromiseFunctionType<TT> = any>(
   arg: R,
@@ -154,9 +328,23 @@ export function castPromiseFunction<TT extends PromiseFunction<any[], any>, R ex
 }
 
 /**
- * Cast helper
+ * Cast helper (with task function type specified)
+ *
+ * Useful with ```typeof``` when an task function is used
+ *
+ * @template TT type of task function resolving to target type
+ * @template R source type
  * @param arg plain value of some compatible type
- * @returns arg casted to the reoslve type of specified function returning task
+ * @returns arg casted to the reoslve type of specified function's returned task
+ *
+ * @example
+ * ```typescript
+ * const someTaskFunction = liftPromsieFunction(somePromiseFunction);
+ * // ... //
+ * const result = castTaskFunction<typeof someTaskFunction>(
+ *   yield someTaskFunction(),
+ * );
+ * ```
  */
 export function castTaskFunction<TT extends TaskFunction<any[], any>, R extends TaskFunctionType<TT> = any>(
   arg: R,
@@ -196,8 +384,8 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
       Promise.all(
         tasks.map((task) => {
           return task.resolve().then((result) => {
-            if (isJust(result)) {
-              if (isRight(result.just)) {
+            if (result.isJust()) {
+              if (result.just.isRight()) {
                 return result.just.right;
               } else {
                 throw just(result.just.left);
@@ -213,7 +401,7 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
           globalResolve = stub;
         },
         (error: Maybe<any>) => {
-          if (isJust(error)) {
+          if (error.isJust()) {
             globalResolve(just(left(error.just)));
             globalResolve = stub;
           } else {
@@ -224,7 +412,7 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
       );
     }),
     (error: Maybe<any>) => {
-      if (isJust(error)) {
+      if (error.isJust()) {
         globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
@@ -232,51 +420,6 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
       globalResolve = stub;
 
       tasks.forEach((task) => task.cancel());
-    },
-  );
-}
-
-/**
- * Generic timeout task
- * @param delay duration in ms after that the task resolves to void
- *
- * Userfull for creating delays in task chains or implementing limiting tasks
- *
- * @example
- * ```typescript
- * const delayedValueTask = <T>(value: T, delay: number) => timeoutTask(delay).fmap(() => value);
- *
- * const value = castPromise<number>(yield delayedValueTask(42, 1000));
- *
- * console.log("It's past 1 second and here's a value:", value)
- * ```
- */
-export function timeoutTask(delay: number) {
-  let handler: NodeJS.Timeout;
-
-  const stub = (_?: Cancelable<void> | PromiseLike<Cancelable<void>> | undefined) => {};
-
-  let globalResolve = stub;
-
-  return task(
-    new Promise<Cancelable<void>>((resolve) => {
-      globalResolve = resolve;
-
-      handler = setTimeout(() => {
-        globalResolve(just(right(undefined)));
-
-        globalResolve = stub;
-      }, delay);
-    }),
-    (error: Maybe<any>) => {
-      if (isJust(error)) {
-        globalResolve(just(left(error.just)));
-      } else {
-        globalResolve(nothing());
-      }
-      globalResolve = stub;
-
-      clearTimeout(handler);
     },
   );
 }
@@ -307,7 +450,7 @@ export function repeatTask<T>(taskFunction: TaskFunction<[], T>, repeatFunction:
       } catch (error) {
         yield repeatFunction();
       }
-    } while (!isJust(result));
+    } while (result.isNothing());
 
     return result.just;
   });

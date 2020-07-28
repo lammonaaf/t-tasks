@@ -2,70 +2,218 @@
  * Right (correct) value of type R
  *
  * Either data type specialization representing a correct value
+ *
+ * @template R underlying value type
  */
 export interface Right<R> {
-  readonly kind: 'right';
   readonly right: R;
 
   /**
-   * tap applied to 'right value' returns self invoking op(value) in process
+   * Either peeker function
+   *
+   * Applied to 'right value' returns self invoking op(value) in process
+   * Applied to 'left error' returns self without invoking callback
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
    */
   tap(op: (value: R) => void): Right<R>;
+
   /**
-   * fmap applied to 'right value' returns 'right op(value)'
+   * Either transformer function
+   *
+   * Applied to 'right value' returns 'right op(value)'
+   * Applied to 'left error' returns self without invoking transformer
+   *
+   * @template R2 transformer function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right op(value)' or 'left error'
    */
   fmap<R2>(op: (value: R) => R2): Right<R2>;
+
   /**
-   * chain applied to 'right value' returns 'op(value)'
+   * Either composition function
+   *
+   * Applied to 'right value' returns 'op(value)'
+   * Applied to 'left error' returns self without invoking composition function
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or 'left error'
    */
   chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2>;
+
   /**
-   * tapLeft applied to 'right value' returns self not invoking callback
+   * Either fallback peeker function
+   *
+   * Applied to 'right value' returns self without invoking callback
+   * Applied to 'left error' returns self invoking op(error) in process
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
    */
   tapLeft(): Right<R>;
+
   /**
-   * fmapLeft applied to 'right value' returns self not invoking callback
+   * Either fallback transformer function
+   *
+   * Applied to 'right value' returns self without invoking transformer
+   * Applied to 'left error' returns 'right op(error)'
+   *
+   * @template R2 transformer function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right value' or 'right op(error)'
    */
   fmapLeft(): Right<R>;
+
   /**
-   * chainLeft applied to 'right value' returns self not invoking callback
+   * Either composition function
+   *
+   * Applied to 'right value' returns self without invoking composition function
+   * Applied to 'left error' returns 'op(error)'
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right value' or 'op(error)'
    */
   chainLeft(): Right<R>;
+
+  /**
+   * Either type guard for 'right'
+   *
+   * @returns 'true' in case this is 'right value' (and resolves type to be 'right')
+   *
+   * @example
+   * ```typescript
+   * if (either.isRight()) {
+   *   console.log(either.right)
+   * }
+   * ```
+   */
+  isRight(): this is Right<R>;
+
+  /**
+   * Either type guard for 'left'
+   *
+   * @returns 'true' in case this is 'left error' (and resolves type to be 'left')
+   *
+   * @example
+   * ```typescript
+   * if (either.isLeft()) {
+   *   console.error(either.left)
+   * }
+   * ```
+   */
+  isLeft(): this is Left<never>;
 }
 
 /**
  * Left (erroneous) value of type L
  *
  * Either data type specialization representing an erroneous value
+ *
+ * @template L underlying error type
  */
 export interface Left<L> {
-  readonly kind: 'left';
   readonly left: L;
 
   /**
-   * tap applied to 'left error' returns self not invoking callback
+   * Either peeker function
+   *
+   * Applied to 'right value' returns self invoking op(value) in process
+   * Applied to 'left error' returns self without invoking callback
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
    */
   tap(): Left<L>;
+
   /**
-   * fmap applied to 'left error' returns self not invoking transformer
+   * Either transformer function
+   *
+   * Applied to 'right value' returns 'right op(value)'
+   * Applied to 'left error' returns self without invoking transformer
+   *
+   * @template R2 transformer function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right op(value)' or 'left error'
    */
   fmap(): Left<L>;
+
   /**
-   * chain applied to 'left error' returns self not invoking transformer
+   * Either composition function
+   *
+   * Applied to 'right value' returns 'op(value)'
+   * Applied to 'left error' returns self without invoking composition function
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or 'left error'
    */
   chain(): Left<L>;
+
   /**
-   * tapLeft applied to 'left error' returns self invoking op(error) in process
+   * Either fallback peeker function
+   *
+   * Applied to 'right value' returns self without invoking callback
+   * Applied to 'left error' returns self invoking op(error) in process
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
    */
   tapLeft(op: (error: L) => void): Left<L>;
+
   /**
-   * fmapLeft applied to 'left error' returns 'just op(error)'
+   * Either fallback transformer function
+   *
+   * Applied to 'right value' returns self without invoking transformer
+   * Applied to 'left error' returns 'right op(error)'
+   *
+   * @template R2 transformer function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right value' or 'right op(error)'
    */
   fmapLeft<R2>(op: (error: L) => R2): Right<R2>;
+
   /**
-   * chainLeft applied to 'left error' returns 'op(error)'
+   * Either composition function
+   *
+   * Applied to 'right value' returns self without invoking composition function
+   * Applied to 'left error' returns 'op(error)'
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right value' or 'op(error)'
    */
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R2, L2>;
+
+  /**
+   * Either type guard for 'right'
+   *
+   * @returns 'true' in case this is 'right value' (and resolves type to be 'right')
+   *
+   * @example
+   * ```typescript
+   * if (either.isRight()) {
+   *   console.log(either.right)
+   * }
+   * ```
+   */
+  isRight(): this is Right<never>;
+
+  /**
+   * Either type guard for 'left'
+   *
+   * @returns 'true' in case this is 'left error' (and resolves type to be 'left')
+   *
+   * @example
+   * ```typescript
+   * if (either.isLeft()) {
+   *   console.error(either.left)
+   * }
+   * ```
+   */
+  isLeft(): this is Left<L>;
 }
 
 /**
@@ -73,89 +221,18 @@ export interface Left<L> {
  *
  * As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
  * Used throughout the library to represent the result of failable operations, namely failed tasks
+ *
+ * @template R underlying value type
+ * @template L underlying error type
  */
-export interface Either<R, L> {
-  readonly kind: 'left' | 'right';
-  readonly right?: R;
-  readonly left?: L;
-
-  /**
-   * Either peeker
-   * @param op callback function to be called with underlying value
-   *
-   * Returns copy of self no matter whether callback was called or not
-   */
-  tap(op: (value: R) => void): Either<R, L>;
-
-  /**
-   * Either fmap transformer
-   * @param op transformer function for the underlying value
-   *
-   * Returns 'left error' without invoking transformer if wrapped value is already 'left error'
-   */
-  fmap<R2>(op: (value: R) => R2): Either<R2, L>;
-
-  /**
-   * Chain multiple functions returning Either
-   * @param op transformer function for the underlying value which can also return 'left'
-   *
-   * @example
-   * ```typescript
-   * // test(right(42))  - right 21
-   * // test(right(41))  - left 'failure'
-   * // test(left('invalid')) - left 'invalid'
-   * function test(arg: Either<number, strign>): Either<number, string> {
-   *   return arg.chain((magic) => {
-   *     return magic % 2 === 0 ? right(magic / 2) : left('failure');
-   *   });
-   * }
-   * ```
-   *
-   * @note
-   * ```typescript
-   * chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2> | Left<L>; // this version of typings compiles 4 times faster
-   * ```
-   */
-  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L | L2>;
-
-  /**
-   * Inverse either peeker
-   * @param op callback function to be called with underlying value
-   *
-   * Returns copy of self no matter whether callback was called or not
-   */
-  tapLeft(op: (error: L) => void): Either<R, L>;
-
-  /**
-   * Inverse either fmap tranformer
-   * @param op callback function to be called with underlying error
-   *
-   * Returns self without invoking transformer if wrapped value is not 'left error', effectively acting as a fallback method
-   *
-   * @note
-   * ```typescript
-   * fmapLeft<R2>(op: (error: L) => R2): Right<R> | Right<R2>; // this version of typings compiles 4 times faster
-   * ```
-   */
-  fmapLeft<R2>(op: (error: L) => R2): Right<R | R2>;
-
-  /**
-   * Chain fallback also returning Either
-   * @param op callback function to be called with underlying error
-   *
-   * Returns self without invoking transformer if wrapped value is not 'left error', effectively acting as a fallback method
-   *
-   * @note
-   * ```typescript
-   * chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Right<R> | Either<R2, L2>; // this version of typings compiles 4 times faster
-   * ```
-   */
-  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
-}
+export type Either<R, L> = Right<R> | Left<L>;
 
 /**
  * Right monad constructor
+ *
+ * @template R underlying value type
  * @param value underlying value
+ * @returns 'right value'
  */
 export function right<R>(value: R): Right<R> {
   return new RightClass<R>(value);
@@ -163,37 +240,13 @@ export function right<R>(value: R): Right<R> {
 
 /**
  * Left monad constructor
+ *
+ * @template L underlying error type
  * @param error underlying error
+ * @returns 'left error'
  */
 export function left<L>(error: L): Left<L> {
   return new LeftClass<L>(error);
-}
-
-/**
- * Pattern mathching for 'right'
- * @param either 'right value' or 'left error'
- *
- * Returns 'true' in case either is right (and resolves argument type to be 'right value')
- *
- * @example
- * ```typescript
- * if (isRight(either)) {
- *   console.log(either.rigth)
- * }
- * ```
- */
-export function isRight<R>(either: Either<R, any>): either is Right<R> {
-  return either.kind === 'right';
-}
-
-/**
- * Pattern mathching for 'left'
- * @param either 'right value' or 'left error'
- *
- * Returns 'true' in case either is left (and resolves argument type to be 'left error')
- */
-export function isLeft<L>(either: Either<any, L>): either is Left<L> {
-  return either.kind === 'left';
 }
 
 /// --------------------------------------------------------------------------------------
@@ -201,8 +254,6 @@ export function isLeft<L>(either: Either<any, L>): either is Left<L> {
 /// --------------------------------------------------------------------------------------
 
 class RightClass<R> implements Right<R> {
-  readonly kind = 'right';
-
   constructor(readonly right: R) {}
 
   tap(op: (value: R) => void) {
@@ -225,11 +276,15 @@ class RightClass<R> implements Right<R> {
   chainLeft() {
     return this;
   }
+  isRight(): this is Right<R> {
+    return true;
+  }
+  isLeft(): this is Left<never> {
+    return false;
+  }
 }
 
 class LeftClass<L> implements Left<L> {
-  readonly kind = 'left';
-
   constructor(readonly left: L) {}
 
   tap() {
@@ -251,5 +306,11 @@ class LeftClass<L> implements Left<L> {
   }
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>) {
     return op(this.left);
+  }
+  isRight(): this is Right<never> {
+    return false;
+  }
+  isLeft(): this is Left<L> {
+    return true;
   }
 }

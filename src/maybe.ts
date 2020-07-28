@@ -1,36 +1,110 @@
 /**
- * Just a value of type R
+ * Just a value
  *
  * Maybe data type specialization representing an existing value
+ *
+ * @template R underlying value
  */
 export interface Just<R> {
-  readonly kind: 'just';
   readonly just: R;
 
   /**
-   * tap applied to 'just value' returns self invoking op(value) in process
+   * Maybe peeker function
+   *
+   * Applied to 'just value' returns self invoking op(value) in process
+   * Applied to 'nothing' returns self without invoking callback
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
    */
   tap(op: (value: R) => void): Just<R>;
+
   /**
-   * fmap applied to 'just value' returns 'just op(value)'
+   * Maybe transformer function
+   *
+   * Applied to 'just value' returns 'just op(value)'
+   * Applied to 'nothing' returns self without invoking transformer
+   *
+   * @template R2 transformer function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'just op(value)' or 'nothing'
    */
   fmap<R2>(op: (value: R) => R2): Just<R2>;
+
   /**
-   * chain applied to 'just value' returns 'op(value)'
+   * Maybe composition function
+   *
+   * Applied to 'just value' returns 'op(value)'
+   * Applied to 'nothing' returns self without invoking composition function
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or 'nothing'
    */
   chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
+
   /**
-   * tapNothing applied to 'just value' returns self not invoking callback
+   * Maybe fallback peeker function
+   *
+   * Applied to 'just value' returns self without invoking callback
+   * Applied to 'nothing' returns self invoking op() in process
+   *
+   * @param op function to be invoked
+   * @returns self
    */
   tapNothing(): Just<R>;
+
   /**
-   * fmapNothing applied to 'just value' returns self not invoking transformer
+   * Maybe fallback transformer function
+   *
+   * Applied to 'just value' returns self without invoking transformer
+   * Applied to 'nothing' returns 'just op()'
+   *
+   * @template R2 transformer function's result type
+   * @param op function to be invoked
+   * @returns 'just value' or 'just op()'
    */
   fmapNothing(): Just<R>;
+
   /**
-   * chainNothing applied to 'just value' returns self not invoking transformer
+   * Maybe fallback composition function
+   *
+   * Applied to 'just value' returns self witjout invoking composition function
+   * Applied to 'nothing' returns op()
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op function to be invoked
+   * @returns 'just value' or 'op()'
    */
   chainNothing(): Just<R>;
+
+  /**
+   * Maybe type guard for 'just'
+   *
+   * @returns 'true' in case wrapped value exists (and resolves argument type to be 'just')
+   *
+   * @example
+   * ```typescript
+   * if (maybe.isJust()) {
+   *   console.log(maybe.just);
+   * }
+   * ```
+   */
+  isJust(): this is Just<R>;
+
+  /**
+   * Maybe type guard for 'nothing'
+   *
+   * @returns 'true' in case wrapped value is 'nothing' (and resolves argument type to be 'nothing')
+   *
+   * @example
+   * ```typescript
+   * if (maybe.isNohing()) {
+   *   console.log('nothing');
+   * }
+   * ```
+   */
+  isNothing(): this is Nothing;
 }
 
 /**
@@ -39,32 +113,103 @@ export interface Just<R> {
  * Maybe data type specialiation representing an absence of any value
  */
 export interface Nothing {
-  readonly kind: 'nothing';
-
   /**
-   * tap applied to 'nothing' returns self not invoking callback
+   * Maybe peeker function
+   *
+   * Applied to 'just value' returns self invoking op(value) in process
+   * Applied to 'nothing' returns self without invoking callback
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
    */
   tap(): Nothing;
+
   /**
-   * fmap applied to 'nothing' returns self not invoking transformer
+   * Maybe transformer function
+   *
+   * Applied to 'just value' returns 'just op(value)'
+   * Applied to 'nothing' returns self without invoking transformer
+   *
+   * @template R2 transformer function return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'just op(value)' or self
    */
   fmap(): Nothing;
+
   /**
-   * chain applied to 'nothing' returns self not invoking transformer
+   * Maybe composition function
+   *
+   * Applied to 'just value' returns 'op(value)'
+   * Applied to 'nothing' returns self without invoking composition function
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or self
    */
   chain(): Nothing;
+
   /**
-   * tapNothing applied to 'nothing' returns self invoking op() in process
+   * Maybe fallback peeker function
+   *
+   * Applied to 'just value' returns self without invoking callback
+   * Applied to 'nothing' returns self invoking op() in process
+   *
+   * @param op function to be invoked
+   * @returns self
    */
   tapNothing(op: () => void): Nothing;
+
   /**
-   * fmapNothing applied to 'nothing' returns just(op())
+   * Maybe fallback transformer function
+   *
+   * Applied to 'just value' returns self without invoking transformer
+   * Applied to 'nothing' returns 'just op()'
+   *
+   * @template R2 transformer function's result type
+   * @param op function to be invoked
+   * @returns self or 'just op()'
    */
   fmapNothing<R2>(op: () => R2): Just<R2>;
+
   /**
-   * chainNothing applied to 'nothing' returns op()
+   * Maybe fallback composition function
+   *
+   * Applied to 'just value' returns self witjout invoking composition function
+   * Applied to 'nothing' returns op()
+   *
+   * @template R2 composition function's return type's underlying type
+   * @param op function to be invoked
+   * @returns self or 'op()'
    */
   chainNothing<R2>(op: () => Maybe<R2>): Maybe<R2>;
+
+  /**
+   * Maybe type guard for 'just'
+   *
+   * @returns 'true' in case wrapped value exists (and resolves argument type to be 'just')
+   *
+   * @example
+   * ```typescript
+   * if (maybe.isJust()) {
+   *   console.log(maybe.just);
+   * }
+   * ```
+   */
+  isJust(): this is Just<never>;
+
+  /**
+   * Maybe type guard for 'nothing'
+   *
+   * @returns 'true' in case wrapped value is 'nothing' (and resolves argument type to be 'nothing')
+   *
+   * @example
+   * ```typescript
+   * if (maybe.isNohing()) {
+   *   console.log('nothing');
+   * }
+   * ```
+   */
+  isNothing(): this is Nothing;
 }
 
 /**
@@ -72,79 +217,17 @@ export interface Nothing {
  *
  * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
+ *
+ * @template R underlying value
  */
-export interface Maybe<R> {
-  readonly kind: 'just' | 'nothing';
-  readonly just?: R;
-
-  /**
-   * Maybe peeker
-   * @param op callback function to be called with underlying value
-   *
-   * Returns copy of self no matter whether callback was called or not
-   */
-  tap(op: (value: R) => void): Maybe<R>;
-
-  /**
-   * Maybe fmap transformer
-   * @param op transformer function for the underlying value
-   *
-   * Returns 'nothing' without invoking transformer if wrapped value is already 'nothing'
-   */
-  fmap<R2>(op: (value: R) => R2): Maybe<R2>;
-
-  /**
-   * Chain multiple functions returning Maybe
-   * @param op transformer function for the underlying value which can also return nothing
-   *
-   * @example
-   * ```typescript
-   * // test(just(42))  - just 21
-   * // test(just(41))  - nothing
-   * // test(nothing()) - nothing
-   * function test(arg: Maybe<number>): Maybe<number> {
-   *   return arg.chain((magic) => {
-   *     return magic % 2 === 0 ? just(magic / 2) : nothing();
-   *   });
-   * }
-   * ```
-   */
-  chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
-
-  /**
-   * Inverse maybe peeker
-   * @param op callback function to be called in case of 'nothing'
-   *
-   * Returns copy of self no matter whether callback was called or not
-   */
-  tapNothing(op: () => void): Maybe<R>;
-
-  /**
-   * inverse maybe fmap transformer
-   * @param op transformer function to be called in case of 'nothing'
-   *
-   * Returns self without invoking transformer if wrapped value is not 'nothing', effectively acting as a fallback method
-   *
-   * @note ```typescript
-   * fmapNothing<R2>(op: () => R2): Just<R2> | Just<R>; // this version of typings compiles 4 times faster
-   * ```
-   */
-  fmapNothing<R2>(op: () => R2): Just<R | R2>;
-
-  /**
-   * Chain fallback also returning Maybe
-   * @param op transformer function to be called in case of nothing
-   *
-   * @note ```typescript
-   * chainNothing<R2>(op: () => Maybe<R2>): Just<R> | Maybe<R2>; // this version of typings compiles 4 times faster
-   * ```
-   */
-  chainNothing<R2>(op: () => Maybe<R2>): Maybe<R | R2>;
-}
+export type Maybe<R> = Just<R> | Nothing;
 
 /**
  * Non-empty monad constructor
+ *
+ * @template R underlying type
  * @param value underlying value
+ * @returns 'just value'
  */
 export function just<R>(value: R): Just<R> {
   return new JustClass<R>(value);
@@ -152,36 +235,11 @@ export function just<R>(value: R): Just<R> {
 
 /**
  * Empty monad constructor
+ *
+ * @returns 'nothing'
  */
 export function nothing(): Nothing {
   return new NothingClass();
-}
-
-/**
- * Pattern mathching for 'just'
- * @param maybe wrapped value (or absence of it)
- *
- * Returns 'true' in case wrapped value exists (and resolves argument type to be 'Just')
- *
- * @example
- * ```typescript
- * if (isJust(maybe)) {
- *   console.log(maybe.just)
- * }
- * ```
- */
-export function isJust<R>(maybe: Maybe<R>): maybe is Just<R> {
-  return maybe.kind === 'just';
-}
-
-/**
- * Pattern mathching for 'nothing'
- * @param maybe wrapped value (or absence of it)
- *
- * Returns 'true' in case wrapped value does not exist (and resolves argument type to be 'Nothing')
- */
-export function isNothing(maybe: Maybe<any>): maybe is Nothing {
-  return maybe.kind === 'nothing';
 }
 
 /// --------------------------------------------------------------------------------------
@@ -189,8 +247,6 @@ export function isNothing(maybe: Maybe<any>): maybe is Nothing {
 /// --------------------------------------------------------------------------------------
 
 class JustClass<R> implements Just<R> {
-  readonly kind = 'just';
-
   constructor(readonly just: R) {}
 
   tap(op: (value: R) => void) {
@@ -213,11 +269,15 @@ class JustClass<R> implements Just<R> {
   chainNothing() {
     return this;
   }
+  isJust(): this is Just<R> {
+    return true;
+  }
+  isNothing(): this is Nothing {
+    return false;
+  }
 }
 
 class NothingClass implements Nothing {
-  readonly kind = 'nothing';
-
   tap() {
     return this;
   }
@@ -237,5 +297,11 @@ class NothingClass implements Nothing {
   }
   chainNothing<R2>(op: () => Maybe<R2>) {
     return op();
+  }
+  isJust(): this is Just<never> {
+    return false;
+  }
+  isNothing(): this is Nothing {
+    return true;
   }
 }

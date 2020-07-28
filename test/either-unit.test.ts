@@ -1,15 +1,19 @@
-import { Either, right, isRight, left, isLeft } from '../src';
+import { Either, right, left } from '../src';
 
 describe('right("data")', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Either<string, boolean> => right('data'))();
 
   it('is Right', () => {
-    expect(isRight(subject)).toBeTruthy();
+    expect(subject.isRight()).toBeTruthy();
+  });
+
+  it('is not Left', () => {
+    expect(subject.isLeft()).toBeFalsy();
   });
 
   it('contains "data"', () => {
-    expect(isRight(subject) && subject.right === 'data').toBeTruthy();
+    expect(subject.isRight() && subject.right === 'data').toBeTruthy();
   });
 
   it('taps "data"', () => {
@@ -24,7 +28,7 @@ describe('right("data")', () => {
   it('transforms to length 4', () => {
     const mapped = subject.fmap((value) => value.length);
 
-    expect(isRight(mapped) && mapped.right === 4).toBeTruthy();
+    expect(mapped.isRight() && mapped.right === 4).toBeTruthy();
   });
 
   it('does not fallback', () => {
@@ -37,19 +41,19 @@ describe('right("data")', () => {
     });
 
     expect(callback).not.toBeCalled();
-    expect(isRight(mapped) && mapped.right === 'data').toBeTruthy();
+    expect(mapped.isRight() && mapped.right === 'data').toBeTruthy();
   });
 
   it('chains to length 4', () => {
     const mapped = subject.chain((value) => right(value.length));
 
-    expect(isRight(mapped) && mapped.right === 4).toBeTruthy();
+    expect(mapped.isRight() && mapped.right === 4).toBeTruthy();
   });
 
   it('chains to false', () => {
     const mapped = subject.chain(() => left(false));
 
-    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
   });
 
   it('does not fallback chain', () => {
@@ -62,7 +66,7 @@ describe('right("data")', () => {
     });
 
     expect(callback).not.toBeCalled();
-    expect(isRight(mapped) && mapped.right === 'data').toBeTruthy();
+    expect(mapped.isRight() && mapped.right === 'data').toBeTruthy();
   });
 });
 
@@ -71,11 +75,15 @@ describe('left(false)', () => {
   const subject = ((): Either<string, boolean> => left(false))();
 
   it('is Left', () => {
-    expect(isLeft(subject)).toBeTruthy();
+    expect(subject.isLeft()).toBeTruthy();
+  });
+
+  it('is not Right', () => {
+    expect(subject.isRight()).toBeFalsy();
   });
 
   it('contains false', () => {
-    expect(isLeft(subject) && subject.left === false).toBeTruthy();
+    expect(subject.isLeft() && subject.left === false).toBeTruthy();
   });
 
   it('does not tap', () => {
@@ -89,7 +97,7 @@ describe('left(false)', () => {
   it('transforms to left(false)', () => {
     const mapped = subject.fmap((value) => value.length);
 
-    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
   });
 
   it('fallbacks to 3', () => {
@@ -102,19 +110,19 @@ describe('left(false)', () => {
     });
 
     expect(callback).toBeCalledWith(false);
-    expect(isRight(mapped) && mapped.right === 3).toBeTruthy();
+    expect(mapped.isRight() && mapped.right === 3).toBeTruthy();
   });
 
   it('chains to left(false)', () => {
     const mapped = subject.chain((value) => right(value.length));
 
-    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
   });
 
   it('chains to left(false)', () => {
     const mapped = subject.chain(() => left(true));
 
-    expect(isLeft(mapped) && mapped.left === false).toBeTruthy();
+    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
   });
 
   it('fallback chains to 3', () => {
@@ -127,6 +135,6 @@ describe('left(false)', () => {
     });
 
     expect(callback).toBeCalledWith(false);
-    expect(isRight(mapped) && mapped.right === 3).toBeTruthy();
+    expect(mapped.isRight() && mapped.right === 3).toBeTruthy();
   });
 });

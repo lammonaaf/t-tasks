@@ -1,15 +1,15 @@
-import { just, isJust, nothing, isNothing, Maybe } from '../src';
+import { just, nothing, Maybe } from '../src';
 
 describe('just("data")', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Maybe<string> => just('data'))();
 
   it('is Just', () => {
-    expect(isJust(subject)).toBeTruthy();
+    expect(subject.isJust()).toBeTruthy();
   });
 
   it('contains "data"', () => {
-    expect(isJust(subject) && subject.just === 'data').toBeTruthy();
+    expect(subject.isJust() && subject.just === 'data').toBeTruthy();
   });
 
   it('taps "data"', () => {
@@ -24,31 +24,31 @@ describe('just("data")', () => {
   it('transforms to length 4', () => {
     const mapped = subject.fmap((value) => value.length);
 
-    expect(isJust(mapped) && mapped.just === 4).toBeTruthy();
+    expect(mapped.isJust() && mapped.just === 4).toBeTruthy();
   });
 
   it('does not fallback', () => {
     const mapped = subject.fmapNothing(() => 6);
 
-    expect(isJust(mapped) && mapped.just === 'data').toBeTruthy();
+    expect(mapped.isJust() && mapped.just === 'data').toBeTruthy();
   });
 
   it('chains to length 4', () => {
     const mapped = subject.chain((value) => just(value.length));
 
-    expect(isJust(mapped) && mapped.just === 4).toBeTruthy();
+    expect(mapped.isJust() && mapped.just === 4).toBeTruthy();
   });
 
   it('chains to nothing', () => {
     const mapped = subject.chain(() => nothing());
 
-    expect(isNothing(mapped)).toBeTruthy();
+    expect(mapped.isNothing()).toBeTruthy();
   });
 
   it('doues not fallback chain', () => {
     const mapped = subject.chainNothing(() => just(6));
 
-    expect(isJust(mapped) && mapped.just === 'data').toBeTruthy();
+    expect(mapped.isJust() && mapped.just === 'data').toBeTruthy();
   });
 });
 
@@ -57,7 +57,7 @@ describe('nothing()', () => {
   const subject = ((): Maybe<string> => nothing())();
 
   it('is Nothing', () => {
-    expect(isNothing(subject)).toBeTruthy();
+    expect(subject.isNothing()).toBeTruthy();
   });
 
   it('taps nothing', () => {
@@ -71,30 +71,30 @@ describe('nothing()', () => {
   it('transforms to Nothing', () => {
     const mapped = subject.fmap((value) => value.length);
 
-    expect(isNothing(mapped)).toBeTruthy();
+    expect(mapped.isNothing()).toBeTruthy();
   });
 
   it('fallbacks to just 6', () => {
     const mapped = subject.fmapNothing(() => 6);
 
-    expect(isJust(mapped) && mapped.just === 6).toBeTruthy();
+    expect(mapped.isJust() && mapped.just === 6).toBeTruthy();
   });
 
   it('chains to nothing', () => {
     const mapped = subject.chain((value) => just(value.length));
 
-    expect(isNothing(mapped)).toBeTruthy();
+    expect(mapped.isNothing()).toBeTruthy();
   });
 
   it('chains to nothing', () => {
     const mapped = subject.chain(() => nothing());
 
-    expect(isNothing(mapped)).toBeTruthy();
+    expect(mapped.isNothing()).toBeTruthy();
   });
 
   it('fallback chains to just 6', () => {
     const mapped = subject.chainNothing(() => just(6));
 
-    expect(isJust(mapped) && mapped.just === 6).toBeTruthy();
+    expect(mapped.isJust() && mapped.just === 6).toBeTruthy();
   });
 });
