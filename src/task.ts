@@ -1,5 +1,5 @@
-import { Maybe, just, isJust, nothing } from './maybe';
-import { Either, right, isRight, left } from './either';
+import { Maybe, just, nothing } from './maybe';
+import { Either, right, left } from './either';
 
 /**
  * Shortcut for monadic Either type, where erroneous value is of type any
@@ -240,7 +240,7 @@ function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) =>
 
 function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
   return chainTaskMaybe<R, R2>(_task, (maybe) => {
-    if (isJust(maybe)) {
+    if (maybe.isJust()) {
       return op(maybe.just);
     } else {
       return canceledTask<R2>();
@@ -250,7 +250,7 @@ function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) =
 
 function chainTask<R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>) {
   return chainTaskEither<R, R2>(_task, (either) => {
-    if (isRight(either)) {
+    if (either.isRight()) {
       return op(either.right);
     } else {
       return rejectedTask<R2>(either.left);
@@ -260,8 +260,8 @@ function chainTask<R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>) {
 
 function chainTaskCanceled<R, R2>(_task: TaskBase<R>, op: () => Task<R2>) {
   return chainTaskMaybe<R, R | R2>(_task, (maybe) => {
-    if (isJust(maybe)) {
-      if (isRight(maybe.just)) {
+    if (maybe.isJust()) {
+      if (maybe.just.isRight()) {
         return resolvedTask<R>(maybe.just.right);
       } else {
         return rejectedTask<R>(maybe.just.left);
@@ -274,7 +274,7 @@ function chainTaskCanceled<R, R2>(_task: TaskBase<R>, op: () => Task<R2>) {
 
 function chainTaskRejected<R, R2>(_task: TaskBase<R>, op: (error: any) => Task<R2>) {
   return chainTaskEither<R, R | R2>(_task, (either) => {
-    if (isRight(either)) {
+    if (either.isRight()) {
       return resolvedTask<R>(either.right);
     } else {
       return op(either.left);

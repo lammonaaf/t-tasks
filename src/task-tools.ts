@@ -1,5 +1,5 @@
-import { Maybe, just, nothing, isJust } from './maybe';
-import { right, left, isRight } from './either';
+import { Maybe, just, nothing } from './maybe';
+import { right, left } from './either';
 import { Task, task, resolvedTask, Cancelable } from './task';
 
 /**
@@ -109,16 +109,14 @@ export function liftPromise<R>(promise: PromiseLike<R>): Task<R> {
       promise.then(
         (value) => {
           globalResolve(just(right(value)));
-          globalResolve = stub;
         },
         (error) => {
           globalResolve(just(left(error)));
-          globalResolve = stub;
         },
       );
     }),
     (error: Maybe<any>) => {
-      if (isJust(error)) {
+      if (error.isJust()) {
         globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
@@ -233,7 +231,7 @@ export function timeoutTask(delay: number) {
       }, delay);
     }),
     (error: Maybe<any>) => {
-      if (isJust(error)) {
+      if (error.isJust()) {
         globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
@@ -386,8 +384,8 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
       Promise.all(
         tasks.map((task) => {
           return task.resolve().then((result) => {
-            if (isJust(result)) {
-              if (isRight(result.just)) {
+            if (result.isJust()) {
+              if (result.just.isRight()) {
                 return result.just.right;
               } else {
                 throw just(result.just.left);
@@ -403,7 +401,7 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
           globalResolve = stub;
         },
         (error: Maybe<any>) => {
-          if (isJust(error)) {
+          if (error.isJust()) {
             globalResolve(just(left(error.just)));
             globalResolve = stub;
           } else {
@@ -414,7 +412,7 @@ export function parallelTask<TT extends TaskFunction<[], any>>(taskFunctions: TT
       );
     }),
     (error: Maybe<any>) => {
-      if (isJust(error)) {
+      if (error.isJust()) {
         globalResolve(just(left(error.just)));
       } else {
         globalResolve(nothing());
@@ -452,7 +450,7 @@ export function repeatTask<T>(taskFunction: TaskFunction<[], T>, repeatFunction:
       } catch (error) {
         yield repeatFunction();
       }
-    } while (!isJust(result));
+    } while (result.isNothing());
 
     return result.just;
   });
