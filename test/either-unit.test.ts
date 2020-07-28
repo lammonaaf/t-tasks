@@ -8,6 +8,10 @@ describe('right("data")', () => {
     expect(subject.isRight()).toBeTruthy();
   });
 
+  it('is not Left', () => {
+    expect(subject.isLeft()).toBeFalsy();
+  });
+
   it('contains "data"', () => {
     expect(subject.isRight() && subject.right === 'data').toBeTruthy();
   });
@@ -72,6 +76,10 @@ describe('left(false)', () => {
 
   it('is Left', () => {
     expect(subject.isLeft()).toBeTruthy();
+  });
+
+  it('is not Right', () => {
+    expect(subject.isRight()).toBeFalsy();
   });
 
   it('contains false', () => {
