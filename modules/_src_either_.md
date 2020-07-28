@@ -4,82 +4,40 @@
 
 ## Index
 
-### Classes
-
-* [LeftClass](../classes/_src_either_.leftclass.md)
-* [RightClass](../classes/_src_either_.rightclass.md)
-
 ### Interfaces
 
-* [Either](../interfaces/_src_either_.either.md)
 * [Left](../interfaces/_src_either_.left.md)
 * [Right](../interfaces/_src_either_.right.md)
 
+### Type aliases
+
+* [Either](_src_either_.md#either)
+
 ### Functions
 
-* [isLeft](_src_either_.md#isleft)
-* [isRight](_src_either_.md#isright)
 * [left](_src_either_.md#left)
 * [right](_src_either_.md#right)
 
+## Type aliases
+
+###  Either
+
+Ƭ **Either**: *[Right](../interfaces/_src_either_.right.md)‹R› | [Left](../interfaces/_src_either_.left.md)‹L›*
+
+*Defined in [src/either.ts:228](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L228)*
+
+Either data type: either Right value of type R or Left value of type L
+
+As per classic Either monad implementation can eithr contain a right (correct) value or a left (erroneous) value
+Used throughout the library to represent the result of failable operations, namely failed tasks
+
 ## Functions
-
-###  isLeft
-
-▸ **isLeft**‹**L**›(`either`: [Either](../interfaces/_src_either_.either.md)‹any, L›): *either is Left<L>*
-
-*Defined in [src/either.ts:195](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L195)*
-
-Pattern mathching for 'left'
-
-**Type parameters:**
-
-▪ **L**
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`either` | [Either](../interfaces/_src_either_.either.md)‹any, L› | 'right value' or 'left error'  Returns 'true' in case either is left (and resolves argument type to be 'left error')  |
-
-**Returns:** *either is Left<L>*
-
-___
-
-###  isRight
-
-▸ **isRight**‹**R**›(`either`: [Either](../interfaces/_src_either_.either.md)‹R, any›): *either is Right<R>*
-
-*Defined in [src/either.ts:185](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L185)*
-
-Pattern mathching for 'right'
-
-**`example`** 
-```typescript
-if (isRight(either)) {
-  console.log(either.rigth)
-}
-```
-
-**Type parameters:**
-
-▪ **R**
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`either` | [Either](../interfaces/_src_either_.either.md)‹R, any› | 'right value' or 'left error'  Returns 'true' in case either is right (and resolves argument type to be 'right value')  |
-
-**Returns:** *either is Right<R>*
-
-___
 
 ###  left
 
 ▸ **left**‹**L**›(`error`: L): *[Left](../interfaces/_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:168](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L168)*
+*Defined in [src/either.ts:248](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L248)*
 
 Left monad constructor
 
@@ -87,13 +45,17 @@ Left monad constructor
 
 ▪ **L**
 
+underlying error type
+
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`error` | L | underlying error  |
+`error` | L | underlying error |
 
 **Returns:** *[Left](../interfaces/_src_either_.left.md)‹L›*
+
+'left error'
 
 ___
 
@@ -101,7 +63,7 @@ ___
 
 ▸ **right**‹**R**›(`value`: R): *[Right](../interfaces/_src_either_.right.md)‹R›*
 
-*Defined in [src/either.ts:160](https://github.com/lammonaaf/t-tasks/blob/f57e57b/src/either.ts#L160)*
+*Defined in [src/either.ts:237](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L237)*
 
 Right monad constructor
 
@@ -109,10 +71,14 @@ Right monad constructor
 
 ▪ **R**
 
+underlying value type
+
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`value` | R | underlying value  |
+`value` | R | underlying value |
 
 **Returns:** *[Right](../interfaces/_src_either_.right.md)‹R›*
+
+'right value'

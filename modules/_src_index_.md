@@ -21,6 +21,7 @@
 * [TaskFunction](_src_index_.md#taskfunction)
 * [TaskFunctionType](_src_index_.md#taskfunctiontype)
 * [TaskGenerator](_src_index_.md#taskgenerator)
+* [TaskGeneratorFunction](_src_index_.md#taskgeneratorfunction)
 * [TaskType](_src_index_.md#tasktype)
 * [canceledTask](_src_index_.md#canceledtask)
 * [cast](_src_index_.md#cast)
@@ -29,10 +30,6 @@
 * [castTask](_src_index_.md#casttask)
 * [castTaskFunction](_src_index_.md#casttaskfunction)
 * [generateTask](_src_index_.md#generatetask)
-* [isJust](_src_index_.md#isjust)
-* [isLeft](_src_index_.md#isleft)
-* [isNothing](_src_index_.md#isnothing)
-* [isRight](_src_index_.md#isright)
 * [just](_src_index_.md#just)
 * [left](_src_index_.md#left)
 * [liftPromise](_src_index_.md#liftpromise)
@@ -140,6 +137,12 @@ ___
 
 ___
 
+###  TaskGeneratorFunction
+
+• **TaskGeneratorFunction**:
+
+___
+
 ###  TaskType
 
 • **TaskType**:
@@ -185,30 +188,6 @@ ___
 ###  generateTask
 
 • **generateTask**:
-
-___
-
-###  isJust
-
-• **isJust**:
-
-___
-
-###  isLeft
-
-• **isLeft**:
-
-___
-
-###  isNothing
-
-• **isNothing**:
-
-___
-
-###  isRight
-
-• **isRight**:
 
 ___
 
