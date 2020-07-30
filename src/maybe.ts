@@ -239,7 +239,7 @@ export function just<R>(value: R): Just<R> {
  * @returns 'nothing'
  */
 export function nothing(): Nothing {
-  return new NothingClass();
+  return staticNothing;
 }
 
 /// --------------------------------------------------------------------------------------
@@ -309,3 +309,5 @@ class NothingClass implements Nothing {
     return true;
   }
 }
+
+const staticNothing = new NothingClass();
