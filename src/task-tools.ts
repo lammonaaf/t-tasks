@@ -109,18 +109,19 @@ export function liftPromise<R>(promise: PromiseLike<R>): Task<R> {
       promise.then(
         (value) => {
           globalResolve(just(right(value)));
+
+          globalResolve = stub;
         },
         (error) => {
           globalResolve(just(left(error)));
+
+          globalResolve = stub;
         },
       );
     }),
     (error: Maybe<any>) => {
-      if (error.isJust()) {
-        globalResolve(just(left(error.just)));
-      } else {
-        globalResolve(nothing());
-      }
+      error.tap((error) => globalResolve(just(left(error)))).tapNothing(() => globalResolve(nothing()));
+
       globalResolve = stub;
     },
   );
@@ -231,11 +232,8 @@ export function timeoutTask(delay: number) {
       }, delay);
     }),
     (error: Maybe<any>) => {
-      if (error.isJust()) {
-        globalResolve(just(left(error.just)));
-      } else {
-        globalResolve(nothing());
-      }
+      error.tap((error) => globalResolve(just(left(error)))).tapNothing(() => globalResolve(nothing()));
+
       globalResolve = stub;
 
       clearTimeout(handler);
