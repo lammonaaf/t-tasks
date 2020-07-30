@@ -41,7 +41,7 @@ export interface Just<R> {
    * @param op transformer to be invoked with underlying value
    * @returns 'op(value)' or 'nothing'
    */
-  chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
+  chain<TT extends Maybe<any>>(op: (value: R) => TT): TT;
 
   /**
    * Maybe fallback peeker function
@@ -52,7 +52,7 @@ export interface Just<R> {
    * @param op function to be invoked
    * @returns self
    */
-  tapNothing(): Just<R>;
+  tapNothing(op: unknown): Just<R>;
 
   /**
    * Maybe fallback transformer function
@@ -64,7 +64,7 @@ export interface Just<R> {
    * @param op function to be invoked
    * @returns 'just value' or 'just op()'
    */
-  fmapNothing(): Just<R>;
+  fmapNothing(op: unknown): Just<R>;
 
   /**
    * Maybe fallback composition function
@@ -76,7 +76,7 @@ export interface Just<R> {
    * @param op function to be invoked
    * @returns 'just value' or 'op()'
    */
-  chainNothing(): Just<R>;
+  chainNothing(op: unknown): Just<R>;
 
   /**
    * Maybe type guard for 'just'
@@ -122,7 +122,7 @@ export interface Nothing {
    * @param op function to be invoked with underlying value
    * @returns self
    */
-  tap(): Nothing;
+  tap(op: unknown): Nothing;
 
   /**
    * Maybe transformer function
@@ -134,7 +134,7 @@ export interface Nothing {
    * @param op transformer to be invoked with underlying value
    * @returns 'just op(value)' or self
    */
-  fmap(): Nothing;
+  fmap(op: unknown): Nothing;
 
   /**
    * Maybe composition function
@@ -146,7 +146,7 @@ export interface Nothing {
    * @param op transformer to be invoked with underlying value
    * @returns 'op(value)' or self
    */
-  chain(): Nothing;
+  chain(op: unknown): Nothing;
 
   /**
    * Maybe fallback peeker function
@@ -181,7 +181,7 @@ export interface Nothing {
    * @param op function to be invoked
    * @returns self or 'op()'
    */
-  chainNothing<R2>(op: () => Maybe<R2>): Maybe<R2>;
+  chainNothing<TT extends Maybe<any>>(op: () => TT): TT;
 
   /**
    * Maybe type guard for 'just'
@@ -257,6 +257,8 @@ class JustClass<R> implements Just<R> {
   fmap<R2>(op: (value: R) => R2) {
     return just(op(this.just));
   }
+  chain(op: (value: R) => Nothing): Nothing;
+  chain<R2>(op: (value: R) => Just<R2>): Just<R2>;
   chain<R2>(op: (value: R) => Maybe<R2>) {
     return op(this.just);
   }
@@ -295,6 +297,8 @@ class NothingClass implements Nothing {
   fmapNothing<R2>(op: () => R2) {
     return just(op());
   }
+  chainNothing(op: () => Nothing): Nothing;
+  chainNothing<R2>(op: () => Just<R2>): Just<R2>;
   chainNothing<R2>(op: () => Maybe<R2>) {
     return op();
   }

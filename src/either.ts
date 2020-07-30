@@ -41,7 +41,7 @@ export interface Right<R> {
    * @param op transformer to be invoked with underlying value
    * @returns 'op(value)' or 'left error'
    */
-  chain<R2, L2>(op: (value: R) => Either<R2, L2>): Either<R2, L2>;
+  chain<TT extends Either<any, any>>(op: (value: R) => TT): TT;
 
   /**
    * Either fallback peeker function
@@ -52,7 +52,7 @@ export interface Right<R> {
    * @param op function to be invoked with underlying value
    * @returns self
    */
-  tapLeft(): Right<R>;
+  tapLeft(op: unknown): Right<R>;
 
   /**
    * Either fallback transformer function
@@ -64,7 +64,7 @@ export interface Right<R> {
    * @param op transformer to be invoked with underlying value
    * @returns 'right value' or 'right op(error)'
    */
-  fmapLeft(): Right<R>;
+  fmapLeft(op: unknown): Right<R>;
 
   /**
    * Either composition function
@@ -76,7 +76,7 @@ export interface Right<R> {
    * @param op transformer to be invoked with underlying value
    * @returns 'right value' or 'op(error)'
    */
-  chainLeft(): Right<R>;
+  chainLeft(op: unknown): Right<R>;
 
   /**
    * Either type guard for 'right'
@@ -126,7 +126,7 @@ export interface Left<L> {
    * @param op function to be invoked with underlying value
    * @returns self
    */
-  tap(): Left<L>;
+  tap(op: unknown): Left<L>;
 
   /**
    * Either transformer function
@@ -138,7 +138,7 @@ export interface Left<L> {
    * @param op transformer to be invoked with underlying value
    * @returns 'right op(value)' or 'left error'
    */
-  fmap(): Left<L>;
+  fmap(op: unknown): Left<L>;
 
   /**
    * Either composition function
@@ -150,7 +150,7 @@ export interface Left<L> {
    * @param op transformer to be invoked with underlying value
    * @returns 'op(value)' or 'left error'
    */
-  chain(): Left<L>;
+  chain(op: unknown): Left<L>;
 
   /**
    * Either fallback peeker function
@@ -185,7 +185,7 @@ export interface Left<L> {
    * @param op transformer to be invoked with underlying value
    * @returns 'right value' or 'op(error)'
    */
-  chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>): Either<R2, L2>;
+  chainLeft<TT extends Either<any, any>>(op: (error: L) => TT): TT;
 
   /**
    * Either type guard for 'right'
@@ -264,6 +264,8 @@ class RightClass<R> implements Right<R> {
   fmap<R2>(op: (value: R) => R2) {
     return right(op(this.right));
   }
+  chain<R2>(op: (value: R) => Right<R2>): Right<R2>;
+  chain<L2>(op: (value: R) => Left<L2>): Left<L2>;
   chain<R2, L2>(op: (value: R) => Either<R2, L2>) {
     return op(this.right);
   }
@@ -304,6 +306,8 @@ class LeftClass<L> implements Left<L> {
   fmapLeft<R2>(op: (error: L) => R2) {
     return right(op(this.left));
   }
+  chainLeft<L2>(op: (error: L) => Left<L2>): Left<L2>;
+  chainLeft<R2>(op: (error: L) => Right<R2>): Right<R2>;
   chainLeft<R2, L2>(op: (error: L) => Either<R2, L2>) {
     return op(this.left);
   }
