@@ -239,47 +239,23 @@ function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) =>
 }
 
 function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
-  return chainTaskMaybe<R, R2>(_task, (maybe) => {
-    if (maybe.isJust()) {
-      return op(maybe.just);
-    } else {
-      return canceledTask<R2>();
-    }
-  });
+  return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.fmap(op).fmapNothing<Task<R2>>(canceledTask).just);
 }
 
 function chainTask<R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>) {
-  return chainTaskEither<R, R2>(_task, (either) => {
-    if (either.isRight()) {
-      return op(either.right);
-    } else {
-      return rejectedTask<R2>(either.left);
-    }
-  });
+  return chainTaskEither<R, R2>(_task, (either) => either.fmap(op).fmapLeft<Task<R2>>(rejectedTask).right);
 }
 
 function chainTaskCanceled<R, R2>(_task: TaskBase<R>, op: () => Task<R2>) {
   return chainTaskMaybe<R, R | R2>(_task, (maybe) => {
-    if (maybe.isJust()) {
-      if (maybe.just.isRight()) {
-        return resolvedTask<R>(maybe.just.right);
-      } else {
-        return rejectedTask<R>(maybe.just.left);
-      }
-    } else {
-      return op();
-    }
+    return maybe
+      .fmap((either) => either.fmap(resolvedTask).fmapLeft<Task<R>>(rejectedTask))
+      .fmapNothing(() => right(op())).just.right;
   });
 }
 
 function chainTaskRejected<R, R2>(_task: TaskBase<R>, op: (error: any) => Task<R2>) {
-  return chainTaskEither<R, R | R2>(_task, (either) => {
-    if (either.isRight()) {
-      return resolvedTask<R>(either.right);
-    } else {
-      return op(either.left);
-    }
-  });
+  return chainTaskEither<R, R | R2>(_task, (either) => either.fmap(resolvedTask).fmapLeft(op).right);
 }
 
 class TaskClass<R> implements Task<R> {
