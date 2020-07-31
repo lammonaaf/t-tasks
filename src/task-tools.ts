@@ -120,7 +120,7 @@ export function liftPromise<R>(promise: PromiseLike<R>): Task<R> {
       );
     }),
     (error: Maybe<any>) => {
-      error.tap((error) => globalResolve(just(left(error)))).tapNothing(() => globalResolve(nothing()));
+      error.tap((error) => globalResolve(just(left(error)))).orTap(() => globalResolve(nothing()));
 
       globalResolve = stub;
     },
@@ -232,7 +232,7 @@ export function timeoutTask(delay: number) {
       }, delay);
     }),
     (error: Maybe<any>) => {
-      error.tap((error) => globalResolve(just(left(error)))).tapNothing(() => globalResolve(nothing()));
+      error.tap((error) => globalResolve(just(left(error)))).orTap(() => globalResolve(nothing()));
 
       globalResolve = stub;
 

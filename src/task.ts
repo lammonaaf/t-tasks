@@ -180,7 +180,7 @@ function fmapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => 
 }
 
 function fmapTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Rejectable<R2>) {
-  return fmapTaskMaybe<R, R2>(_task, (maybe) => maybe.fmap(op));
+  return fmapTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op));
 }
 
 function fmapTask<R, R2>(_task: TaskBase<R>, op: (value: R) => R2) {
@@ -188,7 +188,7 @@ function fmapTask<R, R2>(_task: TaskBase<R>, op: (value: R) => R2) {
 }
 
 function fmapTaskCanceled<R, R2>(_task: TaskBase<R>, op: () => R2) {
-  return fmapTaskMaybe<R, R | R2>(_task, (maybe) => maybe.fmapNothing(() => right(op())));
+  return fmapTaskMaybe<R, R | R2>(_task, (maybe) => maybe.orMap(() => right(op())));
 }
 
 function fmapTaskRejected<R, R2>(_task: TaskBase<R>, op: (error: any) => R2) {
@@ -212,7 +212,7 @@ function tapTask<R>(_task: TaskBase<R>, op: (value: R) => void) {
 }
 
 function tapTaskCanceled<R>(_task: TaskBase<R>, op: () => void) {
-  return tapTaskMaybe<R>(_task, (maybe) => maybe.tapNothing(op));
+  return tapTaskMaybe<R>(_task, (maybe) => maybe.orTap(op));
 }
 
 function tapTaskRejected<R>(_task: TaskBase<R>, op: (error: any) => void) {
@@ -239,7 +239,7 @@ function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) =>
 }
 
 function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
-  return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.fmap(op).fmapNothing<Task<R2>>(canceledTask).just);
+  return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op).orMap<Task<R2>>(canceledTask).just);
 }
 
 function chainTask<R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>) {
@@ -248,9 +248,8 @@ function chainTask<R, R2>(_task: TaskBase<R>, op: (value: R) => Task<R2>) {
 
 function chainTaskCanceled<R, R2>(_task: TaskBase<R>, op: () => Task<R2>) {
   return chainTaskMaybe<R, R | R2>(_task, (maybe) => {
-    return maybe
-      .fmap((either) => either.fmap(resolvedTask).fmapLeft<Task<R>>(rejectedTask))
-      .fmapNothing(() => right(op())).just.right;
+    return maybe.map((either) => either.fmap(resolvedTask).fmapLeft<Task<R>>(rejectedTask)).orMap(() => right(op()))
+      .just.right;
   });
 }
 
