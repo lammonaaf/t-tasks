@@ -439,17 +439,17 @@ export function limitTask<T>(task: Task<T>, limit: Task<void>) {
  * Under construction
  */
 export function repeatTask<T>(taskFunction: TaskFunction<[], T>, repeatFunction: TaskFunction<[], void>) {
-  return generateTask(function*() {
-    let result: Maybe<T> = nothing();
+  const iteration = () => {
+    return taskFunction()
+      .fmap(just)
+      .chainRejected(() => repeatFunction().fmap(nothing));
+  };
 
-    do {
-      try {
-        result = just(castTaskFunction<typeof taskFunction>(yield taskFunction()));
-      } catch (error) {
-        yield repeatFunction();
-      }
-    } while (result.isNothing());
+  const sequentor = (maybe: Maybe<T>): Task<T> => {
+    return maybe
+      .map(resolvedTask) // return on success
+      .orMap(() => iteration().chain(sequentor)).just; // repeat on failure
+  };
 
-    return result.just;
-  });
+  return sequentor(nothing());
 }
