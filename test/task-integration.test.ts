@@ -13,6 +13,7 @@ import {
   sequenceTask,
   castTask,
   castPromiseFunction,
+  castTaskFunction,
 } from '../src/task-tools';
 import { just, right, left, nothing, rejectedTask, resolvedTask, Task } from '../src';
 
@@ -1274,7 +1275,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = castTaskFunction<() => Task<number>>(yield delayedValueTask(data.length, 200));
 
       resolved(length);
 
@@ -1626,7 +1627,9 @@ describe('repeatTask scenarios', () => {
       .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction))
       .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction));
 
-    const task = repeatTask(taskFunction, () => timeoutTask(200));
+    const task = repeatTask(() => {
+      return taskFunction().chainRejected((error) => timeoutTask(200).chain(() => rejectedTask<number>(error)));
+    });
 
     await advanceTime(300);
 

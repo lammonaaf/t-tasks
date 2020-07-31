@@ -438,18 +438,8 @@ export function limitTask<T>(task: Task<T>, limit: Task<void>) {
 /**
  * Under construction
  */
-export function repeatTask<T>(taskFunction: TaskFunction<[], T>, repeatFunction: TaskFunction<[], void>) {
-  const iteration = () => {
-    return taskFunction()
-      .fmap(just)
-      .chainRejected(() => repeatFunction().fmap(nothing));
-  };
+export function repeatTask<T>(taskFunction: TaskFunction<[], T>) {
+  const sequentor = (): Task<T> => taskFunction().chainRejected(sequentor);
 
-  const sequentor = (maybe: Maybe<T>): Task<T> => {
-    return maybe
-      .map(resolvedTask) // return on success
-      .orMap(() => iteration().chain(sequentor)).just; // repeat on failure
-  };
-
-  return sequentor(nothing());
+  return sequentor();
 }
