@@ -1,23 +1,8 @@
 /* eslint-disable no-throw-literal */ // fore more confinient failure testing
 
-import {
-  timeoutTask,
-  generateTask,
-  cast,
-  castPromise,
-  liftPromise,
-  liftPromiseFunction,
-  repeatTask,
-  limitTask,
-  parallelTask,
-  sequenceTask,
-  castTask,
-  castPromiseFunction,
-  castTaskFunction,
-} from '../src/task-tools';
-import { just, right, left, nothing, rejectedTask, resolvedTask, Task } from '../src';
+import { Either, Maybe, Task } from '../src';
 
-const delayedValueTask = <R>(value: R, delay: number) => timeoutTask(delay).fmap(() => value);
+const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
 const delayedValuePromise = async <R>(value: R, delay: number) => {
   return new Promise((resolve) => setTimeout(resolve, delay)).then(() => value);
 };
@@ -64,7 +49,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(42)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
 
   it('cancel in 50ms', async () => {
@@ -95,7 +80,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('cancel in 50ms with fallback', async () => {
@@ -104,7 +89,7 @@ describe('basic scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask(42, 100)
-      .fmapCanceled(canceled)
+      .mapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
 
@@ -126,7 +111,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 
   it('fail externally in 50ms', async () => {
@@ -157,7 +142,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail externally in 50ms with fallback', async () => {
@@ -167,7 +152,7 @@ describe('basic scenarios', () => {
 
     const task = delayedValueTask(42, 100)
       .tapCanceled(canceled)
-      .fmapRejected(rejected)
+      .mapRejected(rejected)
       .tap(resolved);
 
     await advanceTime(50);
@@ -188,7 +173,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 
   it('fail internally in 50ms', async () => {
@@ -218,7 +203,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally in 50ms with fallback', async () => {
@@ -231,7 +216,7 @@ describe('basic scenarios', () => {
         throw 'some-error';
       })
       .tapCanceled(canceled)
-      .fmapRejected(rejected)
+      .mapRejected(rejected)
       .tap(resolved);
 
     await advanceTime(50);
@@ -248,7 +233,7 @@ describe('basic scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 });
 
@@ -275,7 +260,7 @@ describe('chained scenarios', () => {
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved)
-      .chainCanceled(() => resolvedTask('cat'))
+      .chainCanceled(() => Task.resolved('cat'))
       .chain((value) => delayedValueTask(value.length, 200))
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -311,7 +296,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(2);
 
-    expect(result).toStrictEqual(just(right(4)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(4)));
   });
 
   it('cancel on first step in 50ms', async () => {
@@ -346,7 +331,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('cancel on second step in 150ms', async () => {
@@ -393,7 +378,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('cancel on first step in 50ms with fallback', async () => {
@@ -440,7 +425,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(5)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
 
   it('fail externally on first step in 50ms', async () => {
@@ -452,7 +437,7 @@ describe('chained scenarios', () => {
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved)
-      .chainCanceled(() => resolvedTask('cat'))
+      .chainCanceled(() => Task.resolved('cat'))
       .chain((value) => delayedValueTask(value.length, 200))
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -476,7 +461,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(2);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail externally on second step in 150ms', async () => {
@@ -523,7 +508,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally before first step', async () => {
@@ -531,7 +516,7 @@ describe('chained scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = rejectedTask('some-error')
+    const task = Task.rejected('some-error')
       .chain(() => delayedValueTask('data', 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -555,7 +540,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(2);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally on first step in 50ms', async () => {
@@ -589,7 +574,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(2);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally between steps in 100ms', async () => {
@@ -632,7 +617,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally on second step in 150ms', async () => {
@@ -678,7 +663,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail externally on first step in 50ms with fallback', async () => {
@@ -725,7 +710,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(5)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
 
   it('fail internally on first step in 50ms with fallback', async () => {
@@ -771,7 +756,7 @@ describe('chained scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(5)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
 });
 
@@ -796,12 +781,12 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = castTask<Task<string>>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
-      const length = castPromiseFunction<() => Promise<number>>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -840,7 +825,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(2);
 
-    expect(result).toStrictEqual(just(right(4)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(4)));
   });
 
   it('cancel on first step in 50ms', async () => {
@@ -848,12 +833,12 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = castTask<Task<string>>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
-      const length = castPromiseFunction<() => Promise<number>>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -880,7 +865,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('cancel on second step in 150ms', async () => {
@@ -888,12 +873,12 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = cast<string>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -932,7 +917,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('fail externally on first step in 50ms', async () => {
@@ -940,12 +925,12 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = castPromise<Promise<string>>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -972,7 +957,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail externally on second step in 150ms', async () => {
@@ -980,12 +965,12 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = castPromise<Promise<string>>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -1024,7 +1009,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally before first step', async () => {
@@ -1032,15 +1017,15 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
+    const task = Task.generate(function*() {
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
-      const data = cast<string>(yield delayedValueTask('data', 50));
+      const data = yield* delayedValueTask('data', 50).generator();
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -1063,7 +1048,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally on first step in 50ms', async () => {
@@ -1071,16 +1056,16 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = cast<string>(
-        yield delayedValueTask('data', 50).tap(() => {
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 50)
+        .tap(() => {
           throw 'some-error';
-        }),
-      );
+        })
+        .generator();
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -1103,7 +1088,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally between steps in 100ms', async () => {
@@ -1111,15 +1096,15 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = cast<string>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
       throw 'some-error';
 
       // eslint-disable-next-line no-unreachable
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -1142,7 +1127,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally on second step in 150ms', async () => {
@@ -1150,16 +1135,16 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
-      const data = cast<string>(yield delayedValueTask('data', 100));
+    const task = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
 
       resolved(data);
 
-      const length = cast<number>(
-        yield delayedValueTask(data.length, 50).tap(() => {
+      const length = yield* delayedValueTask(data.length, 50)
+        .tap(() => {
           throw 'some-error';
-        }),
-      );
+        })
+        .generator();
 
       resolved(length);
 
@@ -1194,7 +1179,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail externally on first step in 50ms with fallback', async () => {
@@ -1202,10 +1187,10 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
+    const task = Task.generate(function*() {
       let data: string;
       try {
-        data = cast<string>(yield delayedValueTask('data', 100));
+        data = yield* delayedValueTask('data', 100).generator();
       } catch (e) {
         rejected(e);
 
@@ -1214,7 +1199,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = cast<number>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -1251,7 +1236,7 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(2);
 
-    expect(result).toStrictEqual(just(right(3)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(3)));
   });
 
   it('fail internally on first step in 50ms with fallback', async () => {
@@ -1259,14 +1244,14 @@ describe('generated scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = generateTask(function*() {
+    const task = Task.generate(function*() {
       let data: string;
       try {
-        data = cast<string>(
-          yield delayedValueTask('data', 50).tap(() => {
+        data = yield* delayedValueTask('data', 50)
+          .tap(() => {
             throw 'some-error';
-          }),
-        );
+          })
+          .generator();
       } catch (e) {
         rejected(e);
 
@@ -1275,7 +1260,7 @@ describe('generated scenarios', () => {
 
       resolved(data);
 
-      const length = castTaskFunction<() => Task<number>>(yield delayedValueTask(data.length, 200));
+      const length = yield* delayedValueTask(data.length, 200).generator();
 
       resolved(length);
 
@@ -1308,11 +1293,11 @@ describe('generated scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(2);
 
-    expect(result).toStrictEqual(just(right(3)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(3)));
   });
 });
 
-describe('liftPromise scenarios', () => {
+describe('Task.liftPromise scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1333,7 +1318,7 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftPromise(delayedValuePromise(42, 100))
+    const task = Task.fromPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1356,7 +1341,7 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(42)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
 
   it('cancel in 50ms', async () => {
@@ -1364,7 +1349,7 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftPromise(delayedValuePromise(42, 100))
+    const task = Task.fromPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1387,7 +1372,7 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('cancel in 50ms with fallback', async () => {
@@ -1395,8 +1380,8 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftPromise(delayedValuePromise(42, 100))
-      .fmapCanceled(canceled)
+    const task = Task.fromPromise(delayedValuePromise(42, 100))
+      .mapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
 
@@ -1418,7 +1403,7 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 
   it('fail externally in 50ms', async () => {
@@ -1426,7 +1411,7 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftPromise(delayedValuePromise(42, 100))
+    const task = Task.fromPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1449,7 +1434,7 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail externally in 50ms with fallback', async () => {
@@ -1457,9 +1442,9 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn(() => 63);
     const resolved = jest.fn();
 
-    const task = liftPromise(delayedValuePromise(42, 100))
+    const task = Task.fromPromise(delayedValuePromise(42, 100))
       .tapCanceled(canceled)
-      .fmapRejected(rejected)
+      .mapRejected(rejected)
       .tap(resolved);
 
     await advanceTime(50);
@@ -1480,7 +1465,7 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 
   it('fail internally in 50ms', async () => {
@@ -1488,7 +1473,7 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = liftPromise(delayedValuePromise(42, 50))
+    const task = Task.fromPromise(delayedValuePromise(42, 50))
       .tap(() => {
         throw 'some-error';
       })
@@ -1510,7 +1495,7 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally in 50ms with fallback', async () => {
@@ -1518,11 +1503,11 @@ describe('liftPromise scenarios', () => {
     const rejected = jest.fn(() => 63);
     const resolved = jest.fn();
 
-    const task = liftPromise(
+    const task = Task.fromPromise(
       new Promise<number>((_, reject) => setTimeout(() => reject('some-error'), 50)),
     )
       .tapCanceled(canceled)
-      .fmapRejected(rejected)
+      .mapRejected(rejected)
       .tap(resolved);
 
     await advanceTime(50);
@@ -1539,11 +1524,11 @@ describe('liftPromise scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 });
 
-describe('liftPromiseFunction scenarios', () => {
+describe('Task.liftPromiseFunction scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1564,7 +1549,7 @@ describe('liftPromiseFunction scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const promiseFunction = liftPromiseFunction(delayedValuePromise);
+    const promiseFunction = Task.liftPromiseFunction(delayedValuePromise);
 
     const task = promiseFunction(42, 100)
       .tapCanceled(canceled)
@@ -1589,11 +1574,11 @@ describe('liftPromiseFunction scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(42)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
 });
 
-describe('repeatTask scenarios', () => {
+describe('Task.repeat scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1622,13 +1607,13 @@ describe('repeatTask scenarios', () => {
         return 42;
       });
     const taskFunction = jest
-      .fn(() => timeoutTask(300).fmap(promiseFunction))
-      .mockImplementationOnce(() => timeoutTask(300).fmap(promiseFunction))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction));
+      .fn(() => Task.timeout(300).map(promiseFunction))
+      .mockImplementationOnce(() => Task.timeout(300).map(promiseFunction))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction));
 
-    const task = repeatTask(() => {
-      return taskFunction().chainRejected((error) => timeoutTask(200).chain(() => rejectedTask<number>(error)));
+    const task = Task.repeat(() => {
+      return taskFunction().chainRejected((error) => Task.timeout(200).chain(() => Task.rejected<number>(error)));
     });
 
     await advanceTime(300);
@@ -1663,7 +1648,7 @@ describe('repeatTask scenarios', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right(42)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
 });
 
@@ -1688,7 +1673,7 @@ describe('limitTask scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = limitTask(delayedValueTask(42, 200), timeoutTask(300))
+    const task = Task.limit(delayedValueTask(42, 200), () => Task.timeout(300))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1713,7 +1698,7 @@ describe('limitTask scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(1);
 
-    expect(result).toStrictEqual(just(right(42)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
 
   it('cancel in 100ms', async () => {
@@ -1721,7 +1706,7 @@ describe('limitTask scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = limitTask(delayedValueTask(42, 200), timeoutTask(100))
+    const task = Task.limit(delayedValueTask(42, 200), () => Task.timeout(100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1746,7 +1731,7 @@ describe('limitTask scenarios', () => {
     expect(rejected).toBeCalledTimes(0);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('fail in 100ms', async () => {
@@ -1754,7 +1739,7 @@ describe('limitTask scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = limitTask(delayedValueTask(42, 200), timeoutTask(300))
+    const task = Task.limit(delayedValueTask(42, 200), () => Task.timeout(300))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1777,7 +1762,7 @@ describe('limitTask scenarios', () => {
     expect(rejected).toBeCalledTimes(1);
     expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 });
 
@@ -1803,12 +1788,12 @@ describe('parallelTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(600);
 
@@ -1822,7 +1807,7 @@ describe('parallelTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right([40, 41, 42])));
+    expect(result).toStrictEqual(Maybe.just(Either.right([40, 41, 42])));
   });
 
   it('cancel in 300ms', async () => {
@@ -1831,12 +1816,12 @@ describe('parallelTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(300);
 
@@ -1854,7 +1839,7 @@ describe('parallelTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('fail externally in 300ms', async () => {
@@ -1863,12 +1848,12 @@ describe('parallelTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(300);
 
@@ -1886,7 +1871,7 @@ describe('parallelTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally in 400ms', async () => {
@@ -1900,12 +1885,12 @@ describe('parallelTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = parallelTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -1919,7 +1904,7 @@ describe('parallelTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 });
 
@@ -1945,12 +1930,12 @@ describe('sequenceTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.sequence([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -1968,7 +1953,7 @@ describe('sequenceTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right([40, 41, 42])));
+    expect(result).toStrictEqual(Maybe.just(Either.right([40, 41, 42])));
   });
 
   it('cancel in 500ms', async () => {
@@ -1977,12 +1962,12 @@ describe('sequenceTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.sequence([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2006,7 +1991,7 @@ describe('sequenceTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('fail externally in 500ms', async () => {
@@ -2015,12 +2000,12 @@ describe('sequenceTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.sequence([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2044,7 +2029,7 @@ describe('sequenceTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally in 400ms', async () => {
@@ -2058,12 +2043,12 @@ describe('sequenceTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.sequence([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2081,7 +2066,7 @@ describe('sequenceTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('fail internally in 1000ms', async () => {
@@ -2095,12 +2080,12 @@ describe('sequenceTask', () => {
     const promiseFunction3 = jest.fn(() => 42);
 
     const taskFunction = jest
-      .fn(() => resolvedTask(65))
-      .mockImplementationOnce(() => timeoutTask(400).fmap(promiseFunction1))
-      .mockImplementationOnce(() => timeoutTask(600).fmap(promiseFunction2))
-      .mockImplementationOnce(() => timeoutTask(200).fmap(promiseFunction3));
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
 
-    const task = sequenceTask([taskFunction, taskFunction, taskFunction]);
+    const task = Task.sequence([taskFunction, taskFunction, taskFunction]);
 
     await advanceTime(400);
 
@@ -2118,6 +2103,6 @@ describe('sequenceTask', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 });

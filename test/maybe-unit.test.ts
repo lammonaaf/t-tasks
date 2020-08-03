@@ -1,8 +1,8 @@
-import { just, nothing, Maybe } from '../src';
+import { Maybe } from '../src';
 
 describe('just("data")', () => {
   // So typescript does not make assumptions about actual type
-  const subject = ((): Maybe<string> => just('data'))();
+  const subject = ((): Maybe<string> => Maybe.just('data'))();
 
   it('is Just', () => {
     expect(subject.isJust()).toBeTruthy();
@@ -36,43 +36,43 @@ describe('just("data")', () => {
   it('transforms to length 4', () => {
     const mapped = subject.map((value) => value.length);
 
-    expect(mapped).toStrictEqual(just(4));
+    expect(mapped).toStrictEqual(Maybe.just(4));
   });
 
   it('does not fallback', () => {
     const mapped = subject.orMap(() => 6);
 
-    expect(mapped).toStrictEqual(just('data'));
+    expect(mapped).toStrictEqual(Maybe.just('data'));
   });
 
   it('chains to length 4', () => {
-    const mapped = subject.chain((value) => just(value.length));
+    const mapped = subject.chain((value) => Maybe.just(value.length));
 
-    expect(mapped).toStrictEqual(just(4));
+    expect(mapped).toStrictEqual(Maybe.just(4));
   });
 
   it('chains to nothing', () => {
-    const mapped = subject.chain((_) => nothing());
+    const mapped = subject.chain((_) => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(nothing());
+    expect(mapped).toStrictEqual(Maybe.nothing());
   });
 
   it('doues not fallback chain', () => {
-    const mapped = subject.orChain(() => just(6));
+    const mapped = subject.orChain(() => Maybe.just(6));
 
-    expect(mapped).toStrictEqual(just('data'));
+    expect(mapped).toStrictEqual(Maybe.just('data'));
   });
 
   it('doues not fallback chain', () => {
-    const mapped = subject.orChain(() => nothing());
+    const mapped = subject.orChain(() => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(just('data'));
+    expect(mapped).toStrictEqual(Maybe.just('data'));
   });
 });
 
 describe('nothing()', () => {
   // So typescript does not make assumptions about actual type
-  const subject = ((): Maybe<string> => nothing())();
+  const subject = ((): Maybe<string> => Maybe.nothing())();
 
   it('is not Just', () => {
     expect(subject.isJust()).toBeFalsy();
@@ -102,36 +102,76 @@ describe('nothing()', () => {
   it('transforms to Nothing', () => {
     const mapped = subject.map((value) => value.length);
 
-    expect(mapped).toStrictEqual(nothing());
+    expect(mapped).toStrictEqual(Maybe.nothing());
   });
 
   it('fallbacks to just 6', () => {
     const mapped = subject.orMap(() => 6);
 
-    expect(mapped).toStrictEqual(just(6));
+    expect(mapped).toStrictEqual(Maybe.just(6));
   });
 
   it('chains to nothing', () => {
-    const mapped = subject.chain((value) => just(value.length));
+    const mapped = subject.chain((value) => Maybe.just(value.length));
 
-    expect(mapped).toStrictEqual(nothing());
+    expect(mapped).toStrictEqual(Maybe.nothing());
   });
 
   it('chains to nothing', () => {
-    const mapped = subject.chain((_) => nothing());
+    const mapped = subject.chain((_) => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(nothing());
+    expect(mapped).toStrictEqual(Maybe.nothing());
   });
 
   it('fallback chains to just 6', () => {
-    const mapped = subject.orChain(() => just(6));
+    const mapped = subject.orChain(() => Maybe.just(6));
 
-    expect(mapped).toStrictEqual(just(6));
+    expect(mapped).toStrictEqual(Maybe.just(6));
   });
 
   it('fallback chains to nothing', () => {
-    const mapped = subject.orChain(() => nothing());
+    const mapped = subject.orChain(() => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(nothing());
+    expect(mapped).toStrictEqual(Maybe.nothing());
+  });
+});
+
+describe('fromOptional()', () => {
+  it('creates just 5 from 5', () => {
+    const value = Maybe.fromOptional(5);
+
+    expect(value).toStrictEqual(Maybe.just(5));
+  });
+
+  it('creates nothing from undefined', () => {
+    const value = Maybe.fromOptional(undefined);
+
+    expect(value).toStrictEqual(Maybe.nothing());
+  });
+
+  it('creates just null from null', () => {
+    const value = Maybe.fromOptional(null);
+
+    expect(value).toStrictEqual(Maybe.just(null));
+  });
+});
+
+describe('fromNullable()', () => {
+  it('creates just 5 from 5', () => {
+    const value = Maybe.fromNullable(5);
+
+    expect(value).toStrictEqual(Maybe.just(5));
+  });
+
+  it('creates nothing from undefined', () => {
+    const value = Maybe.fromNullable(undefined);
+
+    expect(value).toStrictEqual(Maybe.nothing());
+  });
+
+  it('creates nothing from null', () => {
+    const value = Maybe.fromNullable(null);
+
+    expect(value).toStrictEqual(Maybe.nothing());
   });
 });

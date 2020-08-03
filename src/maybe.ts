@@ -222,24 +222,41 @@ export interface Nothing {
  */
 export type Maybe<R> = Just<R> | Nothing;
 
-/**
- * Non-empty monad constructor
- *
- * @template R underlying type
- * @param value underlying value
- * @returns 'just value'
- */
-export function just<R>(value: R): Just<R> {
-  return new JustClass<R>(value);
-}
+export namespace Maybe {
+  /**
+   * Non-empty monad constructor
+   *
+   * @template R underlying type
+   * @param value underlying value
+   * @returns 'just value'
+   */
+  export function just<R>(value: R): Just<R> {
+    return new JustClass<R>(value);
+  }
 
-/**
- * Empty monad constructor
- *
- * @returns 'nothing'
- */
-export function nothing(): Nothing {
-  return staticNothing;
+  /**
+   * Empty monad constructor
+   *
+   * @returns 'nothing'
+   */
+  export function nothing(): Nothing {
+    return staticNothing;
+  }
+
+  export function fromOptional(value: undefined): Nothing;
+  export function fromOptional<T>(value: Exclude<T, undefined>): Just<T>;
+  export function fromOptional<T>(value: T | undefined): Just<T> | Nothing;
+  export function fromOptional<T>(value: T | undefined) {
+    return typeof value !== 'undefined' ? Maybe.just(value) : Maybe.nothing();
+  }
+
+  export function fromNullable(value: undefined): Nothing;
+  export function fromNullable(value: null): Nothing;
+  export function fromNullable<T>(value: Exclude<T, null | undefined>): Just<T>;
+  export function fromNullable<T>(value: T | null | undefined): Just<T> | Nothing;
+  export function fromNullable<T>(value: T | null | undefined) {
+    return Maybe.fromOptional(value).chain((v) => (v !== null ? Maybe.just(v) : Maybe.nothing()));
+  }
 }
 
 /// --------------------------------------------------------------------------------------
@@ -258,7 +275,7 @@ class JustClass<R> implements Just<R> {
     return this;
   }
   map<R2>(op: (value: R) => R2) {
-    return just(op(this.just));
+    return Maybe.just(op(this.just));
   }
   orMap() {
     return this;
@@ -293,7 +310,7 @@ class NothingClass implements Nothing {
     return this;
   }
   orMap<R2>(op: () => R2) {
-    return just(op());
+    return Maybe.just(op());
   }
   orChain<TT extends Maybe<any>>(op: () => TT) {
     return op();
