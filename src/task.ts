@@ -21,21 +21,7 @@ export type Cancelable<R> = Maybe<Rejectable<R>>;
  * @template A argument types
  * @template R returned promise resolve type
  */
-export type PromiseFunction<A extends any[], R> = (...args: A) => PromiseLike<R>;
-
-/**
- * Resolve type of a promise
- *
- * @template TT promise type
- */
-export type PromiseType<TT extends PromiseLike<any>> = TT extends PromiseLike<infer U> ? U : never;
-
-/**
- * Resolve type of a promise returned by function
- *
- * @template TT promsie function Type
- */
-export type PromiseFunctionType<TT extends PromiseFunction<any[], any>> = PromiseType<ReturnType<TT>>;
+export type PromiseFunction<A extends unknown[], R> = (...args: A) => PromiseLike<R>;
 
 /**
  * Function returning Task
@@ -43,21 +29,7 @@ export type PromiseFunctionType<TT extends PromiseFunction<any[], any>> = Promis
  * @template A argument types
  * @template R returned task resolve type
  */
-export type TaskFunction<A extends any[], R> = (...args: A) => Task<R>;
-
-/**
- * Resolve type of a task
- *
- * @template TT task type
- */
-export type TaskType<TT extends Task<any>> = TT extends Task<infer U> ? U : never;
-
-/**
- * Resolve type of a task returned by function
- *
- * @template TT task function Type
- */
-export type TaskFunctionType<TT extends TaskFunction<any[], any>> = TaskType<ReturnType<TT>>;
+export type TaskFunction<A extends unknown[], R> = (...args: A) => Task<R>;
 
 /**
  * Task generator
@@ -74,7 +46,7 @@ export type TaskFunctionType<TT extends TaskFunction<any[], any>> = TaskType<Ret
  * };
  * ```
  */
-export type TaskGenerator<TT extends Task<any>, R> = Generator<TT, R, TaskType<TT>>;
+export type TaskGenerator<T, TT extends Task<T>, R> = Generator<TT, R, T>;
 
 /**
  * Function returning task generator (generator function)
@@ -92,7 +64,9 @@ export type TaskGenerator<TT extends Task<any>, R> = Generator<TT, R, TaskType<T
  * };
  * ```
  */
-export type TaskGeneratorFunction<A extends any[], TT extends Task<any>, R> = (...args: A) => TaskGenerator<TT, R>;
+export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R> = (
+  ...args: A
+) => TaskGenerator<T, TT, R>;
 
 /**
  * Task monad interface
@@ -215,7 +189,7 @@ export interface Task<R> extends TaskBase<R> {
    * });
    * ```
    */
-  generator: () => TaskGenerator<Task<R>, R>;
+  generator: () => Generator<Task<R>, R, unknown>;
 }
 
 export namespace Task {
@@ -329,7 +303,7 @@ export namespace Task {
    * const task = taskFunction('someData').map((result) => result.length);
    * ```
    */
-  export function lift<A extends any[], R>(promiseFunction: PromiseFunction<A, R>): TaskFunction<A, R> {
+  export function lift<A extends unknown[], R>(promiseFunction: PromiseFunction<A, R>): TaskFunction<A, R> {
     return (...args: A) => Task.fromPromise(promiseFunction(...args));
   }
 
@@ -366,14 +340,16 @@ export namespace Task {
    * });
    * ```
    */
-  export function generate<TT extends Task<any>, R>(taskGeneratorFunction: TaskGeneratorFunction<[], TT, R>): Task<R> {
+  export function generate<T, TT extends Task<T>, R>(
+    taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>,
+  ): Task<R> {
     const generator = taskGeneratorFunction();
 
-    const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
+    const sequentor = (next: IteratorResult<Task<T>, R>): Task<R> => {
       return next.done
         ? Task.resolved(next.value)
         : next.value
-            .chain((value: TaskType<TT>) => sequentor(generator.next(value)))
+            .chain((value) => sequentor(generator.next(value)))
             .chainRejected((error) => sequentor(generator.throw(error)));
     };
 
@@ -429,28 +405,26 @@ export namespace Task {
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task in order and resolving to the list of results
    */
-  export function sequence<TT extends TaskFunction<[], any>>(taskFunctions: TT[]): Task<TaskFunctionType<TT>[]> {
+  export function sequence<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
     return taskFunctions.reduce((prev, taskFunction) => {
       return prev.chain((list) => {
         return taskFunction().map((value) => list.concat(value));
       });
-    }, Task.resolved<TaskFunctionType<TT>[]>([]));
+    }, Task.resolved<T[]>([]));
   }
 
   /**
    * Under construction
    */
-  export function parallel<TT extends TaskFunction<[], any>>(taskFunctions: TT[]): Task<TaskFunctionType<TT>[]> {
-    const stub = (
-      _?: Cancelable<TaskFunctionType<TT>[]> | PromiseLike<Cancelable<TaskFunctionType<TT>[]>> | undefined,
-    ) => {};
+  export function parallel<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
+    const stub = (_?: Cancelable<T[]> | PromiseLike<Cancelable<T[]>> | undefined) => {};
 
     let globalResolve = stub;
 
     const tasks = taskFunctions.map((taskFunction) => taskFunction());
 
     return Task.create(
-      new Promise<Cancelable<TaskFunctionType<TT>[]>>((resolve) => {
+      new Promise<Cancelable<T[]>>((resolve) => {
         globalResolve = resolve;
 
         Promise.all(

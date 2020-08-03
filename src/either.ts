@@ -20,6 +20,17 @@ export interface Right<R> {
   tap(op: (value: R) => void): Right<R>;
 
   /**
+   * Either fallback peeker function
+   *
+   * Applied to 'right value' returns self without invoking callback
+   * Applied to 'left error' returns self invoking op(error) in process
+   *
+   * @param op function to be invoked with underlying value
+   * @returns self
+   */
+  orTap(op: unknown): Right<R>;
+
+  /**
    * Either transformer function
    *
    * Applied to 'right value' returns 'right op(value)'
@@ -32,35 +43,11 @@ export interface Right<R> {
   map<R2>(op: (value: R) => R2): Right<R2>;
 
   /**
-   * Either composition function
-   *
-   * Applied to 'right value' returns 'op(value)'
-   * Applied to 'left error' returns self without invoking composition function
-   *
-   * @template R2 composition function's return type's underlying type
-   * @param op transformer to be invoked with underlying value
-   * @returns 'op(value)' or 'left error'
-   */
-  chain<TT extends Either<any, any>>(op: (value: R) => TT): TT;
-
-  /**
-   * Either fallback peeker function
-   *
-   * Applied to 'right value' returns self without invoking callback
-   * Applied to 'left error' returns self invoking op(error) in process
-   *
-   * @param op function to be invoked with underlying value
-   * @returns self
-   */
-  orTap(op: unknown): Right<R>;
-
-  /**
    * Either fallback transformer function
    *
    * Applied to 'right value' returns self without invoking transformer
    * Applied to 'left error' returns 'right op(error)'
    *
-   * @template R2 transformer function's return type
    * @param op transformer to be invoked with underlying value
    * @returns 'right value' or 'right op(error)'
    */
@@ -69,10 +56,21 @@ export interface Right<R> {
   /**
    * Either composition function
    *
+   * Applied to 'right value' returns 'op(value)'
+   * Applied to 'left error' returns self without invoking composition function
+   *
+   * @template TT composition function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or 'left error'
+   */
+  chain<TT extends Either<unknown, unknown>>(op: (value: R) => TT): TT;
+
+  /**
+   * Either composition function
+   *
    * Applied to 'right value' returns self without invoking composition function
    * Applied to 'left error' returns 'op(error)'
    *
-   * @template R2 composition function's return type's underlying type
    * @param op transformer to be invoked with underlying value
    * @returns 'right value' or 'op(error)'
    */
@@ -129,30 +127,6 @@ export interface Left<L> {
   tap(op: unknown): Left<L>;
 
   /**
-   * Either transformer function
-   *
-   * Applied to 'right value' returns 'right op(value)'
-   * Applied to 'left error' returns self without invoking transformer
-   *
-   * @template R2 transformer function's return type
-   * @param op transformer to be invoked with underlying value
-   * @returns 'right op(value)' or 'left error'
-   */
-  map(op: unknown): Left<L>;
-
-  /**
-   * Either composition function
-   *
-   * Applied to 'right value' returns 'op(value)'
-   * Applied to 'left error' returns self without invoking composition function
-   *
-   * @template R2 composition function's return type's underlying type
-   * @param op transformer to be invoked with underlying value
-   * @returns 'op(value)' or 'left error'
-   */
-  chain(op: unknown): Left<L>;
-
-  /**
    * Either fallback peeker function
    *
    * Applied to 'right value' returns self without invoking callback
@@ -162,6 +136,17 @@ export interface Left<L> {
    * @returns self
    */
   orTap(op: (error: L) => void): Left<L>;
+
+  /**
+   * Either transformer function
+   *
+   * Applied to 'right value' returns 'right op(value)'
+   * Applied to 'left error' returns self without invoking transformer
+   *
+   * @param op transformer to be invoked with underlying value
+   * @returns 'right op(value)' or 'left error'
+   */
+  map(op: unknown): Left<L>;
 
   /**
    * Either fallback transformer function
@@ -178,14 +163,25 @@ export interface Left<L> {
   /**
    * Either composition function
    *
+   * Applied to 'right value' returns 'op(value)'
+   * Applied to 'left error' returns self without invoking composition function
+   *
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or 'left error'
+   */
+  chain(op: unknown): Left<L>;
+
+  /**
+   * Either composition function
+   *
    * Applied to 'right value' returns self without invoking composition function
    * Applied to 'left error' returns 'op(error)'
    *
-   * @template R2 composition function's return type's underlying type
+   * @template TT composition function's return type
    * @param op transformer to be invoked with underlying value
    * @returns 'right value' or 'op(error)'
    */
-  orChain<TT extends Either<any, any>>(op: (error: L) => TT): TT;
+  orChain<TT extends Either<unknown, unknown>>(op: (error: L) => TT): TT;
 
   /**
    * Either type guard for 'right'
@@ -278,19 +274,17 @@ class RightClass<R> implements Right<R> {
 
     return this;
   }
-  map<R2>(op: (value: R) => R2) {
-    return Either.right(op(this.right));
-  }
-  chain<R2>(op: (value: R) => Right<R2>): Right<R2>;
-  chain<L2>(op: (value: R) => Left<L2>): Left<L2>;
-  chain<R2, L2>(op: (value: R) => Either<R2, L2>) {
-    return op(this.right);
-  }
   orTap() {
     return this;
   }
+  map<R2>(op: (value: R) => R2) {
+    return Either.right(op(this.right));
+  }
   orMap() {
     return this;
+  }
+  chain<TT extends Either<unknown, unknown>>(op: (value: R) => TT) {
+    return op(this.right);
   }
   orChain() {
     return this;
@@ -309,23 +303,21 @@ class LeftClass<L> implements Left<L> {
   tap() {
     return this;
   }
-  map() {
-    return this;
-  }
-  chain() {
-    return this;
-  }
   orTap(op: (error: L) => void) {
     op(this.left);
 
     return this;
   }
+  map() {
+    return this;
+  }
   orMap<R2>(op: (error: L) => R2) {
     return Either.right(op(this.left));
   }
-  orChain<L2>(op: (error: L) => Left<L2>): Left<L2>;
-  orChain<R2>(op: (error: L) => Right<R2>): Right<R2>;
-  orChain<R2, L2>(op: (error: L) => Either<R2, L2>) {
+  chain() {
+    return this;
+  }
+  orChain<TT extends Either<unknown, unknown>>(op: (error: L) => TT) {
     return op(this.left);
   }
   isRight(): this is Right<never> {

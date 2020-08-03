@@ -48,7 +48,6 @@ export interface Just<R> {
    * Applied to 'just value' returns self without invoking transformer
    * Applied to 'nothing' returns 'just op()'
    *
-   * @template R2 transformer function's result type
    * @param op function to be invoked
    * @returns 'just value' or 'just op()'
    */
@@ -60,11 +59,11 @@ export interface Just<R> {
    * Applied to 'just value' returns 'op(value)'
    * Applied to 'nothing' returns self without invoking composition function
    *
-   * @template R2 composition function's return type's underlying type
+   * @template TT composition function's return type
    * @param op transformer to be invoked with underlying value
    * @returns 'op(value)' or 'nothing'
    */
-  chain<TT extends Maybe<any>>(op: (value: R) => TT): TT;
+  chain<TT extends Maybe<unknown>>(op: (value: R) => TT): TT;
 
   /**
    * Maybe fallback composition function
@@ -72,7 +71,6 @@ export interface Just<R> {
    * Applied to 'just value' returns self witjout invoking composition function
    * Applied to 'nothing' returns op()
    *
-   * @template R2 composition function's return type's underlying type
    * @param op function to be invoked
    * @returns 'just value' or 'op()'
    */
@@ -141,7 +139,6 @@ export interface Nothing {
    * Applied to 'just value' returns 'just op(value)'
    * Applied to 'nothing' returns self without invoking transformer
    *
-   * @template R2 transformer function return type
    * @param op transformer to be invoked with underlying value
    * @returns 'just op(value)' or self
    */
@@ -165,7 +162,6 @@ export interface Nothing {
    * Applied to 'just value' returns 'op(value)'
    * Applied to 'nothing' returns self without invoking composition function
    *
-   * @template R2 composition function's return type's underlying type
    * @param op transformer to be invoked with underlying value
    * @returns 'op(value)' or self
    */
@@ -177,11 +173,11 @@ export interface Nothing {
    * Applied to 'just value' returns self witjout invoking composition function
    * Applied to 'nothing' returns op()
    *
-   * @template R2 composition function's return type's underlying type
+   * @template TT composition function's return type
    * @param op function to be invoked
    * @returns self or 'op()'
    */
-  orChain<TT extends Maybe<any>>(op: () => TT): TT;
+  orChain<TT extends Maybe<unknown>>(op: () => TT): TT;
 
   /**
    * Maybe type guard for 'just'
@@ -280,7 +276,7 @@ class JustClass<R> implements Just<R> {
   orMap() {
     return this;
   }
-  chain<TT extends Maybe<any>>(op: (value: R) => TT) {
+  chain<TT extends Maybe<unknown>>(op: (value: R) => TT) {
     return op(this.just);
   }
   orChain() {
@@ -298,21 +294,21 @@ class NothingClass implements Nothing {
   tap() {
     return this;
   }
-  map() {
-    return this;
-  }
-  chain() {
-    return this;
-  }
   orTap(op: () => void) {
     op();
 
     return this;
   }
+  map() {
+    return this;
+  }
   orMap<R2>(op: () => R2) {
     return Maybe.just(op());
   }
-  orChain<TT extends Maybe<any>>(op: () => TT) {
+  chain() {
+    return this;
+  }
+  orChain<TT extends Maybe<unknown>>(op: () => TT) {
     return op();
   }
   isJust(): this is Just<never> {
