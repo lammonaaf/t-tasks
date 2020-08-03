@@ -68,7 +68,7 @@ export type TaskFunctionType<TT extends TaskFunction<any[], any>> = TaskType<Ret
  * @example
  * ```typescript
  * const generatorFunction = function*(): TaskGenerator<Task<string>, number> {
- *   const v = cast<string>(yield someTaskFunction());
+ *   const v = yield* someTaskFunction().generator();
  *
  *   return v.length;
  * };
@@ -86,7 +86,7 @@ export type TaskGenerator<TT extends Task<any>, R> = Generator<TT, R, TaskType<T
  * @example
  * ```typescript
  * const generatorFunction: TaskGeneratorFunction<[], Task<string>, number> = function*() {
- *   const v = cast<string>(yield someTaskFunction());
+ *   const v = yield* someTaskFunction().generator();
  *
  *   return v.length;
  * };
@@ -278,7 +278,7 @@ export namespace Task {
    *
    * @example
    * ```typescript
-   * const task = liftTask(someAsyncOperation('someData')).fmap((result) => result.length);
+   * const task = Task.fromPromise(someAsyncOperation('someData')).map((result) => result.length);
    * ```
    */
   export function fromPromise<R>(promise: PromiseLike<R>): Task<R> {
@@ -320,23 +320,24 @@ export namespace Task {
    * @template R returned function's result task's resolve type
    * @param promiseFunction function returning promise or plain value to be resolved
    * @returns task function wrapping specified promise function
-   * @see liftTask
+   * @see Task.fromPromise
    *
    * @example
    * ```typescript
    * const taskFunction = liftPromiseFunction(someAsyncOperation);
    *
-   * const task = taskFunction('someData').fmap((result) => result.length);
+   * const task = taskFunction('someData').map((result) => result.length);
    * ```
    */
-  export function liftPromiseFunction<A extends any[], R>(promiseFunction: PromiseFunction<A, R>): TaskFunction<A, R> {
+  export function lift<A extends any[], R>(promiseFunction: PromiseFunction<A, R>): TaskFunction<A, R> {
     return (...args: A) => Task.fromPromise(promiseFunction(...args));
   }
 
   /**
    * Create compound task from generator function
    *
-   * Applying yield to task within the generator function awaits task and returns underlying value in case of success
+   * Applying yield to task within the generator function awaits the task and returns underlying value in case of success
+   * However the convinient option for typescript is to use ```yield* task.generator()``` as othervise one may have to deal with union types
    *
    * In case of failure an error is thrown and may be caught by try-catch
    *
@@ -348,15 +349,15 @@ export namespace Task {
    * @returns task resolving to generator's return type
    *
    * @note compound task execution is interrupted only at yield statements, so despite returning immediately any promise-based chains would continue running until the first yield
-   * @note due to type unpredictability you HAVE to cast yield result to avoid werid type issues. Some helper functions for casting are provided
+   * @note due to type unpredictability you HAVE to use ```.generator()``` together with yield* to avoid type issues, despite the fact that task may be yielded directly
    *
    * @example
    * ```typescript
-   * const task = generateTask(function*() {
+   * const task = Task.generate(function*() {
    *   try {
-   *     const value1 = castPromise<string>(yield delayedValueTask('data', 400));
+   *     const value1 = yield* delayedValueTask('data', 400).generator();
    *
-   *     const value2 = castPromise<number>(yield delayedValueTask(value1.length, 300));
+   *     const value2 = yield* delayedValueTask(value1.length, 300).generator();
    *
    *     return value2;
    *   } catch (e) {
@@ -389,9 +390,9 @@ export namespace Task {
    *
    * @example
    * ```typescript
-   * const delayedValueTask = <T>(value: T, delay: number) => timeoutTask(delay).fmap(() => value);
+   * const delayedValueTask = <T>(value: T, delay: number) => timeoutTask(delay).map(() => value);
    * // ... //
-   * const value = castPromise<number>(yield delayedValueTask(42, 1000));
+   * const value = yield* delayedValueTask(42, 1000).generator();
    *
    * console.log("It's past 1 second and here's a value:", value)
    * ```

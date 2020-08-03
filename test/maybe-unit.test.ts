@@ -1,6 +1,6 @@
 import { Maybe } from '../src';
 
-describe('just("data")', () => {
+describe('Maybe.just("data")', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Maybe<string> => Maybe.just('data'))();
 
@@ -70,7 +70,7 @@ describe('just("data")', () => {
   });
 });
 
-describe('nothing()', () => {
+describe('Maybe.nothing()', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Maybe<string> => Maybe.nothing())();
 

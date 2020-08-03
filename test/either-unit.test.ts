@@ -1,6 +1,6 @@
 import { Either } from '../src';
 
-describe('right("data")', () => {
+describe('Either.right("data")', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Either<string, boolean> => Either.right('data'))();
 
@@ -70,7 +70,7 @@ describe('right("data")', () => {
   });
 });
 
-describe('left(false)', () => {
+describe('Either.left(false)', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Either<string, boolean> => Either.left(false))();
 
@@ -94,7 +94,7 @@ describe('left(false)', () => {
     expect(callback).not.toBeCalled();
   });
 
-  it('transforms to left(false)', () => {
+  it('transforms to left false', () => {
     const mapped = subject.map((value) => value.length);
 
     expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
@@ -113,13 +113,13 @@ describe('left(false)', () => {
     expect(mapped.isRight() && mapped.right === 3).toBeTruthy();
   });
 
-  it('chains to left(false)', () => {
+  it('chains to left false', () => {
     const mapped = subject.chain((value) => Either.right(value.length));
 
     expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
   });
 
-  it('chains to left(false)', () => {
+  it('chains to left false', () => {
     const mapped = subject.chain(() => Either.left(true));
 
     expect(mapped.isLeft() && mapped.left === false).toBeTruthy();

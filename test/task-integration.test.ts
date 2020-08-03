@@ -1549,7 +1549,7 @@ describe('Task.liftPromiseFunction scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const promiseFunction = Task.liftPromiseFunction(delayedValuePromise);
+    const promiseFunction = Task.lift(delayedValuePromise);
 
     const task = promiseFunction(42, 100)
       .tapCanceled(canceled)

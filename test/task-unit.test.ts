@@ -29,7 +29,7 @@ describe('resolvedTask()', () => {
     expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
 
-  it('creates Task fmappable to specified data', async () => {
+  it('creates Task mappable to specified data', async () => {
     const task = Task.resolved(undefined).map(() => 'some-data');
 
     const result = await task.resolve();
@@ -65,7 +65,7 @@ describe('rejectedTask()', () => {
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
-  it('creates non-fmappable Task', async () => {
+  it('creates non-mappable Task', async () => {
     const task = Task.rejected('some-error').map(() => 'some-data');
 
     const result = await task.resolve();
@@ -101,7 +101,7 @@ describe('canceledTask()', () => {
     expect(result).toStrictEqual(Maybe.nothing());
   });
 
-  it('creates non-fmappable Task', async () => {
+  it('creates non-mappable Task', async () => {
     const task = Task.canceled().map(() => 'some-data');
 
     const result = await task.resolve();
