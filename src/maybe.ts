@@ -20,6 +20,17 @@ export interface Just<R> {
   tap(op: (value: R) => void): Just<R>;
 
   /**
+   * Maybe fallback peeker function
+   *
+   * Applied to 'just value' returns self without invoking callback
+   * Applied to 'nothing' returns self invoking op() in process
+   *
+   * @param op function to be invoked
+   * @returns self
+   */
+  orTap(op: unknown): Just<R>;
+
+  /**
    * Maybe transformer function
    *
    * Applied to 'just value' returns 'just op(value)'
@@ -29,30 +40,7 @@ export interface Just<R> {
    * @param op transformer to be invoked with underlying value
    * @returns 'just op(value)' or 'nothing'
    */
-  fmap<R2>(op: (value: R) => R2): Just<R2>;
-
-  /**
-   * Maybe composition function
-   *
-   * Applied to 'just value' returns 'op(value)'
-   * Applied to 'nothing' returns self without invoking composition function
-   *
-   * @template R2 composition function's return type's underlying type
-   * @param op transformer to be invoked with underlying value
-   * @returns 'op(value)' or 'nothing'
-   */
-  chain<R2>(op: (value: R) => Maybe<R2>): Maybe<R2>;
-
-  /**
-   * Maybe fallback peeker function
-   *
-   * Applied to 'just value' returns self without invoking callback
-   * Applied to 'nothing' returns self invoking op() in process
-   *
-   * @param op function to be invoked
-   * @returns self
-   */
-  tapNothing(): Just<R>;
+  map<R2>(op: (value: R) => R2): Just<R2>;
 
   /**
    * Maybe fallback transformer function
@@ -60,11 +48,22 @@ export interface Just<R> {
    * Applied to 'just value' returns self without invoking transformer
    * Applied to 'nothing' returns 'just op()'
    *
-   * @template R2 transformer function's result type
    * @param op function to be invoked
    * @returns 'just value' or 'just op()'
    */
-  fmapNothing(): Just<R>;
+  orMap(op: unknown): Just<R>;
+
+  /**
+   * Maybe composition function
+   *
+   * Applied to 'just value' returns 'op(value)'
+   * Applied to 'nothing' returns self without invoking composition function
+   *
+   * @template TT composition function's return type
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or 'nothing'
+   */
+  chain<TT extends Maybe<unknown>>(op: (value: R) => TT): TT;
 
   /**
    * Maybe fallback composition function
@@ -72,11 +71,10 @@ export interface Just<R> {
    * Applied to 'just value' returns self witjout invoking composition function
    * Applied to 'nothing' returns op()
    *
-   * @template R2 composition function's return type's underlying type
    * @param op function to be invoked
    * @returns 'just value' or 'op()'
    */
-  chainNothing(): Just<R>;
+  orChain(op: unknown): Just<R>;
 
   /**
    * Maybe type guard for 'just'
@@ -122,31 +120,7 @@ export interface Nothing {
    * @param op function to be invoked with underlying value
    * @returns self
    */
-  tap(): Nothing;
-
-  /**
-   * Maybe transformer function
-   *
-   * Applied to 'just value' returns 'just op(value)'
-   * Applied to 'nothing' returns self without invoking transformer
-   *
-   * @template R2 transformer function return type
-   * @param op transformer to be invoked with underlying value
-   * @returns 'just op(value)' or self
-   */
-  fmap(): Nothing;
-
-  /**
-   * Maybe composition function
-   *
-   * Applied to 'just value' returns 'op(value)'
-   * Applied to 'nothing' returns self without invoking composition function
-   *
-   * @template R2 composition function's return type's underlying type
-   * @param op transformer to be invoked with underlying value
-   * @returns 'op(value)' or self
-   */
-  chain(): Nothing;
+  tap(op: unknown): Nothing;
 
   /**
    * Maybe fallback peeker function
@@ -157,7 +131,18 @@ export interface Nothing {
    * @param op function to be invoked
    * @returns self
    */
-  tapNothing(op: () => void): Nothing;
+  orTap(op: () => void): Nothing;
+
+  /**
+   * Maybe transformer function
+   *
+   * Applied to 'just value' returns 'just op(value)'
+   * Applied to 'nothing' returns self without invoking transformer
+   *
+   * @param op transformer to be invoked with underlying value
+   * @returns 'just op(value)' or self
+   */
+  map(op: unknown): Nothing;
 
   /**
    * Maybe fallback transformer function
@@ -169,7 +154,18 @@ export interface Nothing {
    * @param op function to be invoked
    * @returns self or 'just op()'
    */
-  fmapNothing<R2>(op: () => R2): Just<R2>;
+  orMap<R2>(op: () => R2): Just<R2>;
+
+  /**
+   * Maybe composition function
+   *
+   * Applied to 'just value' returns 'op(value)'
+   * Applied to 'nothing' returns self without invoking composition function
+   *
+   * @param op transformer to be invoked with underlying value
+   * @returns 'op(value)' or self
+   */
+  chain(op: unknown): Nothing;
 
   /**
    * Maybe fallback composition function
@@ -177,11 +173,11 @@ export interface Nothing {
    * Applied to 'just value' returns self witjout invoking composition function
    * Applied to 'nothing' returns op()
    *
-   * @template R2 composition function's return type's underlying type
+   * @template TT composition function's return type
    * @param op function to be invoked
    * @returns self or 'op()'
    */
-  chainNothing<R2>(op: () => Maybe<R2>): Maybe<R2>;
+  orChain<TT extends Maybe<unknown>>(op: () => TT): TT;
 
   /**
    * Maybe type guard for 'just'
@@ -222,24 +218,41 @@ export interface Nothing {
  */
 export type Maybe<R> = Just<R> | Nothing;
 
-/**
- * Non-empty monad constructor
- *
- * @template R underlying type
- * @param value underlying value
- * @returns 'just value'
- */
-export function just<R>(value: R): Just<R> {
-  return new JustClass<R>(value);
-}
+export namespace Maybe {
+  /**
+   * Non-empty monad constructor
+   *
+   * @template R underlying type
+   * @param value underlying value
+   * @returns 'just value'
+   */
+  export function just<R>(value: R): Just<R> {
+    return new JustClass<R>(value);
+  }
 
-/**
- * Empty monad constructor
- *
- * @returns 'nothing'
- */
-export function nothing(): Nothing {
-  return new NothingClass();
+  /**
+   * Empty monad constructor
+   *
+   * @returns 'nothing'
+   */
+  export function nothing(): Nothing {
+    return staticNothing;
+  }
+
+  export function fromOptional(value: undefined): Nothing;
+  export function fromOptional<T>(value: Exclude<T, undefined>): Just<T>;
+  export function fromOptional<T>(value: T | undefined): Just<T> | Nothing;
+  export function fromOptional<T>(value: T | undefined) {
+    return typeof value !== 'undefined' ? Maybe.just(value) : Maybe.nothing();
+  }
+
+  export function fromNullable(value: undefined): Nothing;
+  export function fromNullable(value: null): Nothing;
+  export function fromNullable<T>(value: Exclude<T, null | undefined>): Just<T>;
+  export function fromNullable<T>(value: T | null | undefined): Just<T> | Nothing;
+  export function fromNullable<T>(value: T | null | undefined) {
+    return Maybe.fromOptional(value).chain((v) => (v !== null ? Maybe.just(v) : Maybe.nothing()));
+  }
 }
 
 /// --------------------------------------------------------------------------------------
@@ -254,19 +267,19 @@ class JustClass<R> implements Just<R> {
 
     return this;
   }
-  fmap<R2>(op: (value: R) => R2) {
-    return just(op(this.just));
+  orTap() {
+    return this;
   }
-  chain<R2>(op: (value: R) => Maybe<R2>) {
+  map<R2>(op: (value: R) => R2) {
+    return Maybe.just(op(this.just));
+  }
+  orMap() {
+    return this;
+  }
+  chain<TT extends Maybe<unknown>>(op: (value: R) => TT) {
     return op(this.just);
   }
-  tapNothing() {
-    return this;
-  }
-  fmapNothing() {
-    return this;
-  }
-  chainNothing() {
+  orChain() {
     return this;
   }
   isJust(): this is Just<R> {
@@ -281,21 +294,21 @@ class NothingClass implements Nothing {
   tap() {
     return this;
   }
-  fmap() {
-    return this;
-  }
-  chain() {
-    return this;
-  }
-  tapNothing(op: () => void) {
+  orTap(op: () => void) {
     op();
 
     return this;
   }
-  fmapNothing<R2>(op: () => R2) {
-    return just(op());
+  map() {
+    return this;
   }
-  chainNothing<R2>(op: () => Maybe<R2>) {
+  orMap<R2>(op: () => R2) {
+    return Maybe.just(op());
+  }
+  chain() {
+    return this;
+  }
+  orChain<TT extends Maybe<unknown>>(op: () => TT) {
     return op();
   }
   isJust(): this is Just<never> {
@@ -305,3 +318,5 @@ class NothingClass implements Nothing {
     return true;
   }
 }
+
+const staticNothing = new NothingClass();

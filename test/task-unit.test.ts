@@ -1,124 +1,124 @@
-import { timeoutTask, resolvedTask, right, just, rejectedTask, left, canceledTask, nothing } from '../src';
+import { Maybe, Either, Task } from '../src';
 
-describe('resolvedTask()', () => {
+describe('Task.resolved()', () => {
   it('creates Task containing specified data', async () => {
-    const task = resolvedTask('some-data');
+    const task = Task.resolved('some-data');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right('some-data')));
+    expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
 
   it('creates non-cancelable Task', async () => {
-    const task = resolvedTask('some-data');
+    const task = Task.resolved('some-data');
 
     task.cancel();
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right('some-data')));
+    expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
 
   it('creates non-rejectable Task', async () => {
-    const task = resolvedTask('some-data');
+    const task = Task.resolved('some-data');
 
     task.reject('some-error');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right('some-data')));
+    expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
 
-  it('creates Task fmappable to specified data', async () => {
-    const task = resolvedTask(undefined).fmap(() => 'some-data');
+  it('creates Task mappable to specified data', async () => {
+    const task = Task.resolved(undefined).map(() => 'some-data');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right('some-data')));
+    expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
 
   it('creates Task chainable to specified data', async () => {
-    const task = resolvedTask(undefined).chain(() => resolvedTask('some-data'));
+    const task = Task.resolved(undefined).chain(() => Task.resolved('some-data'));
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(right('some-data')));
+    expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
 });
 
-describe('rejectedTask()', () => {
+describe('Task.rejected()', () => {
   it('creates Task containing specified error', async () => {
-    const task = rejectedTask('some-error');
+    const task = Task.rejected('some-error');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('creates non-cancelable Task', async () => {
-    const task = rejectedTask('some-error');
+    const task = Task.rejected('some-error');
 
     task.cancel();
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
-  it('creates non-fmappable Task', async () => {
-    const task = rejectedTask('some-error').fmap(() => 'some-data');
+  it('creates non-mappable Task', async () => {
+    const task = Task.rejected('some-error').map(() => 'some-data');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('creates non-chainable Task', async () => {
-    const task = rejectedTask('some-error').chain(() => resolvedTask('some-data'));
+    const task = Task.rejected('some-error').chain(() => Task.resolved('some-data'));
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(just(left('some-error')));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 });
 
-describe('canceledTask()', () => {
+describe('Task.canceled()', () => {
   it('creates Task containing nothing', async () => {
-    const task = canceledTask();
+    const task = Task.canceled();
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('creates non-rejectable Task', async () => {
-    const task = canceledTask();
+    const task = Task.canceled();
 
     task.reject('some-error');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
-  it('creates non-fmappable Task', async () => {
-    const task = canceledTask().fmap(() => 'some-data');
+  it('creates non-mappable Task', async () => {
+    const task = Task.canceled().map(() => 'some-data');
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 
   it('creates non-chainable Task', async () => {
-    const task = canceledTask().chain(() => resolvedTask('some-data'));
+    const task = Task.canceled().chain(() => Task.resolved('some-data'));
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(nothing());
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 });
 
-describe('timoutTask', () => {
+describe('Task.timeout', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -135,7 +135,7 @@ describe('timoutTask', () => {
   };
 
   it('creates Task resolving with undefined in exactly 100ms', async () => {
-    const task = timeoutTask(100);
+    const task = Task.timeout(100);
 
     const callback = jest.fn();
 
@@ -147,11 +147,11 @@ describe('timoutTask', () => {
 
     await advanceTime(1);
 
-    expect(callback).toBeCalledWith(just(right(undefined)));
+    expect(callback).toBeCalledWith(Maybe.just(Either.right(undefined)));
   });
 
   it('creates Task resolving with undefined in exactly 1ms', async () => {
-    const task = timeoutTask(1);
+    const task = Task.timeout(1);
 
     const callback = jest.fn();
 
@@ -159,11 +159,11 @@ describe('timoutTask', () => {
 
     await advanceTime(1);
 
-    expect(callback).toBeCalledWith(just(right(undefined)));
+    expect(callback).toBeCalledWith(Maybe.just(Either.right(undefined)));
   });
 
   it('creates Task resolving with undefined immediately', async () => {
-    const task = timeoutTask(0);
+    const task = Task.timeout(0);
 
     const callback = jest.fn();
 
@@ -171,11 +171,11 @@ describe('timoutTask', () => {
 
     await advanceTime(0);
 
-    expect(callback).toBeCalledWith(just(right(undefined)));
+    expect(callback).toBeCalledWith(Maybe.just(Either.right(undefined)));
   });
 
   it('creates Task cancelable in 50ms', async () => {
-    const task = timeoutTask(100);
+    const task = Task.timeout(100);
 
     const callback = jest.fn();
 
@@ -189,11 +189,11 @@ describe('timoutTask', () => {
 
     await flushPromises();
 
-    expect(callback).toBeCalledWith(nothing());
+    expect(callback).toBeCalledWith(Maybe.nothing());
   });
 
   it('creates Task cancelable immediately', async () => {
-    const task = timeoutTask(100);
+    const task = Task.timeout(100);
 
     const callback = jest.fn();
 
@@ -203,11 +203,11 @@ describe('timoutTask', () => {
 
     await flushPromises();
 
-    expect(callback).toBeCalledWith(nothing());
+    expect(callback).toBeCalledWith(Maybe.nothing());
   });
 
   it('creates Task not cancelable after being resolved', async () => {
-    const task = timeoutTask(100);
+    const task = Task.timeout(100);
 
     const callback = jest.fn();
 
@@ -219,11 +219,11 @@ describe('timoutTask', () => {
 
     await flushPromises();
 
-    expect(callback).toBeCalledWith(just(right(undefined)));
+    expect(callback).toBeCalledWith(Maybe.just(Either.right(undefined)));
   });
 
   it('creates Task rejectable in 50ms', async () => {
-    const task = timeoutTask(100);
+    const task = Task.timeout(100);
 
     const callback = jest.fn();
 
@@ -237,6 +237,6 @@ describe('timoutTask', () => {
 
     await flushPromises();
 
-    expect(callback).toBeCalledWith(just(left('some-error')));
+    expect(callback).toBeCalledWith(Maybe.just(Either.left('some-error')));
   });
 });

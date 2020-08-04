@@ -1,8 +1,8 @@
-import { Either, right, left } from '../src';
+import { Either } from '../src';
 
-describe('right("data")', () => {
-  // So typescript does not make assumptions about actual type
-  const subject = ((): Either<string, boolean> => right('data'))();
+describe('Either.right("data")', () => {
+  // So it does not coerse straight to Right
+  const subject = ((): Either<string, boolean> => Either.right('data'))();
 
   it('is Right', () => {
     expect(subject.isRight()).toBeTruthy();
@@ -17,62 +17,85 @@ describe('right("data")', () => {
   });
 
   it('taps "data"', () => {
-    const callback = jest.fn((_: string) => {});
+    const callback = jest.fn();
 
-    subject.tap(callback);
+    const tapped = subject.tap(callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith('data');
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('transforms to length 4', () => {
-    const mapped = subject.fmap((value) => value.length);
+  it('does not fallback tap', () => {
+    const callback = jest.fn();
 
-    expect(mapped.isRight() && mapped.right === 4).toBeTruthy();
-  });
-
-  it('does not fallback', () => {
-    const callback = jest.fn((_: boolean) => {});
-
-    const mapped = subject.fmapLeft((error) => {
-      callback(error);
-
-      return 3;
-    });
+    const tapped = subject.orTap(callback);
 
     expect(callback).not.toBeCalled();
-    expect(mapped.isRight() && mapped.right === 'data').toBeTruthy();
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('chains to length 4', () => {
-    const mapped = subject.chain((value) => right(value.length));
+  it('maps to Either.right(4)', () => {
+    const callback = jest.fn((data: string) => data.length);
 
-    expect(mapped.isRight() && mapped.right === 4).toBeTruthy();
+    const mapped = subject.map(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
+    expect(mapped).toStrictEqual(Either.right(4));
   });
 
-  it('chains to false', () => {
-    const mapped = subject.chain(() => left(false));
+  it('fallback maps to self', () => {
+    const callback = jest.fn(() => 3);
 
-    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
-  });
-
-  it('does not fallback chain', () => {
-    const callback = jest.fn((_: boolean) => {});
-
-    const mapped = subject.chainLeft((value) => {
-      callback(value);
-
-      return right(3);
-    });
+    const mapped = subject.orMap(callback);
 
     expect(callback).not.toBeCalled();
-    expect(mapped.isRight() && mapped.right === 'data').toBeTruthy();
+    expect(mapped).toStrictEqual(subject);
+  });
+
+  it('chains to Either.right(4)', () => {
+    const callback = jest.fn((data: string) => Either.right(data.length));
+
+    const chained = subject.chain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
+    expect(chained).toStrictEqual(Either.right(4));
+  });
+
+  it('chains to Either.left(true)', () => {
+    const callback = jest.fn(() => Either.left(true));
+
+    const chained = subject.chain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
+    expect(chained).toStrictEqual(Either.left(true));
+  });
+
+  it('fallback chains to self', () => {
+    const callback = jest.fn(() => Either.right(3));
+
+    const mapped = subject.orChain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
+  });
+
+  it('fallback chains to self', () => {
+    const callback = jest.fn(() => Either.left(true));
+
+    const mapped = subject.orChain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
   });
 });
 
-describe('left(false)', () => {
-  // So typescript does not make assumptions about actual type
-  const subject = ((): Either<string, boolean> => left(false))();
+describe('Either.left(false)', () => {
+  // So it does not coerse straight to Left
+  const subject = ((): Either<string, boolean> => Either.left(false))();
 
   it('is Left', () => {
     expect(subject.isLeft()).toBeTruthy();
@@ -87,54 +110,118 @@ describe('left(false)', () => {
   });
 
   it('does not tap', () => {
-    const callback = jest.fn((_: string) => {});
+    const callback = jest.fn();
 
-    subject.tap(callback);
+    const tapped = subject.tap(callback);
 
     expect(callback).not.toBeCalled();
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('transforms to left(false)', () => {
-    const mapped = subject.fmap((value) => value.length);
+  it('fallback taps "false"', () => {
+    const callback = jest.fn();
 
-    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
-  });
+    const tapped = subject.orTap(callback);
 
-  it('fallbacks to 3', () => {
-    const callback = jest.fn((_: boolean) => {});
-
-    const mapped = subject.fmapLeft((error) => {
-      callback(error);
-
-      return 3;
-    });
-
+    expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith(false);
-    expect(mapped.isRight() && mapped.right === 3).toBeTruthy();
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('chains to left(false)', () => {
-    const mapped = subject.chain((value) => right(value.length));
+  it('maps to self', () => {
+    const callback = jest.fn((data: string) => data.length);
 
-    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
+    const mapped = subject.map(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
   });
 
-  it('chains to left(false)', () => {
-    const mapped = subject.chain(() => left(true));
+  it('fallback maps to Either.right(3)', () => {
+    const callback = jest.fn(() => 3);
 
-    expect(mapped.isLeft() && mapped.left === false).toBeTruthy();
-  });
+    const mapped = subject.orMap(callback);
 
-  it('fallback chains to 3', () => {
-    const callback = jest.fn((_: boolean) => {});
-
-    const mapped = subject.chainLeft((value) => {
-      callback(value);
-
-      return right(3);
-    });
-
+    expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith(false);
-    expect(mapped.isRight() && mapped.right === 3).toBeTruthy();
+    expect(mapped).toStrictEqual(Either.right(3));
+  });
+
+  it('chains to self', () => {
+    const callback = jest.fn((data: string) => Either.right(data.length));
+
+    const chained = subject.chain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(chained).toStrictEqual(subject);
+  });
+
+  it('chains to self', () => {
+    const callback = jest.fn(() => Either.left(true));
+
+    const chained = subject.chain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(chained).toStrictEqual(subject);
+  });
+
+  it('fallback chains to Either.right(3)', () => {
+    const callback = jest.fn(() => Either.right(3));
+
+    const mapped = subject.orChain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(false);
+    expect(mapped).toStrictEqual(Either.right(3));
+  });
+
+  it('fallback chains to Either.left(true)', () => {
+    const callback = jest.fn(() => Either.left(true));
+
+    const mapped = subject.orChain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith(false);
+    expect(mapped).toStrictEqual(Either.left(true));
+  });
+});
+
+describe('Either.fromOptional', () => {
+  it('creates Either.right(5) from 5', () => {
+    const value = Either.fromOptional(5, 'some-error');
+
+    expect(value).toStrictEqual(Either.right(5));
+  });
+
+  it('creates Either.right(null) from null', () => {
+    const value = Either.fromOptional(null, 'some-error');
+
+    expect(value).toStrictEqual(Either.right(null));
+  });
+
+  it('creates Either.left("some-error") from undefined', () => {
+    const value = Either.fromOptional(undefined, 'some-error');
+
+    expect(value).toStrictEqual(Either.left('some-error'));
+  });
+});
+
+describe('Either.fromNullable', () => {
+  it('creates Either.right(5) from 5', () => {
+    const value = Either.fromNullable(5, 'some-error');
+
+    expect(value).toStrictEqual(Either.right(5));
+  });
+
+  it('creates Either.left("some-error") from null', () => {
+    const value = Either.fromNullable(null, 'some-error');
+
+    expect(value).toStrictEqual(Either.left('some-error'));
+  });
+
+  it('creates Either.left("some-error") from undefined', () => {
+    const value = Either.fromNullable(undefined, 'some-error');
+
+    expect(value).toStrictEqual(Either.left('some-error'));
   });
 });
