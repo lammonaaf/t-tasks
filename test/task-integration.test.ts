@@ -1528,7 +1528,7 @@ describe('Task.liftPromise scenarios', () => {
   });
 });
 
-describe('Task.liftPromiseFunction scenarios', () => {
+describe('Task.lift scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1652,7 +1652,7 @@ describe('Task.repeat scenarios', () => {
   });
 });
 
-describe('limitTask scenarios', () => {
+describe('Task.limit scenarios', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1766,7 +1766,7 @@ describe('limitTask scenarios', () => {
   });
 });
 
-describe('parallelTask', () => {
+describe('Task.parallel', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1908,7 +1908,7 @@ describe('parallelTask', () => {
   });
 });
 
-describe('sequenceTask', () => {
+describe('Task.sequence', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 

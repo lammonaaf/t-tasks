@@ -1,6 +1,6 @@
 import { Maybe, Either, Task } from '../src';
 
-describe('resolvedTask()', () => {
+describe('Task.resolved()', () => {
   it('creates Task containing specified data', async () => {
     const task = Task.resolved('some-data');
 
@@ -46,7 +46,7 @@ describe('resolvedTask()', () => {
   });
 });
 
-describe('rejectedTask()', () => {
+describe('Task.rejected()', () => {
   it('creates Task containing specified error', async () => {
     const task = Task.rejected('some-error');
 
@@ -82,7 +82,7 @@ describe('rejectedTask()', () => {
   });
 });
 
-describe('canceledTask()', () => {
+describe('Task.canceled()', () => {
   it('creates Task containing nothing', async () => {
     const task = Task.canceled();
 
@@ -118,7 +118,7 @@ describe('canceledTask()', () => {
   });
 });
 
-describe('timoutTask', () => {
+describe('Task.timeout', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 

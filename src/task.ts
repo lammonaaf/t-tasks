@@ -16,14 +16,6 @@ export type Rejectable<R> = Either<R, any>;
 export type Cancelable<R> = Maybe<Rejectable<R>>;
 
 /**
- * Function returning Promise (async function)
- *
- * @template A argument types
- * @template R returned promise resolve type
- */
-export type PromiseFunction<A extends unknown[], R> = (...args: A) => PromiseLike<R>;
-
-/**
  * Function returning Task
  *
  * @template A argument types
@@ -303,7 +295,7 @@ export namespace Task {
    * const task = taskFunction('someData').map((result) => result.length);
    * ```
    */
-  export function lift<A extends unknown[], R>(promiseFunction: PromiseFunction<A, R>): TaskFunction<A, R> {
+  export function lift<A extends unknown[], R>(promiseFunction: (...args: A) => PromiseLike<R>): TaskFunction<A, R> {
     return (...args: A) => Task.fromPromise(promiseFunction(...args));
   }
 
@@ -345,7 +337,7 @@ export namespace Task {
   ): Task<R> {
     const generator = taskGeneratorFunction();
 
-    const sequentor = (next: IteratorResult<Task<T>, R>): Task<R> => {
+    const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
       return next.done
         ? Task.resolved(next.value)
         : next.value
@@ -366,7 +358,7 @@ export namespace Task {
    *
    * @example
    * ```typescript
-   * const delayedValueTask = <T>(value: T, delay: number) => timeoutTask(delay).map(() => value);
+   * const delayedValueTask = <T>(value: T, delay: number) => Task.timeout(delay).map(() => value);
    * // ... //
    * const value = yield* delayedValueTask(42, 1000).generator();
    *
@@ -473,7 +465,7 @@ export namespace Task {
   /**
    * Under construction
    */
-  export function limit<T>(task: Task<T>, taskFunction: () => Task<void>) {
+  export function limit<T>(task: Task<T>, taskFunction: TaskFunction<[], void>) {
     const limit = taskFunction().tap(() => task.cancel());
     return task
       .tap(() => limit.cancel())

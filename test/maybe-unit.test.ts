@@ -17,56 +17,79 @@ describe('Maybe.just("data")', () => {
   });
 
   it('taps "data"', () => {
-    const callback = jest.fn((_: string) => {});
+    const callback = jest.fn();
 
-    subject.tap(callback);
+    const tapped = subject.tap(callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith('data');
+    expect(tapped).toStrictEqual(subject);
   });
 
   it('does not fallback tap', () => {
-    const callback = jest.fn(() => {});
+    const callback = jest.fn();
 
-    subject.orTap(callback);
+    const tapped = subject.orTap(callback);
 
-    expect(callback).toBeCalledTimes(0);
+    expect(callback).not.toBeCalled();
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('transforms to length 4', () => {
-    const mapped = subject.map((value) => value.length);
+  it('maps to Maybe.just(4)', () => {
+    const callback = jest.fn((data: string) => data.length);
 
+    const mapped = subject.map(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
     expect(mapped).toStrictEqual(Maybe.just(4));
   });
 
-  it('does not fallback', () => {
-    const mapped = subject.orMap(() => 6);
+  it('fallback maps to self', () => {
+    const callback = jest.fn(() => 3);
 
-    expect(mapped).toStrictEqual(Maybe.just('data'));
+    const mapped = subject.orMap(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
   });
 
-  it('chains to length 4', () => {
-    const mapped = subject.chain((value) => Maybe.just(value.length));
+  it('chains to Maybe.just(4)', () => {
+    const callback = jest.fn((data: string) => Maybe.just(data.length));
 
-    expect(mapped).toStrictEqual(Maybe.just(4));
+    const chained = subject.chain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
+    expect(chained).toStrictEqual(Maybe.just(4));
   });
 
-  it('chains to nothing', () => {
-    const mapped = subject.chain((_) => Maybe.nothing());
+  it('chains to Maybe.nothing()', () => {
+    const callback = jest.fn(() => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(Maybe.nothing());
+    const chained = subject.chain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith('data');
+    expect(chained).toStrictEqual(Maybe.nothing());
   });
 
-  it('doues not fallback chain', () => {
-    const mapped = subject.orChain(() => Maybe.just(6));
+  it('fallback chains to self', () => {
+    const callback = jest.fn(() => Maybe.just(3));
 
-    expect(mapped).toStrictEqual(Maybe.just('data'));
+    const mapped = subject.orChain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
   });
 
-  it('doues not fallback chain', () => {
-    const mapped = subject.orChain(() => Maybe.nothing());
+  it('fallback chains to self', () => {
+    const callback = jest.fn(() => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(Maybe.just('data'));
+    const mapped = subject.orChain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
   });
 });
 
@@ -83,55 +106,78 @@ describe('Maybe.nothing()', () => {
   });
 
   it('does not tap', () => {
-    const callback = jest.fn((_: string) => {});
+    const callback = jest.fn();
 
-    subject.tap(callback);
+    const tapped = subject.tap(callback);
 
-    expect(callback).toBeCalledTimes(0);
+    expect(callback).not.toBeCalled();
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('taps nothing', () => {
-    const callback = jest.fn(() => {});
+  it('fallback taps', () => {
+    const callback = jest.fn();
 
-    subject.orTap(callback);
+    const tapped = subject.orTap(callback);
 
-    expect(callback).toBeCalled();
+    expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith();
+    expect(tapped).toStrictEqual(subject);
   });
 
-  it('transforms to Nothing', () => {
-    const mapped = subject.map((value) => value.length);
+  it('maps to self', () => {
+    const callback = jest.fn((data: string) => data.length);
 
-    expect(mapped).toStrictEqual(Maybe.nothing());
+    const mapped = subject.map(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(mapped).toStrictEqual(subject);
   });
 
-  it('fallbacks to just 6', () => {
-    const mapped = subject.orMap(() => 6);
+  it('fallback maps to Maybe.just(3)', () => {
+    const callback = jest.fn(() => 3);
 
-    expect(mapped).toStrictEqual(Maybe.just(6));
+    const mapped = subject.orMap(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith();
+    expect(mapped).toStrictEqual(Maybe.just(3));
   });
 
-  it('chains to nothing', () => {
-    const mapped = subject.chain((value) => Maybe.just(value.length));
+  it('chains to self', () => {
+    const callback = jest.fn((data: string) => Maybe.just(data.length));
 
-    expect(mapped).toStrictEqual(Maybe.nothing());
+    const chained = subject.chain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(chained).toStrictEqual(subject);
   });
 
-  it('chains to nothing', () => {
-    const mapped = subject.chain((_) => Maybe.nothing());
+  it('chains to self', () => {
+    const callback = jest.fn(() => Maybe.nothing());
 
-    expect(mapped).toStrictEqual(Maybe.nothing());
+    const chained = subject.chain(callback);
+
+    expect(callback).not.toBeCalled();
+    expect(chained).toStrictEqual(subject);
   });
 
-  it('fallback chains to just 6', () => {
-    const mapped = subject.orChain(() => Maybe.just(6));
+  it('fallback chains to Maybe.just(3)', () => {
+    const callback = jest.fn(() => Maybe.just(3));
 
-    expect(mapped).toStrictEqual(Maybe.just(6));
+    const mapped = subject.orChain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith();
+    expect(mapped).toStrictEqual(Maybe.just(3));
   });
 
-  it('fallback chains to nothing', () => {
-    const mapped = subject.orChain(() => Maybe.nothing());
+  it('fallback chains to Maybe.nothing()', () => {
+    const callback = jest.fn(() => Maybe.nothing());
 
+    const mapped = subject.orChain(callback);
+
+    expect(callback).toBeCalledTimes(1);
+    expect(callback).toBeCalledWith();
     expect(mapped).toStrictEqual(Maybe.nothing());
   });
 });
