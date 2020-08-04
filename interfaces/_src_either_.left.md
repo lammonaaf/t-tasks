@@ -25,13 +25,13 @@ underlying error type
 ### Methods
 
 * [chain](_src_either_.left.md#chain)
-* [chainLeft](_src_either_.left.md#chainleft)
-* [fmap](_src_either_.left.md#fmap)
-* [fmapLeft](_src_either_.left.md#fmapleft)
 * [isLeft](_src_either_.left.md#isleft)
 * [isRight](_src_either_.left.md#isright)
+* [map](_src_either_.left.md#map)
+* [orChain](_src_either_.left.md#orchain)
+* [orMap](_src_either_.left.md#ormap)
+* [orTap](_src_either_.left.md#ortap)
 * [tap](_src_either_.left.md#tap)
-* [tapLeft](_src_either_.left.md#tapleft)
 
 ## Properties
 
@@ -39,22 +39,26 @@ underlying error type
 
 • **left**: *L*
 
-*Defined in [src/either.ts:118](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L118)*
+*Defined in [src/either.ts:116](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L116)*
 
 ## Methods
 
 ###  chain
 
-▸ **chain**(): *[Left](_src_either_.left.md)‹L›*
+▸ **chain**(`op`: unknown): *[Left](_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:153](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L153)*
+*Defined in [src/either.ts:172](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L172)*
 
 Either composition function
 
 Applied to 'right value' returns 'op(value)'
 Applied to 'left error' returns self without invoking composition function
 
-**`template`** composition function's return type's underlying type
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`op` | unknown | transformer to be invoked with underlying value |
 
 **Returns:** *[Left](_src_either_.left.md)‹L›*
 
@@ -62,11 +66,76 @@ Applied to 'left error' returns self without invoking composition function
 
 ___
 
-###  chainLeft
+###  isLeft
 
-▸ **chainLeft**‹**R2**, **L2**›(`op`: function): *[Either](../modules/_src_either_.md#either)‹R2, L2›*
+▸ **isLeft**(): *this is Left<L>*
 
-*Defined in [src/either.ts:188](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L188)*
+*Defined in [src/either.ts:212](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L212)*
+
+Either type guard for 'left'
+
+**`example`** 
+```typescript
+if (either.isLeft()) {
+  console.error(either.left)
+}
+```
+
+**Returns:** *this is Left<L>*
+
+'true' in case this is 'left error' (and resolves type to be 'left')
+
+___
+
+###  isRight
+
+▸ **isRight**(): *this is Right<never>*
+
+*Defined in [src/either.ts:198](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L198)*
+
+Either type guard for 'right'
+
+**`example`** 
+```typescript
+if (either.isRight()) {
+  console.log(either.right)
+}
+```
+
+**Returns:** *this is Right<never>*
+
+'true' in case this is 'right value' (and resolves type to be 'right')
+
+___
+
+###  map
+
+▸ **map**(`op`: unknown): *[Left](_src_either_.left.md)‹L›*
+
+*Defined in [src/either.ts:149](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L149)*
+
+Either transformer function
+
+Applied to 'right value' returns 'right op(value)'
+Applied to 'left error' returns self without invoking transformer
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`op` | unknown | transformer to be invoked with underlying value |
+
+**Returns:** *[Left](_src_either_.left.md)‹L›*
+
+'right op(value)' or 'left error'
+
+___
+
+###  orChain
+
+▸ **orChain**‹**TT**›(`op`: function): *TT*
+
+*Defined in [src/either.ts:184](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L184)*
 
 Either composition function
 
@@ -75,11 +144,9 @@ Applied to 'left error' returns 'op(error)'
 
 **Type parameters:**
 
-▪ **R2**
+▪ **TT**: *[Either](../modules/_src_either_.either.md)‹unknown, unknown›*
 
-composition function's return type's underlying type
-
-▪ **L2**
+composition function's return type
 
 **Parameters:**
 
@@ -87,7 +154,7 @@ composition function's return type's underlying type
 
 transformer to be invoked with underlying value
 
-▸ (`error`: L): *[Either](../modules/_src_either_.md#either)‹R2, L2›*
+▸ (`error`: L): *TT*
 
 **Parameters:**
 
@@ -95,36 +162,17 @@ Name | Type |
 ------ | ------ |
 `error` | L |
 
-**Returns:** *[Either](../modules/_src_either_.md#either)‹R2, L2›*
+**Returns:** *TT*
 
 'right value' or 'op(error)'
 
 ___
 
-###  fmap
+###  orMap
 
-▸ **fmap**(): *[Left](_src_either_.left.md)‹L›*
+▸ **orMap**‹**R2**›(`op`: function): *[Right](_src_either_.right.md)‹R2›*
 
-*Defined in [src/either.ts:141](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L141)*
-
-Either transformer function
-
-Applied to 'right value' returns 'right op(value)'
-Applied to 'left error' returns self without invoking transformer
-
-**`template`** transformer function's return type
-
-**Returns:** *[Left](_src_either_.left.md)‹L›*
-
-'right op(value)' or 'left error'
-
-___
-
-###  fmapLeft
-
-▸ **fmapLeft**‹**R2**›(`op`: function): *[Right](_src_either_.right.md)‹R2›*
-
-*Defined in [src/either.ts:176](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L176)*
+*Defined in [src/either.ts:161](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L161)*
 
 Either fallback transformer function
 
@@ -157,70 +205,11 @@ Name | Type |
 
 ___
 
-###  isLeft
+###  orTap
 
-▸ **isLeft**(): *this is Left<L>*
+▸ **orTap**(`op`: function): *[Left](_src_either_.left.md)‹L›*
 
-*Defined in [src/either.ts:216](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L216)*
-
-Either type guard for 'left'
-
-**`example`** 
-```typescript
-if (either.isLeft()) {
-  console.error(either.left)
-}
-```
-
-**Returns:** *this is Left<L>*
-
-'true' in case this is 'left error' (and resolves type to be 'left')
-
-___
-
-###  isRight
-
-▸ **isRight**(): *this is Right<never>*
-
-*Defined in [src/either.ts:202](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L202)*
-
-Either type guard for 'right'
-
-**`example`** 
-```typescript
-if (either.isRight()) {
-  console.log(either.right)
-}
-```
-
-**Returns:** *this is Right<never>*
-
-'true' in case this is 'right value' (and resolves type to be 'right')
-
-___
-
-###  tap
-
-▸ **tap**(): *[Left](_src_either_.left.md)‹L›*
-
-*Defined in [src/either.ts:129](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L129)*
-
-Either peeker function
-
-Applied to 'right value' returns self invoking op(value) in process
-Applied to 'left error' returns self without invoking callback
-
-**Returns:** *[Left](_src_either_.left.md)‹L›*
-
-self
-
-___
-
-###  tapLeft
-
-▸ **tapLeft**(`op`: function): *[Left](_src_either_.left.md)‹L›*
-
-*Defined in [src/either.ts:164](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/either.ts#L164)*
+*Defined in [src/either.ts:138](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L138)*
 
 Either fallback peeker function
 
@@ -240,6 +229,29 @@ function to be invoked with underlying value
 Name | Type |
 ------ | ------ |
 `error` | L |
+
+**Returns:** *[Left](_src_either_.left.md)‹L›*
+
+self
+
+___
+
+###  tap
+
+▸ **tap**(`op`: unknown): *[Left](_src_either_.left.md)‹L›*
+
+*Defined in [src/either.ts:127](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/either.ts#L127)*
+
+Either peeker function
+
+Applied to 'right value' returns self invoking op(value) in process
+Applied to 'left error' returns self without invoking callback
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`op` | unknown | function to be invoked with underlying value |
 
 **Returns:** *[Left](_src_either_.left.md)‹L›*
 

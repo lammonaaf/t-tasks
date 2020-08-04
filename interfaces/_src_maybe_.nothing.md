@@ -15,28 +15,32 @@ Maybe data type specialiation representing an absence of any value
 ### Methods
 
 * [chain](_src_maybe_.nothing.md#chain)
-* [chainNothing](_src_maybe_.nothing.md#chainnothing)
-* [fmap](_src_maybe_.nothing.md#fmap)
-* [fmapNothing](_src_maybe_.nothing.md#fmapnothing)
 * [isJust](_src_maybe_.nothing.md#isjust)
 * [isNothing](_src_maybe_.nothing.md#isnothing)
+* [map](_src_maybe_.nothing.md#map)
+* [orChain](_src_maybe_.nothing.md#orchain)
+* [orMap](_src_maybe_.nothing.md#ormap)
+* [orTap](_src_maybe_.nothing.md#ortap)
 * [tap](_src_maybe_.nothing.md#tap)
-* [tapNothing](_src_maybe_.nothing.md#tapnothing)
 
 ## Methods
 
 ###  chain
 
-▸ **chain**(): *[Nothing](_src_maybe_.nothing.md)*
+▸ **chain**(`op`: unknown): *[Nothing](_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:149](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L149)*
+*Defined in [src/maybe.ts:168](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L168)*
 
 Maybe composition function
 
 Applied to 'just value' returns 'op(value)'
 Applied to 'nothing' returns self without invoking composition function
 
-**`template`** composition function's return type's underlying type
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`op` | unknown | transformer to be invoked with underlying value |
 
 **Returns:** *[Nothing](_src_maybe_.nothing.md)*
 
@@ -44,11 +48,76 @@ Applied to 'nothing' returns self without invoking composition function
 
 ___
 
-###  chainNothing
+###  isJust
 
-▸ **chainNothing**‹**R2**›(`op`: function): *[Maybe](../modules/_src_maybe_.md#maybe)‹R2›*
+▸ **isJust**(): *this is Just<never>*
 
-*Defined in [src/maybe.ts:184](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L184)*
+*Defined in [src/maybe.ts:194](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L194)*
+
+Maybe type guard for 'just'
+
+**`example`** 
+```typescript
+if (maybe.isJust()) {
+  console.log(maybe.just);
+}
+```
+
+**Returns:** *this is Just<never>*
+
+'true' in case wrapped value exists (and resolves argument type to be 'just')
+
+___
+
+###  isNothing
+
+▸ **isNothing**(): *this is Nothing*
+
+*Defined in [src/maybe.ts:208](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L208)*
+
+Maybe type guard for 'nothing'
+
+**`example`** 
+```typescript
+if (maybe.isNohing()) {
+  console.log('nothing');
+}
+```
+
+**Returns:** *this is Nothing*
+
+'true' in case wrapped value is 'nothing' (and resolves argument type to be 'nothing')
+
+___
+
+###  map
+
+▸ **map**(`op`: unknown): *[Nothing](_src_maybe_.nothing.md)*
+
+*Defined in [src/maybe.ts:145](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L145)*
+
+Maybe transformer function
+
+Applied to 'just value' returns 'just op(value)'
+Applied to 'nothing' returns self without invoking transformer
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`op` | unknown | transformer to be invoked with underlying value |
+
+**Returns:** *[Nothing](_src_maybe_.nothing.md)*
+
+'just op(value)' or self
+
+___
+
+###  orChain
+
+▸ **orChain**‹**TT**›(`op`: function): *TT*
+
+*Defined in [src/maybe.ts:180](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L180)*
 
 Maybe fallback composition function
 
@@ -57,9 +126,9 @@ Applied to 'nothing' returns op()
 
 **Type parameters:**
 
-▪ **R2**
+▪ **TT**: *[Maybe](../modules/_src_maybe_.maybe.md)‹unknown›*
 
-composition function's return type's underlying type
+composition function's return type
 
 **Parameters:**
 
@@ -67,38 +136,19 @@ composition function's return type's underlying type
 
 function to be invoked
 
-▸ (): *[Maybe](../modules/_src_maybe_.md#maybe)‹R2›*
+▸ (): *TT*
 
-**Returns:** *[Maybe](../modules/_src_maybe_.md#maybe)‹R2›*
+**Returns:** *TT*
 
 self or 'op()'
 
 ___
 
-###  fmap
+###  orMap
 
-▸ **fmap**(): *[Nothing](_src_maybe_.nothing.md)*
+▸ **orMap**‹**R2**›(`op`: function): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:137](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L137)*
-
-Maybe transformer function
-
-Applied to 'just value' returns 'just op(value)'
-Applied to 'nothing' returns self without invoking transformer
-
-**`template`** transformer function return type
-
-**Returns:** *[Nothing](_src_maybe_.nothing.md)*
-
-'just op(value)' or self
-
-___
-
-###  fmapNothing
-
-▸ **fmapNothing**‹**R2**›(`op`: function): *[Just](_src_maybe_.just.md)‹R2›*
-
-*Defined in [src/maybe.ts:172](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L172)*
+*Defined in [src/maybe.ts:157](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L157)*
 
 Maybe fallback transformer function
 
@@ -125,70 +175,11 @@ self or 'just op()'
 
 ___
 
-###  isJust
+###  orTap
 
-▸ **isJust**(): *this is Just<never>*
+▸ **orTap**(`op`: function): *[Nothing](_src_maybe_.nothing.md)*
 
-*Defined in [src/maybe.ts:198](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L198)*
-
-Maybe type guard for 'just'
-
-**`example`** 
-```typescript
-if (maybe.isJust()) {
-  console.log(maybe.just);
-}
-```
-
-**Returns:** *this is Just<never>*
-
-'true' in case wrapped value exists (and resolves argument type to be 'just')
-
-___
-
-###  isNothing
-
-▸ **isNothing**(): *this is Nothing*
-
-*Defined in [src/maybe.ts:212](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L212)*
-
-Maybe type guard for 'nothing'
-
-**`example`** 
-```typescript
-if (maybe.isNohing()) {
-  console.log('nothing');
-}
-```
-
-**Returns:** *this is Nothing*
-
-'true' in case wrapped value is 'nothing' (and resolves argument type to be 'nothing')
-
-___
-
-###  tap
-
-▸ **tap**(): *[Nothing](_src_maybe_.nothing.md)*
-
-*Defined in [src/maybe.ts:125](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L125)*
-
-Maybe peeker function
-
-Applied to 'just value' returns self invoking op(value) in process
-Applied to 'nothing' returns self without invoking callback
-
-**Returns:** *[Nothing](_src_maybe_.nothing.md)*
-
-self
-
-___
-
-###  tapNothing
-
-▸ **tapNothing**(`op`: function): *[Nothing](_src_maybe_.nothing.md)*
-
-*Defined in [src/maybe.ts:160](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/maybe.ts#L160)*
+*Defined in [src/maybe.ts:134](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L134)*
 
 Maybe fallback peeker function
 
@@ -202,6 +193,29 @@ Applied to 'nothing' returns self invoking op() in process
 function to be invoked
 
 ▸ (): *void*
+
+**Returns:** *[Nothing](_src_maybe_.nothing.md)*
+
+self
+
+___
+
+###  tap
+
+▸ **tap**(`op`: unknown): *[Nothing](_src_maybe_.nothing.md)*
+
+*Defined in [src/maybe.ts:123](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/maybe.ts#L123)*
+
+Maybe peeker function
+
+Applied to 'just value' returns self invoking op(value) in process
+Applied to 'nothing' returns self without invoking callback
+
+**Parameters:**
+
+Name | Type | Description |
+------ | ------ | ------ |
+`op` | unknown | function to be invoked with underlying value |
 
 **Returns:** *[Nothing](_src_maybe_.nothing.md)*
 

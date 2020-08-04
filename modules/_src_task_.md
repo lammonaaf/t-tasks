@@ -4,29 +4,25 @@
 
 ## Index
 
-### Interfaces
+### Namespaces
 
-* [Task](../interfaces/_src_task_.task.md)
+* [Task](_src_task_.task.md)
 
 ### Type aliases
 
 * [Cancelable](_src_task_.md#cancelable)
 * [Rejectable](_src_task_.md#rejectable)
-
-### Functions
-
-* [canceledTask](_src_task_.md#canceledtask)
-* [rejectedTask](_src_task_.md#rejectedtask)
-* [resolvedTask](_src_task_.md#resolvedtask)
-* [task](_src_task_.md#task)
+* [TaskFunction](_src_task_.md#taskfunction)
+* [TaskGenerator](_src_task_.md#taskgenerator)
+* [TaskGeneratorFunction](_src_task_.md#taskgeneratorfunction)
 
 ## Type aliases
 
 ###  Cancelable
 
-Ƭ **Cancelable**: *[Maybe](_src_maybe_.md#maybe)‹[Either](_src_either_.md#either)‹R, any››*
+Ƭ **Cancelable**: *[Maybe](_src_maybe_.maybe.md)‹[Rejectable](_src_task_.md#rejectable)‹R››*
 
-*Defined in [src/task.ts:16](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/task.ts#L16)*
+*Defined in [src/task.ts:16](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L16)*
 
 Shortcut for underlying task result type
 
@@ -34,109 +30,76 @@ ___
 
 ###  Rejectable
 
-Ƭ **Rejectable**: *[Either](_src_either_.md#either)‹R, any›*
+Ƭ **Rejectable**: *[Either](_src_either_.either.md)‹R, any›*
 
-*Defined in [src/task.ts:9](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/task.ts#L9)*
+*Defined in [src/task.ts:9](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L9)*
 
 Shortcut for monadic Either type, where erroneous value is of type any
 
-## Functions
-
-###  canceledTask
-
-▸ **canceledTask**‹**R**›(): *[Task](../interfaces/_src_task_.task.md)‹R›*
-
-*Defined in [src/task.ts:153](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/task.ts#L153)*
-
-Invariant task constructor creating canceled task
-
-**Type parameters:**
-
-▪ **R**
-
-returned task's resolve type
-
-**Returns:** *[Task](../interfaces/_src_task_.task.md)‹R›*
-
-task resolving to specified value
-
 ___
 
-###  rejectedTask
+###  TaskFunction
 
-▸ **rejectedTask**‹**R**›(`error`: any): *[Task](../interfaces/_src_task_.task.md)‹R›*
+Ƭ **TaskFunction**: *function*
 
-*Defined in [src/task.ts:143](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/task.ts#L143)*
+*Defined in [src/task.ts:24](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L24)*
 
-Invariant task constructor creating rejected task from error value
+Function returning Task
 
-**Type parameters:**
+#### Type declaration:
 
-▪ **R**
-
-returned task's resolve type
+▸ (...`args`: A): *[Task](_src_task_.task.md)‹R›*
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`error` | any | error to be returned upon awaiting |
-
-**Returns:** *[Task](../interfaces/_src_task_.task.md)‹R›*
-
-task resolving to specified value
+Name | Type |
+------ | ------ |
+`...args` | A |
 
 ___
 
-###  resolvedTask
+###  TaskGenerator
 
-▸ **resolvedTask**‹**R**›(`value`: R): *[Task](../interfaces/_src_task_.task.md)‹R›*
+Ƭ **TaskGenerator**: *Generator‹TT, R, T›*
 
-*Defined in [src/task.ts:132](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/task.ts#L132)*
+*Defined in [src/task.ts:41](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L41)*
 
-Invariant task constructor creating resolved task from plain value
+Task generator
 
-**Type parameters:**
+**`example`** 
+```typescript
+const generatorFunction = function*(): TaskGenerator<Task<string>, number> {
+  const v = yield* someTaskFunction().generator();
 
-▪ **R**
-
-returned task's resolve type
-
-**Parameters:**
-
-Name | Type | Description |
------- | ------ | ------ |
-`value` | R | value to be returned upon awaiting |
-
-**Returns:** *[Task](../interfaces/_src_task_.task.md)‹R›*
-
-task resolving to specified value
+  return v.length;
+};
+```
 
 ___
 
-###  task
+###  TaskGeneratorFunction
 
-▸ **task**‹**R**›(`invoke`: TaskInvoke‹R›, `cancel`: TaskCancel): *[Task](../interfaces/_src_task_.task.md)‹R›*
+Ƭ **TaskGeneratorFunction**: *function*
 
-*Defined in [src/task.ts:121](https://github.com/lammonaaf/t-tasks/blob/3fc1177/src/task.ts#L121)*
+*Defined in [src/task.ts:59](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L59)*
 
-Custom task monad constructor
+Function returning task generator (generator function)
 
-**`note`** low-level primitive for creating custom tasks, not intended for general use
+**`example`** 
+```typescript
+const generatorFunction: TaskGeneratorFunction<[], Task<string>, number> = function*() {
+  const v = yield* someTaskFunction().generator();
 
-**Type parameters:**
+  return v.length;
+};
+```
 
-▪ **R**
+#### Type declaration:
 
-returned task's resolve type
+▸ (...`args`: A): *[TaskGenerator](_src_task_.md#taskgenerator)‹T, TT, R›*
 
 **Parameters:**
 
-Name | Type | Description |
------- | ------ | ------ |
-`invoke` | TaskInvoke‹R› | promise defining task execution |
-`cancel` | TaskCancel | cancelation function |
-
-**Returns:** *[Task](../interfaces/_src_task_.task.md)‹R›*
-
-task resolving to resolve value of invoke
+Name | Type |
+------ | ------ |
+`...args` | A |
