@@ -278,6 +278,17 @@ export namespace Task {
   }
 
   /**
+   * Convinience shortcut for yielding async functions as tasks
+   *
+   * @template R returned generator resolve type
+   * @param promise promise to be resolved
+   * @returns generator to be be used with yield*
+   */
+  export function promiseGenerator<R>(promise: PromiseLike<R>) {
+    return Task.fromPromise(promise).generator();
+  }
+
+  /**
    * Lift from function returning value/promise to function returning task resolving to that value
    *
    * Userfull for converting exising async functions to task functions for further use

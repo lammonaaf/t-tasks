@@ -834,11 +834,11 @@ describe('generated scenarios', () => {
     const resolved = jest.fn();
 
     const task = Task.generate(function*() {
-      const data = yield* delayedValueTask('data', 100).generator();
+      const data = yield* Task.promiseGenerator(delayedValuePromise('data', 100));
 
       resolved(data);
 
-      const length = yield* delayedValueTask(data.length, 200).generator();
+      const length = yield* Task.promiseGenerator(delayedValuePromise(data.length, 200));
 
       resolved(length);
 
