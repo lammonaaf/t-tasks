@@ -31,7 +31,7 @@ export type TaskFunction<A extends unknown[], R> = (...args: A) => Task<R>;
  *
  * @example
  * ```typescript
- * const generatorFunction = function*(): TaskGenerator<Task<string>, number> {
+ * const generatorFunction = function*(): TaskGenerator<unknown, Task<string>, number> {
  *   const v = yield* someTaskFunction().generator();
  *
  *   return v.length;
@@ -49,7 +49,7 @@ export type TaskGenerator<T, TT extends Task<T>, R> = Generator<TT, R, T>;
  *
  * @example
  * ```typescript
- * const generatorFunction: TaskGeneratorFunction<[], Task<string>, number> = function*() {
+ * const generatorFunction: TaskGeneratorFunction<[], unknown, Task<string>, number> = function*() {
  *   const v = yield* someTaskFunction().generator();
  *
  *   return v.length;
@@ -426,50 +426,39 @@ export namespace Task {
 
     const tasks = taskFunctions.map((taskFunction) => taskFunction());
 
+    const onResolved = (value: T[]) => {
+      globalResolve(Maybe.just(Either.right(value)));
+      globalResolve = stub;
+    };
+
+    const onRejected = (error: Maybe<any>) => {
+      error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
+      globalResolve = stub;
+
+      tasks.forEach((task) => task.cancel());
+    };
+
+    const promises = tasks.map(async (task) => {
+      const result = await task.resolve();
+
+      return result
+        .map((either) => {
+          return either.orMap((error) => {
+            throw Maybe.just(error);
+          });
+        })
+        .orMap(() => {
+          throw Maybe.nothing();
+        }).just.right;
+    });
+
     return Task.create(
       new Promise<Cancelable<T[]>>((resolve) => {
         globalResolve = resolve;
 
-        Promise.all(
-          tasks.map((task) => {
-            return task.resolve().then((result) => {
-              if (result.isJust()) {
-                if (result.just.isRight()) {
-                  return result.just.right;
-                } else {
-                  throw Maybe.just(result.just.left);
-                }
-              } else {
-                throw Maybe.nothing();
-              }
-            });
-          }),
-        ).then(
-          (result) => {
-            globalResolve(Maybe.just(Either.right(result)));
-            globalResolve = stub;
-          },
-          (error: Maybe<any>) => {
-            if (error.isJust()) {
-              globalResolve(Maybe.just(Either.left(error.just)));
-              globalResolve = stub;
-            } else {
-              globalResolve(Maybe.nothing());
-              globalResolve = stub;
-            }
-          },
-        );
+        Promise.all(promises).then(onResolved, onRejected);
       }),
-      (error: Maybe<any>) => {
-        if (error.isJust()) {
-          globalResolve(Maybe.just(Either.left(error.just)));
-        } else {
-          globalResolve(Maybe.nothing());
-        }
-        globalResolve = stub;
-
-        tasks.forEach((task) => task.cancel());
-      },
+      onRejected,
     );
   }
 
