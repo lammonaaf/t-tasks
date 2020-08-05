@@ -181,7 +181,7 @@ export interface Task<R> extends TaskBase<R> {
    * });
    * ```
    */
-  generator: () => Generator<Task<R>, R, unknown>;
+  generator: TaskGeneratorFunction<[], unknown, Task<R>, R>;
 }
 
 export namespace Task {
