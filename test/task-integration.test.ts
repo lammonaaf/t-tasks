@@ -390,9 +390,7 @@ describe('chained scenarios', () => {
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved)
-      .chainCanceled(() => {
-        return delayedValueTask(5, 200);
-      })
+      .chainCanceled(() => delayedValueTask(5, 200))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -675,9 +673,7 @@ describe('chained scenarios', () => {
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved)
-      .chainRejected(() => {
-        return delayedValueTask(5, 200);
-      })
+      .chainRejected(() => delayedValueTask(5, 200))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -725,9 +721,7 @@ describe('chained scenarios', () => {
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved)
-      .chainRejected(() => {
-        return delayedValueTask(5, 200);
-      })
+      .chainRejected(() => delayedValueTask(5, 200))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -2104,5 +2098,178 @@ describe('Task.sequence', () => {
     const result = await task.resolve();
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+});
+
+describe('Task.race', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  const flushPromises = async () => {
+    return new Promise((resolve) => setImmediate(resolve));
+  };
+
+  const advanceTime = async (by: number) => {
+    await flushPromises();
+
+    jest.advanceTimersByTime(by);
+
+    await flushPromises();
+  };
+
+  it('succeed in 200ms with 42', async () => {
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
+
+    const taskFunction = jest
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
+
+    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+
+    await advanceTime(200);
+
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(0);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(1);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
+  });
+
+  it('fail externally in 100ms with "some-error"', async () => {
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
+
+    const taskFunction = jest
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
+
+    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+
+    await advanceTime(100);
+
+    task.reject('some-error');
+
+    await flushPromises();
+
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(0);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(0);
+    expect(promiseFunction3).toReturnTimes(0);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.left(['some-error', 'some-error', 'some-error'])));
+  });
+
+  it('succeed in 400ms with 40', async () => {
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn((): number => {
+      throw 'some-error';
+    });
+
+    const taskFunction = jest
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
+
+    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+
+    await advanceTime(400);
+
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(1);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(0);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(40)));
+  });
+
+  it('fail in 600ms with some-error231', async () => {
+    const promiseFunction1 = jest.fn((): number => {
+      throw 'some-error2';
+    });
+    const promiseFunction2 = jest.fn((): number => {
+      throw 'some-error3';
+    });
+    const promiseFunction3 = jest.fn((): number => {
+      throw 'some-error1';
+    });
+
+    const taskFunction = jest
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
+
+    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+
+    await advanceTime(600);
+
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(1);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(1);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(1);
+    expect(promiseFunction3).toReturnTimes(0);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.left(['some-error2', 'some-error3', 'some-error1'])));
+  });
+
+  it('cancel externally in 100ms', async () => {
+    const promiseFunction1 = jest.fn(() => 40);
+    const promiseFunction2 = jest.fn(() => 41);
+    const promiseFunction3 = jest.fn(() => 42);
+
+    const taskFunction = jest
+      .fn(() => Task.resolved(65))
+      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
+      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
+      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
+
+    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+
+    await advanceTime(100);
+
+    task.cancel();
+
+    await flushPromises();
+
+    expect(taskFunction).toBeCalledTimes(3);
+    expect(promiseFunction1).toBeCalledTimes(0);
+    expect(promiseFunction1).toReturnTimes(0);
+    expect(promiseFunction2).toBeCalledTimes(0);
+    expect(promiseFunction2).toReturnTimes(0);
+    expect(promiseFunction3).toBeCalledTimes(0);
+    expect(promiseFunction3).toReturnTimes(0);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.nothing());
   });
 });

@@ -3,12 +3,15 @@ import { Either } from '../src';
 describe('Either.right("data")', () => {
   // So it does not coerse straight to Right
   const subject = ((): Either<string, boolean> => Either.right('data'))();
+  // const subject = Either.right('data');
 
   it('is Right', () => {
+    expect(Either.isRight(subject)).toBeTruthy();
     expect(subject.isRight()).toBeTruthy();
   });
 
   it('is not Left', () => {
+    expect(Either.isLeft(subject)).toBeFalsy();
     expect(subject.isLeft()).toBeFalsy();
   });
 
@@ -54,6 +57,21 @@ describe('Either.right("data")', () => {
     expect(mapped).toStrictEqual(subject);
   });
 
+  it('match maps to Maybe.just(4)', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => 'none');
+
+    const mapped = subject.matchMap({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(1);
+    expect(callback1).toBeCalledWith('data');
+    expect(callback2).toBeCalledTimes(0);
+    expect(mapped).toStrictEqual(Either.right(4));
+  });
+
   it('chains to Either.right(4)', () => {
     const callback = jest.fn((data: string) => Either.right(data.length));
 
@@ -65,13 +83,13 @@ describe('Either.right("data")', () => {
   });
 
   it('chains to Either.left(true)', () => {
-    const callback = jest.fn(() => Either.left(true));
+    const callback = jest.fn(() => Either.left('none'));
 
     const chained = subject.chain(callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith('data');
-    expect(chained).toStrictEqual(Either.left(true));
+    expect(chained).toStrictEqual(Either.left('none'));
   });
 
   it('fallback chains to self', () => {
@@ -84,24 +102,42 @@ describe('Either.right("data")', () => {
   });
 
   it('fallback chains to self', () => {
-    const callback = jest.fn(() => Either.left(true));
+    const callback = jest.fn(() => Either.left('none'));
 
     const mapped = subject.orChain(callback);
 
     expect(callback).not.toBeCalled();
     expect(mapped).toStrictEqual(subject);
   });
+
+  it('match maps to Maybe.just(4)', () => {
+    const callback1 = jest.fn((data: string) => Either.right(data.length));
+    const callback2 = jest.fn(() => Either.right('none'));
+
+    const mapped = subject.matchChain({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(1);
+    expect(callback1).toBeCalledWith('data');
+    expect(callback2).toBeCalledTimes(0);
+    expect(mapped).toStrictEqual(Either.right(4));
+  });
 });
 
 describe('Either.left(false)', () => {
   // So it does not coerse straight to Left
   const subject = ((): Either<string, boolean> => Either.left(false))();
+  // const subject = Either.left(false);
 
   it('is Left', () => {
+    expect(Either.isLeft(subject)).toBeTruthy();
     expect(subject.isLeft()).toBeTruthy();
   });
 
   it('is not Right', () => {
+    expect(Either.isRight(subject)).toBeFalsy();
     expect(subject.isRight()).toBeFalsy();
   });
 
@@ -147,6 +183,21 @@ describe('Either.left(false)', () => {
     expect(mapped).toStrictEqual(Either.right(3));
   });
 
+  it('match maps to Maybe.just("none")', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => false);
+
+    const mapped = subject.matchMap({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(0);
+    expect(callback2).toBeCalledTimes(1);
+    expect(callback2).toBeCalledWith(false);
+    expect(mapped).toStrictEqual(Either.right(false));
+  });
+
   it('chains to self', () => {
     const callback = jest.fn((data: string) => Either.right(data.length));
 
@@ -157,7 +208,7 @@ describe('Either.left(false)', () => {
   });
 
   it('chains to self', () => {
-    const callback = jest.fn(() => Either.left(true));
+    const callback = jest.fn(() => Either.left('none'));
 
     const chained = subject.chain(callback);
 
@@ -176,13 +227,28 @@ describe('Either.left(false)', () => {
   });
 
   it('fallback chains to Either.left(true)', () => {
-    const callback = jest.fn(() => Either.left(true));
+    const callback = jest.fn(() => Either.left('none'));
 
     const mapped = subject.orChain(callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith(false);
-    expect(mapped).toStrictEqual(Either.left(true));
+    expect(mapped).toStrictEqual(Either.left('none'));
+  });
+
+  it('match maps to Maybe.just(4)', () => {
+    const callback1 = jest.fn((data: string) => Either.right(data.length));
+    const callback2 = jest.fn(() => Either.right('none'));
+
+    const mapped = subject.matchChain({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(0);
+    expect(callback2).toBeCalledTimes(1);
+    expect(callback2).toBeCalledWith(false);
+    expect(mapped).toStrictEqual(Either.right('none'));
   });
 });
 

@@ -56,9 +56,7 @@ export type TaskGenerator<T, TT extends Task<T>, R> = Generator<TT, R, T>;
  * };
  * ```
  */
-export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R> = (
-  ...args: A
-) => TaskGenerator<T, TT, R>;
+export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R> = (...args: A) => TaskGenerator<T, TT, R>;
 
 /**
  * Task monad interface
@@ -248,7 +246,7 @@ export namespace Task {
    * ```
    */
   export function fromPromise<R>(promise: PromiseLike<R>): Task<R> {
-    const stub = (_?: Cancelable<R> | PromiseLike<Cancelable<R>> | undefined) => {};
+    const stub = (_: Cancelable<R>) => {};
 
     let globalResolve = stub;
 
@@ -343,17 +341,11 @@ export namespace Task {
    * });
    * ```
    */
-  export function generate<T, TT extends Task<T>, R>(
-    taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>,
-  ): Task<R> {
+  export function generate<T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>): Task<R> {
     const generator = taskGeneratorFunction();
 
     const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
-      return next.done
-        ? Task.resolved(next.value)
-        : next.value
-            .chain((value) => sequentor(generator.next(value)))
-            .chainRejected((error) => sequentor(generator.throw(error)));
+      return next.done ? Task.resolved(next.value) : next.value.chain((value) => sequentor(generator.next(value))).chainRejected((error) => sequentor(generator.throw(error)));
     };
 
     return Task.resolved(undefined).chain(() => sequentor(generator.next()));
@@ -404,7 +396,8 @@ export namespace Task {
   }
 
   /**
-   * Chain multiple tasks one after another
+   * Start multiple tasks one after another
+   *
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task in order and resolving to the list of results
    */
@@ -417,10 +410,13 @@ export namespace Task {
   }
 
   /**
-   * Under construction
+   * Start multiple tasks at once
+   *
+   * @param taskFunctions list of task functions (without arguments)
+   * @returns composite task invoring every task simultaneously and resolving to the list of results when all tasks are finished
    */
   export function parallel<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
-    const stub = (_?: Cancelable<T[]> | PromiseLike<Cancelable<T[]>> | undefined) => {};
+    const stub = (_: Cancelable<T[]>) => {};
 
     let globalResolve = stub;
 
@@ -435,7 +431,7 @@ export namespace Task {
       error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
       globalResolve = stub;
 
-      tasks.forEach((task) => task.cancel());
+      tasks.forEach((task) => task._cancel(error));
     };
 
     const promises = tasks.map(async (task) => {
@@ -445,11 +441,11 @@ export namespace Task {
         .map((either) => {
           return either.orMap((error) => {
             throw Maybe.just(error);
-          });
+          }).right;
         })
         .orMap(() => {
           throw Maybe.nothing();
-        }).just.right;
+        }).just;
     });
 
     return Task.create(
@@ -458,13 +454,37 @@ export namespace Task {
 
         Promise.all(promises).then(onResolved, onRejected);
       }),
-      onRejected,
+      (error: Maybe<any>) => {
+        tasks.forEach((task) => task._cancel(error));
+      },
     );
   }
 
-  /**
-   * Under construction
-   */
+  export function race<T>(taskFunctions: TaskFunction<[], T>[]) {
+    const transformer = (taskFunction: TaskFunction<[], T>): TaskFunction<[], Maybe<any>> => () => {
+      return mapTaskMaybe(taskFunction(), (maybe) => {
+        return maybe.map<Either<any, T>>((either) => {
+          return either.matchChain<any, T>({
+            right: Either.left,
+            left: Either.right,
+          });
+        });
+      });
+    };
+
+    return chainTaskMaybe<any[], T>(Task.parallel(taskFunctions.map(transformer)), (maybe) => {
+      return maybe.matchMap<Task<T>>({
+        just: (either) => {
+          return either.matchMap<Task<T>>({
+            right: Task.rejected,
+            left: Task.resolved,
+          }).right;
+        },
+        nothing: Task.canceled,
+      }).just;
+    });
+  }
+
   export function limit<T>(task: Task<T>, taskFunction: TaskFunction<[], void>) {
     const limit = taskFunction().tap(() => task.cancel());
     return task

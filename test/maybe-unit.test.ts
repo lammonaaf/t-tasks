@@ -3,12 +3,15 @@ import { Maybe } from '../src';
 describe('Maybe.just("data")', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Maybe<string> => Maybe.just('data'))();
+  // const subject = Maybe.just('data');
 
   it('is Just', () => {
+    expect(Maybe.isJust(subject)).toBeTruthy();
     expect(subject.isJust()).toBeTruthy();
   });
 
   it('is not Nothing', () => {
+    expect(Maybe.isNothing(subject)).toBeFalsy();
     expect(subject.isNothing()).toBeFalsy();
   });
 
@@ -46,12 +49,27 @@ describe('Maybe.just("data")', () => {
   });
 
   it('fallback maps to self', () => {
-    const callback = jest.fn(() => 3);
+    const callback = jest.fn(() => false);
 
     const mapped = subject.orMap(callback);
 
     expect(callback).not.toBeCalled();
     expect(mapped).toStrictEqual(subject);
+  });
+
+  it('match maps to Maybe.just(4)', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => false);
+
+    const mapped = subject.matchMap({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(1);
+    expect(callback1).toBeCalledWith('data');
+    expect(callback2).toBeCalledTimes(0);
+    expect(mapped).toStrictEqual(Maybe.just(4));
   });
 
   it('chains to Maybe.just(4)', () => {
@@ -75,7 +93,7 @@ describe('Maybe.just("data")', () => {
   });
 
   it('fallback chains to self', () => {
-    const callback = jest.fn(() => Maybe.just(3));
+    const callback = jest.fn(() => Maybe.just(false));
 
     const mapped = subject.orChain(callback);
 
@@ -91,17 +109,35 @@ describe('Maybe.just("data")', () => {
     expect(callback).not.toBeCalled();
     expect(mapped).toStrictEqual(subject);
   });
+
+  it('chains to Maybe.just(4)', () => {
+    const callback1 = jest.fn((data: string) => Maybe.just(data.length));
+    const callback2 = jest.fn(() => Maybe.just(false));
+
+    const chained = subject.matchChain({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(1);
+    expect(callback1).toBeCalledWith('data');
+    expect(callback2).toBeCalledTimes(0);
+    expect(chained).toStrictEqual(Maybe.just(4));
+  });
 });
 
 describe('Maybe.nothing()', () => {
   // So typescript does not make assumptions about actual type
   const subject = ((): Maybe<string> => Maybe.nothing())();
+  // const subject = Maybe.nothing();
 
   it('is not Just', () => {
+    expect(Maybe.isJust(subject)).toBeFalsy();
     expect(subject.isJust()).toBeFalsy();
   });
 
   it('is Nothing', () => {
+    expect(Maybe.isNothing(subject)).toBeTruthy();
     expect(subject.isNothing()).toBeTruthy();
   });
 
@@ -134,13 +170,28 @@ describe('Maybe.nothing()', () => {
   });
 
   it('fallback maps to Maybe.just(3)', () => {
-    const callback = jest.fn(() => 3);
+    const callback = jest.fn(() => false);
 
     const mapped = subject.orMap(callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith();
-    expect(mapped).toStrictEqual(Maybe.just(3));
+    expect(mapped).toStrictEqual(Maybe.just(false));
+  });
+
+  it('match maps to Maybe.just("none")', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => false);
+
+    const mapped = subject.matchMap({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(0);
+    expect(callback2).toBeCalledTimes(1);
+    expect(callback2).toBeCalledWith();
+    expect(mapped).toStrictEqual(Maybe.just(false));
   });
 
   it('chains to self', () => {
@@ -162,13 +213,13 @@ describe('Maybe.nothing()', () => {
   });
 
   it('fallback chains to Maybe.just(3)', () => {
-    const callback = jest.fn(() => Maybe.just(3));
+    const callback = jest.fn(() => Maybe.just(false));
 
     const mapped = subject.orChain(callback);
 
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith();
-    expect(mapped).toStrictEqual(Maybe.just(3));
+    expect(mapped).toStrictEqual(Maybe.just(false));
   });
 
   it('fallback chains to Maybe.nothing()', () => {
@@ -179,6 +230,21 @@ describe('Maybe.nothing()', () => {
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith();
     expect(mapped).toStrictEqual(Maybe.nothing());
+  });
+
+  it('chains to Maybe.just("none")', () => {
+    const callback1 = jest.fn((data: string) => Maybe.just(data.length));
+    const callback2 = jest.fn(() => Maybe.just(false));
+
+    const chained = subject.matchChain({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(0);
+    expect(callback2).toBeCalledTimes(1);
+    expect(callback2).toBeCalledWith();
+    expect(chained).toStrictEqual(Maybe.just(false));
   });
 });
 
