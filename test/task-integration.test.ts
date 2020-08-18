@@ -26,10 +26,11 @@ describe('basic scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = delayedValueTask(42, 100)
-      .tapCanceled(canceled)
-      .tapRejected(rejected)
-      .tap(resolved);
+    const task = delayedValueTask(42, 100).matchTap({
+      resolved,
+      rejected,
+      canceled,
+    });
 
     await advanceTime(99);
 
@@ -57,10 +58,11 @@ describe('basic scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = delayedValueTask(42, 100)
-      .tapCanceled(canceled)
-      .tapRejected(rejected)
-      .tap(resolved);
+    const task = delayedValueTask(42, 100).matchTap({
+      resolved,
+      rejected,
+      canceled,
+    });
 
     await advanceTime(50);
 
@@ -85,13 +87,14 @@ describe('basic scenarios', () => {
 
   it('cancel in 50ms with fallback', async () => {
     const canceled = jest.fn(() => 63);
-    const rejected = jest.fn();
-    const resolved = jest.fn();
+    const rejected = jest.fn(() => 46);
+    const resolved = jest.fn(() => 32);
 
-    const task = delayedValueTask(42, 100)
-      .mapCanceled(canceled)
-      .tapRejected(rejected)
-      .tap(resolved);
+    const task = delayedValueTask(42, 100).matchMap({
+      resolved,
+      rejected,
+      canceled,
+    });
 
     await advanceTime(50);
 
@@ -99,9 +102,9 @@ describe('basic scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
+    expect(canceled).toBeCalledWith();
     expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(63);
+    expect(resolved).not.toBeCalled();
 
     const result = await task.resolve();
 
@@ -109,7 +112,7 @@ describe('basic scenarios', () => {
 
     expect(canceled).toBeCalledTimes(1);
     expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
@@ -119,10 +122,11 @@ describe('basic scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = delayedValueTask(42, 100)
-      .tapCanceled(canceled)
-      .tapRejected(rejected)
-      .tap(resolved);
+    const task = delayedValueTask(42, 100).matchTap({
+      resolved,
+      rejected,
+      canceled,
+    });
 
     await advanceTime(50);
 
@@ -146,14 +150,15 @@ describe('basic scenarios', () => {
   });
 
   it('fail externally in 50ms with fallback', async () => {
-    const canceled = jest.fn();
-    const rejected = jest.fn(() => 63);
-    const resolved = jest.fn();
+    const canceled = jest.fn(() => 63);
+    const rejected = jest.fn(() => 46);
+    const resolved = jest.fn(() => 32);
 
-    const task = delayedValueTask(42, 100)
-      .tapCanceled(canceled)
-      .mapRejected(rejected)
-      .tap(resolved);
+    const task = delayedValueTask(42, 100).matchMap({
+      resolved,
+      rejected,
+      canceled,
+    });
 
     await advanceTime(50);
 
@@ -163,7 +168,7 @@ describe('basic scenarios', () => {
 
     expect(canceled).not.toBeCalled();
     expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(63);
+    expect(resolved).not.toBeCalled();
 
     const result = await task.resolve();
 
@@ -171,9 +176,9 @@ describe('basic scenarios', () => {
 
     expect(canceled).toBeCalledTimes(0);
     expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
 
-    expect(result).toStrictEqual(Maybe.just(Either.right(63)));
+    expect(result).toStrictEqual(Maybe.just(Either.right(46)));
   });
 
   it('fail internally in 50ms', async () => {
@@ -343,7 +348,11 @@ describe('chained scenarios', () => {
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved)
-      .chain((value) => delayedValueTask(value.length, 200))
+      .matchChain({
+        resolved: (value) => delayedValueTask(value.length, 200),
+        rejected: () => delayedValueTask(23, 100),
+        canceled: () => delayedValueTask(45, 100),
+      })
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);

@@ -1,5 +1,5 @@
 import { Maybe } from './maybe';
-import { Either } from './either';
+import { Either, Right } from './either';
 
 /**
  * Shortcut for monadic Either type, where erroneous value is of type any
@@ -180,6 +180,10 @@ export interface Task<R> extends TaskBase<R> {
    * ```
    */
   generator: TaskGeneratorFunction<[], unknown, Task<R>, R>;
+
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }): Task<R>;
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }): Task<R2 | R3 | R4>;
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4>;
 }
 
 export namespace Task {
@@ -619,5 +623,47 @@ class TaskClass<R> implements Task<R> {
     return (function*(task) {
       return (yield task) as R;
     })(this);
+  }
+
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }) {
+    return tapTaskMaybe(this, (maybe) => {
+      return maybe.matchTap({
+        just: (either) => {
+          return either.matchTap({
+            right: op.resolved,
+            left: op.rejected,
+          });
+        },
+        nothing: op.canceled,
+      });
+    });
+  }
+
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }) {
+    return mapTaskMaybe(this, (maybe) => {
+      return maybe.matchMap<Right<R2 | R3 | R4, any>>({
+        just: (either) => {
+          return either.matchMap({
+            right: op.resolved,
+            left: op.rejected,
+          });
+        },
+        nothing: () => Either.right(op.canceled()),
+      });
+    });
+  }
+
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }) {
+    return chainTaskMaybe(this, (maybe) => {
+      return maybe.matchMap<Task<R2 | R3 | R4>>({
+        just: (either) => {
+          return either.matchMap<Task<R2 | R3>>({
+            right: op.resolved,
+            left: op.rejected,
+          }).right;
+        },
+        nothing: op.canceled,
+      }).just;
+    });
   }
 }
