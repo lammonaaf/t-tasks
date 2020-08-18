@@ -38,6 +38,21 @@ describe('Maybe.just("data")', () => {
     expect(tapped).toStrictEqual(subject);
   });
 
+  it('match taps "data"', () => {
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+
+    const mapped = subject.matchTap({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(1);
+    expect(callback1).toBeCalledWith('data');
+    expect(callback2).toBeCalledTimes(0);
+    expect(mapped).toStrictEqual(subject);
+  });
+
   it('maps to Maybe.just(4)', () => {
     const callback = jest.fn((data: string) => data.length);
 
@@ -158,6 +173,21 @@ describe('Maybe.nothing()', () => {
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith();
     expect(tapped).toStrictEqual(subject);
+  });
+
+  it('match taps', () => {
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+
+    const mapped = subject.matchTap({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(0);
+    expect(callback2).toBeCalledTimes(1);
+    expect(callback2).toBeCalledWith();
+    expect(mapped).toStrictEqual(subject);
   });
 
   it('maps to self', () => {

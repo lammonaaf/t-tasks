@@ -38,6 +38,21 @@ describe('Either.right("data")', () => {
     expect(tapped).toStrictEqual(subject);
   });
 
+  it('match taps "data"', () => {
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+
+    const mapped = subject.matchTap({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(1);
+    expect(callback1).toBeCalledWith('data');
+    expect(callback2).toBeCalledTimes(0);
+    expect(mapped).toStrictEqual(subject);
+  });
+
   it('maps to Either.right(4)', () => {
     const callback = jest.fn((data: string) => data.length);
 
@@ -162,6 +177,21 @@ describe('Either.left(false)', () => {
     expect(callback).toBeCalledTimes(1);
     expect(callback).toBeCalledWith(false);
     expect(tapped).toStrictEqual(subject);
+  });
+
+  it('match taps "false"', () => {
+    const callback1 = jest.fn();
+    const callback2 = jest.fn();
+
+    const mapped = subject.matchTap({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toBeCalledTimes(0);
+    expect(callback2).toBeCalledTimes(1);
+    expect(callback2).toBeCalledWith(false);
+    expect(mapped).toStrictEqual(subject);
   });
 
   it('maps to self', () => {

@@ -96,6 +96,8 @@ export interface Right<R, L> {
   orChain<R2, L2>(this: Either<R, L>, op: (error: L) => Left<R2, L2>): Either<R, L2>;
   orChain<R2, L2>(this: Either<R, L>, op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
 
+  matchTap(op: { right: (value: R) => void; left: (error: any) => void }): this;
+
   // Right case
   matchMap<R2, R3 = R2>(this: Right<R, L>, op: { right: (value: R) => R2; left: (error: any) => R3 }): Right<R2, never>;
   // General case
@@ -249,6 +251,8 @@ export interface Left<R, L> {
   orChain<R2, L2>(this: Either<R, L>, op: (error: L) => Left<R2, L2>): Either<R, L2>;
   orChain<R2, L2>(this: Either<R, L>, op: (error: L) => Either<R2, L2>): Either<R | R2, L2>;
 
+  matchTap(op: { right: (value: R) => void; left: (error: any) => void }): this;
+
   // Left case
   matchMap<R2, R3 = R2>(this: Left<R, L>, op: { right: (value: R) => R2; left: (error: any) => R3 }): Right<R3, never>;
   // General case
@@ -395,11 +399,14 @@ class RightClass<R> implements Right<R, never> {
   isLeft(): this is Left<R, never> {
     return false;
   }
+  matchTap(op: { right: (value: R) => void }) {
+    return this.tap(op.right);
+  }
   matchMap<R2>(op: { right: (value: R) => R2 }) {
-    return Either.right(op.right(this.right));
+    return this.map(op.right);
   }
   matchChain<TT extends Either<unknown, unknown>>(op: { right: (value: R) => TT }) {
-    return op.right(this.right);
+    return this.chain(op.right);
   }
 }
 
@@ -432,10 +439,13 @@ class LeftClass<L> implements Left<never, L> {
   isLeft(): this is Left<never, L> {
     return true;
   }
+  matchTap(op: { left: (error: any) => void }) {
+    return this.orTap(op.left);
+  }
   matchMap<R2>(op: { left: (error: any) => R2 }) {
-    return Either.right(op.left(this.left));
+    return this.orMap(op.left);
   }
   matchChain<TT extends Either<unknown, unknown>>(op: { left: (error: any) => TT }) {
-    return op.left(this.left);
+    return this.orChain(op.left);
   }
 }

@@ -96,6 +96,8 @@ export interface Just<R> {
   orChain<R2>(this: Maybe<R>, op: () => Nothing<R2>): Maybe<R>;
   orChain<R2>(this: Maybe<R>, op: () => Maybe<R2>): Maybe<R | R2>;
 
+  matchTap(op: { just: (value: R) => void; nothing: () => void }): this;
+
   // Just cases
   matchMap<R2, R3 = R2>(this: Just<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2>;
   // General case
@@ -245,6 +247,8 @@ export interface Nothing<R> {
   orChain<R2>(this: Maybe<R>, op: () => Nothing<R2>): Maybe<R>;
   orChain<R2>(this: Maybe<R>, op: () => Maybe<R2>): Maybe<R | R2>;
 
+  matchTap(op: { just: (value: R) => void; nothing: () => void }): this;
+
   // Nothing cases
   matchMap<R2, R3 = R2>(this: Nothing<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R3>;
   // General cases
@@ -388,11 +392,14 @@ class JustClass<R> implements Just<R> {
   isNothing(): this is Nothing<R> {
     return false;
   }
+  matchTap(op: { just: (value: R) => void }) {
+    return this.tap(op.just);
+  }
   matchMap<R2>(op: { just: (value: R) => R2 }) {
-    return Maybe.just(op.just(this.just));
+    return this.map(op.just);
   }
   matchChain<TT extends Maybe<unknown>>(op: { just: (value: R) => TT }) {
-    return op.just(this.just);
+    return this.chain(op.just);
   }
 }
 
@@ -423,11 +430,14 @@ class NothingClass implements Nothing<never> {
   isNothing(): this is Nothing<never> {
     return true;
   }
+  matchTap(op: { nothing: () => void }) {
+    return this.orTap(op.nothing);
+  }
   matchMap<R2>(op: { nothing: () => R2 }) {
-    return Maybe.just(op.nothing());
+    return this.orMap(op.nothing);
   }
   matchChain<TT extends Maybe<unknown>>(op: { nothing: () => TT }) {
-    return op.nothing();
+    return this.orChain(op.nothing);
   }
 }
 
