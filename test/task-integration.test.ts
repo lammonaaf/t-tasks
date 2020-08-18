@@ -1667,7 +1667,7 @@ describe('Task.limit scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = Task.limit(delayedValueTask(42, 200), () => Task.timeout(300))
+    const task = Task.limit(delayedValueTask(42, 200), Task.timeout(300))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1700,7 +1700,7 @@ describe('Task.limit scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = Task.limit(delayedValueTask(42, 200), () => Task.timeout(100))
+    const task = Task.limit(delayedValueTask(42, 200), Task.timeout(100))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1733,7 +1733,7 @@ describe('Task.limit scenarios', () => {
     const rejected = jest.fn();
     const resolved = jest.fn();
 
-    const task = Task.limit(delayedValueTask(42, 200), () => Task.timeout(300))
+    const task = Task.limit(delayedValueTask(42, 200), Task.timeout(300))
       .tapCanceled(canceled)
       .tapRejected(rejected)
       .tap(resolved);
@@ -1760,7 +1760,7 @@ describe('Task.limit scenarios', () => {
   });
 });
 
-describe('Task.parallel', () => {
+describe('Task.all', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -1781,17 +1781,10 @@ describe('Task.parallel', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
+    const task = Task.all([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(600);
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(1);
     expect(promiseFunction1).toReturnTimes(1);
     expect(promiseFunction2).toBeCalledTimes(1);
@@ -1809,13 +1802,7 @@ describe('Task.parallel', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
+    const task = Task.all([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(300);
 
@@ -1823,7 +1810,6 @@ describe('Task.parallel', () => {
 
     await flushPromises();
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(0);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(0);
@@ -1841,13 +1827,7 @@ describe('Task.parallel', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
+    const task = Task.all([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(300);
 
@@ -1855,7 +1835,6 @@ describe('Task.parallel', () => {
 
     await flushPromises();
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(0);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(0);
@@ -1878,17 +1857,10 @@ describe('Task.parallel', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.parallel([taskFunction, taskFunction, taskFunction]);
+    const task = Task.all([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(400);
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(1);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(0);
@@ -2101,7 +2073,7 @@ describe('Task.sequence', () => {
   });
 });
 
-describe('Task.race', () => {
+describe('Task.any', () => {
   beforeEach(() => jest.useFakeTimers());
   afterEach(() => jest.useRealTimers());
 
@@ -2122,17 +2094,10 @@ describe('Task.race', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+    const task = Task.any([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(0);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(0);
@@ -2150,13 +2115,7 @@ describe('Task.race', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+    const task = Task.any([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(100);
 
@@ -2164,7 +2123,6 @@ describe('Task.race', () => {
 
     await flushPromises();
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(0);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(0);
@@ -2184,17 +2142,10 @@ describe('Task.race', () => {
       throw 'some-error';
     });
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+    const task = Task.any([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(400);
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(1);
     expect(promiseFunction1).toReturnTimes(1);
     expect(promiseFunction2).toBeCalledTimes(0);
@@ -2218,17 +2169,10 @@ describe('Task.race', () => {
       throw 'some-error1';
     });
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+    const task = Task.any([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(600);
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(1);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(1);
@@ -2246,13 +2190,7 @@ describe('Task.race', () => {
     const promiseFunction2 = jest.fn(() => 41);
     const promiseFunction3 = jest.fn(() => 42);
 
-    const taskFunction = jest
-      .fn(() => Task.resolved(65))
-      .mockImplementationOnce(() => Task.timeout(400).map(promiseFunction1))
-      .mockImplementationOnce(() => Task.timeout(600).map(promiseFunction2))
-      .mockImplementationOnce(() => Task.timeout(200).map(promiseFunction3));
-
-    const task = Task.race([taskFunction, taskFunction, taskFunction]);
+    const task = Task.any([Task.timeout(400).map(promiseFunction1), Task.timeout(600).map(promiseFunction2), Task.timeout(200).map(promiseFunction3)]);
 
     await advanceTime(100);
 
@@ -2260,7 +2198,6 @@ describe('Task.race', () => {
 
     await flushPromises();
 
-    expect(taskFunction).toBeCalledTimes(3);
     expect(promiseFunction1).toBeCalledTimes(0);
     expect(promiseFunction1).toReturnTimes(0);
     expect(promiseFunction2).toBeCalledTimes(0);

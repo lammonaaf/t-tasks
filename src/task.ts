@@ -415,12 +415,10 @@ export namespace Task {
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task simultaneously and resolving to the list of results when all tasks are finished
    */
-  export function parallel<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
+  export function all<T>(tasks: Task<T>[]): Task<T[]> {
     const stub = (_: Cancelable<T[]>) => {};
 
     let globalResolve = stub;
-
-    const tasks = taskFunctions.map((taskFunction) => taskFunction());
 
     const onResolved = (value: T[]) => {
       globalResolve(Maybe.just(Either.right(value)));
@@ -460,9 +458,9 @@ export namespace Task {
     );
   }
 
-  export function race<T>(taskFunctions: TaskFunction<[], T>[]) {
-    const transformer = (taskFunction: TaskFunction<[], T>): TaskFunction<[], Maybe<any>> => () => {
-      return mapTaskMaybe(taskFunction(), (maybe) => {
+  export function any<T>(tasks: Task<T>[]) {
+    const transformer = (task: Task<T>): Task<any> => {
+      return mapTaskMaybe(task, (maybe) => {
         return maybe.map<Either<any, T>>((either) => {
           return either.matchChain<any, T>({
             right: Either.left,
@@ -472,7 +470,7 @@ export namespace Task {
       });
     };
 
-    return chainTaskMaybe<any[], T>(Task.parallel(taskFunctions.map(transformer)), (maybe) => {
+    return chainTaskMaybe<any[], T>(Task.all(tasks.map(transformer)), (maybe) => {
       return maybe.matchMap<Task<T>>({
         just: (either) => {
           return either.matchMap<Task<T>>({
@@ -485,12 +483,8 @@ export namespace Task {
     });
   }
 
-  export function limit<T>(task: Task<T>, taskFunction: TaskFunction<[], void>) {
-    const limit = taskFunction().tap(() => task.cancel());
-    return task
-      .tap(() => limit.cancel())
-      .tapCanceled(() => limit.cancel())
-      .tapRejected(() => limit.cancel());
+  export function limit<T>(task: Task<T>, limitTask: Task<void>) {
+    return Task.any<T>([task, limitTask.chain<T>(Task.canceled)]).chainRejected((errors) => Task.rejected<T>(errors[0]));
   }
 
   /**
