@@ -314,6 +314,12 @@ export interface Nothing<R> {
  */
 export type Maybe<R> = Just<R> | Nothing<R>;
 
+export namespace Just {
+  export function just<R>(just: Just<R>) {
+    return just.just;
+  }
+}
+
 export namespace Maybe {
   /**
    * Non-empty monad constructor
@@ -356,6 +362,22 @@ export namespace Maybe {
 
   export function isNothing<T>(maybe: Maybe<T>): maybe is Nothing<never> {
     return maybe.isNothing();
+  }
+
+  export function everyJust<T>(maybes: Maybe<T>[]): maybes is Just<T>[] {
+    return maybes.every(Maybe.isJust);
+  }
+
+  export function someJust<T>(maybes: Maybe<T>[]): maybes is Just<T>[] {
+    return maybes.some(Maybe.isJust);
+  }
+
+  export function everyNothing<T>(maybes: Maybe<T>[]): maybes is Nothing<never>[] {
+    return maybes.every(Maybe.isNothing);
+  }
+
+  export function someNothing<T>(maybes: Maybe<T>[]): maybes is Nothing<never>[] {
+    return maybes.some(Maybe.isNothing);
   }
 }
 

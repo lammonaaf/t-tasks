@@ -319,6 +319,18 @@ export interface Left<R, L> {
  */
 export type Either<R, L> = Right<R, L> | Left<R, L>;
 
+export namespace Right {
+  export function right<R, L>(right: Right<R, L>) {
+    return right.right;
+  }
+}
+
+export namespace Left {
+  export function left<R, L>(left: Left<R, L>) {
+    return left.left;
+  }
+}
+
 export namespace Either {
   /**
    * Right monad constructor
@@ -363,6 +375,22 @@ export namespace Either {
 
   export function isLeft<R, L>(either: Either<R, L>): either is Left<never, L> {
     return either.isLeft();
+  }
+
+  export function everyRight<R, L>(eithers: Either<R, L>[]): eithers is Right<R, never>[] {
+    return eithers.every(Either.isRight);
+  }
+
+  export function someRight<R, L>(eithers: Either<R, L>[]): eithers is Right<R, never>[] {
+    return eithers.some(Either.isRight);
+  }
+
+  export function everyLeft<R, L>(eithers: Either<R, L>[]): eithers is Left<never, L>[] {
+    return eithers.every(Either.isLeft);
+  }
+
+  export function someLeft<R, L>(eithers: Either<R, L>[]): eithers is Left<never, L>[] {
+    return eithers.some(Either.isLeft);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Maybe } from './maybe';
+import { Maybe, Just } from './maybe';
 import { Either, Right } from './either';
 
 /**
@@ -250,31 +250,19 @@ export namespace Task {
    * ```
    */
   export function fromPromise<R>(promise: PromiseLike<R>): Task<R> {
-    const stub = (_: Cancelable<R>) => {};
-
-    let globalResolve = stub;
+    const [resolve, setResolve] = resolver<Cancelable<R>>();
 
     return Task.create(
-      new Promise<Cancelable<R>>((resolve) => {
-        globalResolve = resolve;
+      new Promise<Cancelable<R>>((_resolve) => {
+        setResolve(_resolve);
 
-        promise.then(
-          (value) => {
-            globalResolve(Maybe.just(Either.right(value)));
-
-            globalResolve = stub;
-          },
-          (error) => {
-            globalResolve(Maybe.just(Either.left(error)));
-
-            globalResolve = stub;
-          },
-        );
+        promise
+          .then(Either.right, Either.left)
+          .then(Maybe.just)
+          .then(resolve);
       }),
       (error: Maybe<any>) => {
-        error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
-
-        globalResolve = stub;
+        resolve(error.map(Either.left));
       },
     );
   }
@@ -375,24 +363,18 @@ export namespace Task {
   export function timeout(delay: number) {
     let handler: NodeJS.Timeout;
 
-    const stub = (_?: Cancelable<void> | PromiseLike<Cancelable<void>> | undefined) => {};
-
-    let globalResolve = stub;
+    const [resolve, setResolve] = resolver<Cancelable<void>>();
 
     return Task.create(
-      new Promise<Cancelable<void>>((resolve) => {
-        globalResolve = resolve;
+      new Promise<Cancelable<void>>((_resolve) => {
+        setResolve(_resolve);
 
         handler = setTimeout(() => {
-          globalResolve(Maybe.just(Either.right(undefined)));
-
-          globalResolve = stub;
+          resolve(Maybe.just(Either.right(undefined)));
         }, delay);
       }),
       (error: Maybe<any>) => {
-        error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
-
-        globalResolve = stub;
+        resolve(error.map(Either.left));
 
         clearTimeout(handler);
       },
@@ -419,72 +401,74 @@ export namespace Task {
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task simultaneously and resolving to the list of results when all tasks are finished
    */
-  export function all<T>(tasks: Task<T>[]): Task<T[]> {
-    const stub = (_: Cancelable<T[]>) => {};
+  export function all<T>(tasks: Iterable<Task<T>>) {
+    const [resolve, setResolve] = resolver<Cancelable<T[]>>();
 
-    let globalResolve = stub;
+    const cancel = (error: Maybe<any>) => Array.from(tasks, (task) => task._cancel(error));
 
-    const onResolved = (value: T[]) => {
-      globalResolve(Maybe.just(Either.right(value)));
-      globalResolve = stub;
+    const list = Array.from<Task<T>, Maybe<T>>(tasks, Maybe.nothing);
+
+    const resolved = (value: T, i: number) => {
+      list[i] = Maybe.just(value);
+
+      if (Maybe.everyJust(list)) {
+        resolve(Maybe.just(Either.right(list.map(Just.just))));
+      }
     };
-
-    const onRejected = (error: Maybe<any>) => {
-      error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
-      globalResolve = stub;
-
-      tasks.forEach((task) => task._cancel(error));
+    const rejected = (error: Maybe<any>) => {
+      resolve(error.map(Either.left));
+      cancel(error);
     };
-
-    const promises = tasks.map(async (task) => {
-      const result = await task.resolve();
-
-      return result
-        .map((either) => {
-          return either.orMap((error) => {
-            throw Maybe.just(error);
-          }).right;
-        })
-        .orMap(() => {
-          throw Maybe.nothing();
-        }).just;
-    });
 
     return Task.create(
-      new Promise<Cancelable<T[]>>((resolve) => {
-        globalResolve = resolve;
+      new Promise<Cancelable<T[]>>((_resolve) => {
+        setResolve(_resolve);
 
-        Promise.all(promises).then(onResolved, onRejected);
+        Array.from(tasks, (task, i) => {
+          return task.matchTap({
+            resolved: (value) => resolved(value, i),
+            rejected: (error) => rejected(Maybe.just(error)),
+            canceled: () => rejected(Maybe.nothing()),
+          });
+        });
       }),
-      (error: Maybe<any>) => {
-        tasks.forEach((task) => task._cancel(error));
-      },
+      cancel,
     );
   }
 
-  export function any<T>(tasks: Task<T>[]) {
-    const transformer = (task: Task<T>): Task<any> => {
-      return mapTaskMaybe(task, (maybe) => {
-        return maybe.map<Either<any, T>>((either) => {
-          return either.matchChain<any, T>({
-            right: Either.left,
-            left: Either.right,
-          });
-        });
-      });
+  export function any<T>(tasks: Iterable<Task<T>>) {
+    const [resolve, setResolve] = resolver<Cancelable<T>>();
+
+    const cancel = (error: Maybe<any>) => Array.from(tasks, (task) => task._cancel(error));
+
+    const list = Array.from<Task<T>, Maybe<any>>(tasks, Maybe.nothing);
+
+    const resolved = (value: Maybe<T>) => {
+      resolve(value.map(Either.right));
+      cancel(Maybe.nothing());
+    };
+    const rejected = (error: any, i: number) => {
+      list[i] = Maybe.just(error);
+
+      if (Maybe.everyJust(list)) {
+        resolve(Maybe.just(Either.left(list.map(Just.just))));
+      }
     };
 
-    return chainTaskMaybe<any[], T>(Task.all(tasks.map(transformer)), (maybe) => {
-      return maybe.matchMap<Task<T>>({
-        just: (either) => {
-          return either.matchMap<Task<T>>({
-            right: Task.rejected,
-            left: Task.resolved,
-          }).right;
-        },
-        nothing: Task.canceled,
-      }).just;
-    });
+    return Task.create(
+      new Promise<Cancelable<T>>((_resolve) => {
+        setResolve(_resolve);
+
+        Array.from(tasks, (task, i) => {
+          return task.matchTap({
+            resolved: (value) => resolved(Maybe.just(value)),
+            rejected: (error) => rejected(error, i),
+            canceled: () => resolved(Maybe.nothing()),
+          });
+        });
+      }),
+      cancel,
+    );
   }
 
   export function limit<T>(task: Task<T>, limitTask: Task<void>) {
@@ -521,6 +505,23 @@ interface TaskBase<R> {
    */
   readonly _cancel: TaskCancel;
 }
+
+const resolver = <T>() => {
+  const stub = (_: T) => {};
+
+  let globalResolve = stub;
+
+  const resolve = (value: T) => {
+    globalResolve(value);
+    globalResolve = stub;
+  };
+
+  const setResolve = (value: typeof resolve) => {
+    globalResolve = value;
+  };
+
+  return [resolve, setResolve] as [typeof resolve, typeof setResolve];
+};
 
 function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
   return Task.create(

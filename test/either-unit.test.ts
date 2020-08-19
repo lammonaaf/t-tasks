@@ -1,4 +1,4 @@
-import { Either } from '../src';
+import { Either, Right, Left } from '../src';
 
 describe('Either.right("data")', () => {
   // So it does not coerse straight to Right
@@ -16,7 +16,7 @@ describe('Either.right("data")', () => {
   });
 
   it('contains "data"', () => {
-    expect(subject.isRight() && subject.right === 'data').toBeTruthy();
+    expect(subject.isRight() && Right.right(subject) === 'data').toBeTruthy();
   });
 
   it('taps "data"', () => {
@@ -72,7 +72,7 @@ describe('Either.right("data")', () => {
     expect(mapped).toStrictEqual(subject);
   });
 
-  it('match maps to Maybe.just(4)', () => {
+  it('match maps to Either.right(4)', () => {
     const callback1 = jest.fn((data: string) => data.length);
     const callback2 = jest.fn(() => 'none');
 
@@ -125,7 +125,7 @@ describe('Either.right("data")', () => {
     expect(mapped).toStrictEqual(subject);
   });
 
-  it('match maps to Maybe.just(4)', () => {
+  it('match maps to Either.right(4)', () => {
     const callback1 = jest.fn((data: string) => Either.right(data.length));
     const callback2 = jest.fn(() => Either.right('none'));
 
@@ -157,7 +157,7 @@ describe('Either.left(false)', () => {
   });
 
   it('contains false', () => {
-    expect(subject.isLeft() && subject.left === false).toBeTruthy();
+    expect(subject.isLeft() && Left.left(subject) === false).toBeTruthy();
   });
 
   it('does not tap', () => {
@@ -213,7 +213,7 @@ describe('Either.left(false)', () => {
     expect(mapped).toStrictEqual(Either.right(3));
   });
 
-  it('match maps to Maybe.just("none")', () => {
+  it('match maps to Either.right("none")', () => {
     const callback1 = jest.fn((data: string) => data.length);
     const callback2 = jest.fn(() => false);
 
@@ -266,7 +266,7 @@ describe('Either.left(false)', () => {
     expect(mapped).toStrictEqual(Either.left('none'));
   });
 
-  it('match maps to Maybe.just(4)', () => {
+  it('match maps to Either.right(4)', () => {
     const callback1 = jest.fn((data: string) => Either.right(data.length));
     const callback2 = jest.fn(() => Either.right('none'));
 
@@ -319,5 +319,71 @@ describe('Either.fromNullable', () => {
     const value = Either.fromNullable(undefined, 'some-error');
 
     expect(value).toStrictEqual(Either.left('some-error'));
+  });
+});
+
+describe('[Either.right("data1"), Either.right("data2"), Either.right("data3")]', () => {
+  // So typescript does not make assumptions about actual type
+  const subjects = ((): Either<string, boolean>[] => [Either.right('data1'), Either.right('data2'), Either.right('data3')])();
+  // const subjects = [Either.right('data1'), Either.right('data2'), Either.right('data3')];
+
+  it('is contains right', () => {
+    expect(Either.someRight(subjects)).toBeTruthy();
+  });
+
+  it('is all right', () => {
+    expect(Either.everyRight(subjects)).toBeTruthy();
+  });
+
+  it('is does not contain left', () => {
+    expect(Either.someLeft(subjects)).toBeFalsy();
+  });
+
+  it('is not all left', () => {
+    expect(Either.everyLeft(subjects)).toBeFalsy();
+  });
+});
+
+describe('[Either.left(), Either.left(), Either.left()]', () => {
+  // So typescript does not make assumptions about actual type
+  const subjects = ((): Either<string, boolean>[] => [Either.left(false), Either.left(true), Either.left(false)])();
+  // const subjects = [Either.left(), Either.left(), Either.left()];
+
+  it('is does not contain right', () => {
+    expect(Either.someRight(subjects)).toBeFalsy();
+  });
+
+  it('is not all right', () => {
+    expect(Either.everyRight(subjects)).toBeFalsy();
+  });
+
+  it('is contains left', () => {
+    expect(Either.someLeft(subjects)).toBeTruthy();
+  });
+
+  it('is all left', () => {
+    expect(Either.everyLeft(subjects)).toBeTruthy();
+  });
+});
+
+describe('[Either.left(), Either.right("data"), Either.left()]', () => {
+  // So typescript does not make assumptions about actual type
+  const subjects = ((): Either<string, boolean>[] => [Either.left(true), Either.right('data'), Either.left(false)])();
+  // const subjects = [Either.left(), Either.right('data'), Either.left()];
+
+  it('is contains right', () => {
+    expect(Either.someRight(subjects)).toBeTruthy();
+  });
+
+  it('is not all right', () => {
+    expect(Either.everyRight(subjects)).toBeFalsy();
+  });
+
+  it('is contains left', () => {
+    expect(Either.someLeft(subjects)).toBeTruthy();
+  });
+
+  it('is not all left', () => {
+    expect(Either.everyLeft(subjects)).toBeFalsy();
   });
 });

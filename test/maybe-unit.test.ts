@@ -1,4 +1,4 @@
-import { Maybe } from '../src';
+import { Maybe, Just } from '../src';
 
 describe('Maybe.just("data")', () => {
   // So typescript does not make assumptions about actual type
@@ -16,7 +16,7 @@ describe('Maybe.just("data")', () => {
   });
 
   it('contains "data"', () => {
-    expect(subject.isJust() && subject.just === 'data').toBeTruthy();
+    expect(subject.isJust() && Just.just(subject) === 'data').toBeTruthy();
   });
 
   it('taps "data"', () => {
@@ -315,5 +315,71 @@ describe('fromNullable()', () => {
     const value = Maybe.fromNullable(null);
 
     expect(value).toStrictEqual(Maybe.nothing());
+  });
+});
+
+describe('[Maybe.just("data1"), Maybe.just("data2"), Maybe.just("data3")]', () => {
+  // So typescript does not make assumptions about actual type
+  const subjects = ((): Maybe<string>[] => [Maybe.just('data1'), Maybe.just('data2'), Maybe.just('data3')])();
+  // const subjects = [Maybe.just('data1'), Maybe.just('data2'), Maybe.just('data3')];
+
+  it('is contains Just', () => {
+    expect(Maybe.someJust(subjects)).toBeTruthy();
+  });
+
+  it('is all Just', () => {
+    expect(Maybe.everyJust(subjects)).toBeTruthy();
+  });
+
+  it('is does not contain Nothing', () => {
+    expect(Maybe.someNothing(subjects)).toBeFalsy();
+  });
+
+  it('is not all Nothing', () => {
+    expect(Maybe.everyNothing(subjects)).toBeFalsy();
+  });
+});
+
+describe('[Maybe.nothing(), Maybe.nothing(), Maybe.nothing()]', () => {
+  // So typescript does not make assumptions about actual type
+  const subjects = ((): Maybe<string>[] => [Maybe.nothing(), Maybe.nothing(), Maybe.nothing()])();
+  // const subjects = [Maybe.nothing(), Maybe.nothing(), Maybe.nothing()];
+
+  it('is does not contain Just', () => {
+    expect(Maybe.someJust(subjects)).toBeFalsy();
+  });
+
+  it('is not all Just', () => {
+    expect(Maybe.everyJust(subjects)).toBeFalsy();
+  });
+
+  it('is contains Nothing', () => {
+    expect(Maybe.someNothing(subjects)).toBeTruthy();
+  });
+
+  it('is all Nothing', () => {
+    expect(Maybe.everyNothing(subjects)).toBeTruthy();
+  });
+});
+
+describe('[Maybe.nothing(), Maybe.just("data"), Maybe.nothing()]', () => {
+  // So typescript does not make assumptions about actual type
+  const subjects = ((): Maybe<string>[] => [Maybe.nothing(), Maybe.just('data'), Maybe.nothing()])();
+  // const subjects = [Maybe.nothing(), Maybe.just('data'), Maybe.nothing()];
+
+  it('is contains Just', () => {
+    expect(Maybe.someJust(subjects)).toBeTruthy();
+  });
+
+  it('is not all Just', () => {
+    expect(Maybe.everyJust(subjects)).toBeFalsy();
+  });
+
+  it('is contains Nothing', () => {
+    expect(Maybe.someNothing(subjects)).toBeTruthy();
+  });
+
+  it('is not all Nothing', () => {
+    expect(Maybe.everyNothing(subjects)).toBeFalsy();
   });
 });
