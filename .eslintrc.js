@@ -23,7 +23,7 @@ module.exports = {
     "prettier/prettier": ["error", {
       "arrowParens": "always",
       "trailingComma": "all",
-      "printWidth": 120,
+      "printWidth": 200,
     }]
   }
 }

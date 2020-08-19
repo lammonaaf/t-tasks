@@ -1,5 +1,5 @@
-import { Maybe } from './maybe';
-import { Either } from './either';
+import { Maybe, Just } from './maybe';
+import { Either, Right } from './either';
 
 /**
  * Shortcut for monadic Either type, where erroneous value is of type any
@@ -31,7 +31,7 @@ export type TaskFunction<A extends unknown[], R> = (...args: A) => Task<R>;
  *
  * @example
  * ```typescript
- * const generatorFunction = function*(): TaskGenerator<Task<string>, number> {
+ * const generatorFunction = function*(): TaskGenerator<unknown, Task<string>, number> {
  *   const v = yield* someTaskFunction().generator();
  *
  *   return v.length;
@@ -49,16 +49,14 @@ export type TaskGenerator<T, TT extends Task<T>, R> = Generator<TT, R, T>;
  *
  * @example
  * ```typescript
- * const generatorFunction: TaskGeneratorFunction<[], Task<string>, number> = function*() {
+ * const generatorFunction: TaskGeneratorFunction<[], unknown, Task<string>, number> = function*() {
  *   const v = yield* someTaskFunction().generator();
  *
  *   return v.length;
  * };
  * ```
  */
-export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R> = (
-  ...args: A
-) => TaskGenerator<T, TT, R>;
+export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R> = (...args: A) => TaskGenerator<T, TT, R>;
 
 /**
  * Task monad interface
@@ -67,12 +65,13 @@ export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R>
  */
 export interface Task<R> extends TaskBase<R> {
   /**
-   * Invoke callback when task is canceled (and only then)
+   * Invoke callback when task is resolved (and only then)
    *
    * @param op callback to invoke
    * @returns self
    */
-  tapCanceled(op: () => void): Task<R>;
+  tap(op: (value: R) => void): Task<R>;
+
   /**
    * Invoke callback when task is rejected (and only then)
    *
@@ -80,29 +79,25 @@ export interface Task<R> extends TaskBase<R> {
    * @returns self
    */
   tapRejected(op: (error: any) => void): Task<R>;
+
   /**
-   * Invoke callback when task is resolved (and only then)
+   * Invoke callback when task is canceled (and only then)
    *
    * @param op callback to invoke
    * @returns self
    */
-  tap(op: (value: R) => void): Task<R>;
+  tapCanceled(op: () => void): Task<R>;
+
   /**
-   * Invoke transformer when task is canceled (and only then) and return it's result instead
+   * Invoke a dedicated callback according to task resolution
    *
-   * @template R2 fallback return type
-   * @param op transformer to invoke
-   * @returns task returning fallback result in case of cancelation
+   * @param op.resolved callback to invoke on success
+   * @param op.rejected callback to invoke on failure
+   * @param op.canceled callback to invoke on cancelation
+   * @returns self
    */
-  mapCanceled<R2>(op: () => R2): Task<R | R2>;
-  /**
-   * Invoke transformer when task is rejected (and only then) and return it's result instead
-   *
-   * @template R2 fallback return type
-   * @param op transformer to invoke
-   * @returns task returning fallback result in case of failure
-   */
-  mapRejected<R2>(op: (error: any) => R2): Task<R | R2>;
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }): Task<R>;
+
   /**
    * Invoke transformer when task is resolved (and only then) and return it's result instead
    *
@@ -111,22 +106,38 @@ export interface Task<R> extends TaskBase<R> {
    * @returns task returning transformer result
    */
   map<R2>(op: (value: R) => R2): Task<R2>;
+
   /**
-   * Invoke transformer when task is canceled (and only then) and continue execution with it's result
+   * Invoke transformer when task is rejected (and only then) and return it's result instead
    *
-   * @template R2 fallback task resolve type
+   * @template R2 fallback return type
    * @param op transformer to invoke
-   * @returns task chaining to fallback task in case of cancelation
+   * @returns task returning fallback result in case of failure
    */
-  chainCanceled<R2>(op: () => Task<R2>): Task<R | R2>;
+  mapRejected<R2>(op: (error: any) => R2): Task<R | R2>;
+
   /**
-   * Invoke transformer when task is rejected (and only then) and continue execution with it's result
+   * Invoke transformer when task is canceled (and only then) and return it's result instead
    *
-   * @template R2 fallback task resolve type
+   * @template R2 fallback return type
    * @param op transformer to invoke
-   * @returns task chaining to fallback task in case of failure
+   * @returns task returning fallback result in case of cancelation
    */
-  chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>;
+  mapCanceled<R2>(op: () => R2): Task<R | R2>;
+
+  /**
+   * Invoke a dedicated transformer according to task resolution
+   *
+   * @template R2 success transformer return type
+   * @template R3 failure transformer return type
+   * @template R4 cancelation transformer return type
+   * @param op.resolved transformer to invoke on success
+   * @param op.rejected transformer to invoke on failure
+   * @param op.canceled transformer to invoke on cancelation
+   * @returns task resolving to a corresponding transformer result
+   */
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }): Task<R2 | R3 | R4>;
+
   /**
    * Invoke transformer when task is resolved (and only then) and continue execution with it's result
    *
@@ -135,22 +146,57 @@ export interface Task<R> extends TaskBase<R> {
    * @returns task chaining to transformer result task
    */
   chain<R2>(op: (value: R) => Task<R2>): Task<R2>;
+
+  /**
+   * Invoke transformer when task is rejected (and only then) and continue execution with it's result
+   *
+   * @template R2 fallback task resolve type
+   * @param op transformer to invoke
+   * @returns task chaining to fallback task in case of failure
+   */
+  chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>;
+
+  /**
+   * Invoke transformer when task is canceled (and only then) and continue execution with it's result
+   *
+   * @template R2 fallback task resolve type
+   * @param op transformer to invoke
+   * @returns task chaining to fallback task in case of cancelation
+   */
+  chainCanceled<R2>(op: () => Task<R2>): Task<R | R2>;
+
+  /**
+   * Invoke a dedicated transformer according to task resolution and continue execution with it's result
+   *
+   * @template R2 success transformer resolve type
+   * @template R3 failure transformer resolve type
+   * @template R4 cancelation transformer resolve type
+   * @param op.resolved transformer to invoke on success
+   * @param op.rejected transformer to invoke on failure
+   * @param op.canceled transformer to invoke on cancelation
+   * @returns task chaining to a corresponding transformer result
+   */
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4>;
+
   /**
    * Return underlying promise in order to await result
    *
    * @returns underlying promise
    */
   resolve: () => TaskInvoke<R>;
+
   /**
    * Invoke underlying canel method without error
    */
   cancel: () => void;
+
   /**
    * Invoke underlying canel method with error
    *
    * @param error error value to be injected from outside
    */
   reject: (error: any) => void;
+
   /**
    * Wrap task to singleton generator
    *
@@ -181,7 +227,7 @@ export interface Task<R> extends TaskBase<R> {
    * });
    * ```
    */
-  generator: () => Generator<Task<R>, R, unknown>;
+  generator: TaskGeneratorFunction<[], unknown, Task<R>, R>;
 }
 
 export namespace Task {
@@ -248,33 +294,32 @@ export namespace Task {
    * ```
    */
   export function fromPromise<R>(promise: PromiseLike<R>): Task<R> {
-    const stub = (_?: Cancelable<R> | PromiseLike<Cancelable<R>> | undefined) => {};
-
-    let globalResolve = stub;
+    const [resolve, setResolve] = resolver<Cancelable<R>>();
 
     return Task.create(
-      new Promise<Cancelable<R>>((resolve) => {
-        globalResolve = resolve;
+      new Promise<Cancelable<R>>((_resolve) => {
+        setResolve(_resolve);
 
-        promise.then(
-          (value) => {
-            globalResolve(Maybe.just(Either.right(value)));
-
-            globalResolve = stub;
-          },
-          (error) => {
-            globalResolve(Maybe.just(Either.left(error)));
-
-            globalResolve = stub;
-          },
-        );
+        promise
+          .then(Either.right, Either.left)
+          .then(Maybe.just)
+          .then(resolve);
       }),
       (error: Maybe<any>) => {
-        error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
-
-        globalResolve = stub;
+        resolve(error.map(Either.left));
       },
     );
+  }
+
+  /**
+   * Convinience shortcut for yielding async functions as tasks
+   *
+   * @template R returned generator resolve type
+   * @param promise promise to be resolved
+   * @returns generator to be be used with yield*
+   */
+  export function promiseGenerator<R>(promise: PromiseLike<R>) {
+    return Task.fromPromise(promise).generator();
   }
 
   /**
@@ -332,17 +377,17 @@ export namespace Task {
    * });
    * ```
    */
-  export function generate<T, TT extends Task<T>, R>(
-    taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>,
-  ): Task<R> {
+  export function generate<T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>): Task<R> {
     const generator = taskGeneratorFunction();
 
     const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
       return next.done
         ? Task.resolved(next.value)
-        : next.value
-            .chain((value) => sequentor(generator.next(value)))
-            .chainRejected((error) => sequentor(generator.throw(error)));
+        : next.value.matchChain<R>({
+            resolved: (value) => sequentor(generator.next(value)),
+            rejected: (error) => sequentor(generator.throw(error)),
+            canceled: Task.canceled,
+          });
     };
 
     return Task.resolved(undefined).chain(() => sequentor(generator.next()));
@@ -368,24 +413,18 @@ export namespace Task {
   export function timeout(delay: number) {
     let handler: NodeJS.Timeout;
 
-    const stub = (_?: Cancelable<void> | PromiseLike<Cancelable<void>> | undefined) => {};
-
-    let globalResolve = stub;
+    const [resolve, setResolve] = resolver<Cancelable<void>>();
 
     return Task.create(
-      new Promise<Cancelable<void>>((resolve) => {
-        globalResolve = resolve;
+      new Promise<Cancelable<void>>((_resolve) => {
+        setResolve(_resolve);
 
         handler = setTimeout(() => {
-          globalResolve(Maybe.just(Either.right(undefined)));
-
-          globalResolve = stub;
+          resolve(Maybe.just(Either.right(undefined)));
         }, delay);
       }),
       (error: Maybe<any>) => {
-        error.tap((error) => globalResolve(Maybe.just(Either.left(error)))).orTap(() => globalResolve(Maybe.nothing()));
-
-        globalResolve = stub;
+        resolve(error.map(Either.left));
 
         clearTimeout(handler);
       },
@@ -393,12 +432,13 @@ export namespace Task {
   }
 
   /**
-   * Chain multiple tasks one after another
+   * Start multiple tasks one after another
+   *
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task in order and resolving to the list of results
    */
-  export function sequence<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
-    return taskFunctions.reduce((prev, taskFunction) => {
+  export function sequence<T>(taskFunctions: Iterable<TaskFunction<[], T>>): Task<T[]> {
+    return Array.from(taskFunctions).reduce((prev, taskFunction) => {
       return prev.chain((list) => {
         return taskFunction().map((value) => list.concat(value));
       });
@@ -406,75 +446,123 @@ export namespace Task {
   }
 
   /**
-   * Under construction
+   * Execute all tasks in parallel and return list of results
+   *
+   * Resulting task resolves when all tasks are resolved, returning list of tasks results maintaining result order
+   * In case of failure (external or internal) resulting task is immediately immediately rejected with that error and all pending tasks are canceled
+   * In case of cancelation resulting task is immediately immediately canceled together with all pending tasks
+   *
+   * @note direct equivalent of Promise.all
+   *
+   * @template T underlying task type
+   * @param tasks iterable of tasks to execute
+   * @retuirns task resolving to the list of results
    */
-  export function parallel<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
-    const stub = (_?: Cancelable<T[]> | PromiseLike<Cancelable<T[]>> | undefined) => {};
+  export function all<T>(tasks: Iterable<Task<T>>) {
+    const [resolve, setResolve] = resolver<Cancelable<T[]>>();
 
-    let globalResolve = stub;
+    const cancel = (error: Maybe<any>) => Array.from(tasks, (task) => task._cancel(error));
 
-    const tasks = taskFunctions.map((taskFunction) => taskFunction());
+    const list = Array.from<Task<T>, Maybe<T>>(tasks, Maybe.nothing);
+
+    const resolved = (value: T, i: number) => {
+      list[i] = Maybe.just(value);
+
+      if (Maybe.everyJust(list)) {
+        resolve(Maybe.just(Either.right(list.map(Just.just))));
+      }
+    };
+    const rejected = (error: Maybe<any>) => {
+      resolve(error.map(Either.left));
+      cancel(error);
+    };
 
     return Task.create(
-      new Promise<Cancelable<T[]>>((resolve) => {
-        globalResolve = resolve;
+      new Promise<Cancelable<T[]>>((_resolve) => {
+        setResolve(_resolve);
 
-        Promise.all(
-          tasks.map((task) => {
-            return task.resolve().then((result) => {
-              if (result.isJust()) {
-                if (result.just.isRight()) {
-                  return result.just.right;
-                } else {
-                  throw Maybe.just(result.just.left);
-                }
-              } else {
-                throw Maybe.nothing();
-              }
-            });
-          }),
-        ).then(
-          (result) => {
-            globalResolve(Maybe.just(Either.right(result)));
-            globalResolve = stub;
-          },
-          (error: Maybe<any>) => {
-            if (error.isJust()) {
-              globalResolve(Maybe.just(Either.left(error.just)));
-              globalResolve = stub;
-            } else {
-              globalResolve(Maybe.nothing());
-              globalResolve = stub;
-            }
-          },
-        );
+        Array.from(tasks, (task, i) => {
+          return task.matchTap({
+            resolved: (value) => resolved(value, i),
+            rejected: (error) => rejected(Maybe.just(error)),
+            canceled: () => rejected(Maybe.nothing()),
+          });
+        });
       }),
-      (error: Maybe<any>) => {
-        if (error.isJust()) {
-          globalResolve(Maybe.just(Either.left(error.just)));
-        } else {
-          globalResolve(Maybe.nothing());
-        }
-        globalResolve = stub;
-
-        tasks.forEach((task) => task.cancel());
-      },
+      cancel,
     );
   }
 
   /**
-   * Under construction
+   * Execute all tasks in parallel and return the result of the first successful one
+   *
+   * Resulting task resolves when the first tasks is successfuly resolved, returning it's result
+   * In case of external task rejecttion all tasks are rejected with that error and resulting task is rejected with an array of errors
+   * In case of internal task rejection the execution is continued untill fthe first task resolves succesfully or all the tasks are rejected this way resulting task is rejected with an array of errors
+   * In case of cancelation resulting task is immediately immediately canceled together with all pending tasks
+   *
+   * @note direct equivalent of Promise.any
+   *
+   * @template T underlying task type
+   * @param tasks iterable of tasks to execute
+   * @retuirns task resolving to the result of first successfull task
    */
-  export function limit<T>(task: Task<T>, taskFunction: TaskFunction<[], void>) {
-    const limit = taskFunction().tap(() => task.cancel());
-    return task
-      .tap(() => limit.cancel())
-      .tapCanceled(() => limit.cancel())
-      .tapRejected(() => limit.cancel());
+  export function any<T>(tasks: Iterable<Task<T>>) {
+    const [resolve, setResolve] = resolver<Cancelable<T>>();
+
+    const cancel = (error: Maybe<any>) => Array.from(tasks, (task) => task._cancel(error));
+
+    const list = Array.from<Task<T>, Maybe<any>>(tasks, Maybe.nothing);
+
+    const resolved = (value: Maybe<T>) => {
+      resolve(value.map(Either.right));
+      cancel(Maybe.nothing());
+    };
+    const rejected = (error: any, i: number) => {
+      list[i] = Maybe.just(error);
+
+      if (Maybe.everyJust(list)) {
+        resolve(Maybe.just(Either.left(list.map(Just.just))));
+      }
+    };
+
+    return Task.create(
+      new Promise<Cancelable<T>>((_resolve) => {
+        setResolve(_resolve);
+
+        Array.from(tasks, (task, i) => {
+          return task.matchTap({
+            resolved: (value) => resolved(Maybe.just(value)),
+            rejected: (error) => rejected(error, i),
+            canceled: () => resolved(Maybe.nothing()),
+          });
+        });
+      }),
+      cancel,
+    );
   }
 
   /**
-   * Under construction
+   * Limit task execution based on another task
+   *
+   * If the second task resolves sooner than the first, resulting task is canceled
+   * Otherwise the resulting task resolves together with the first one
+   *
+   * @param task task to limit
+   * @param limitTask limiting task
+   * @returns task limites according to limitTask
+   */
+  export function limit<T>(task: Task<T>, limitTask: Task<void>) {
+    return Task.any<T>([task, limitTask.chain<T>(Task.canceled)]).chainRejected((errors) => Task.rejected<T>(errors[0]));
+  }
+
+  /**
+   * Repeat task untill successful
+   *
+   * Given task is re-generated in case of failure (both external and internal)
+   * Resulting task is still cancelable by standard means
+   *
+   * @param taskFunction task preoducing function
    */
   export function repeat<T>(taskFunction: TaskFunction<[], T>) {
     const sequentor = (): Task<T> => taskFunction().chainRejected(sequentor);
@@ -503,6 +591,23 @@ interface TaskBase<R> {
    */
   readonly _cancel: TaskCancel;
 }
+
+const resolver = <T>() => {
+  const stub = (_: T) => {};
+
+  let globalResolve = stub;
+
+  const resolve = (value: T) => {
+    globalResolve(value);
+    globalResolve = stub;
+  };
+
+  const setResolve = (value: typeof resolve) => {
+    globalResolve = value;
+  };
+
+  return [resolve, setResolve] as [typeof resolve, typeof setResolve];
+};
 
 function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
   return Task.create(
@@ -605,5 +710,47 @@ class TaskClass<R> implements Task<R> {
     return (function*(task) {
       return (yield task) as R;
     })(this);
+  }
+
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }) {
+    return tapTaskMaybe(this, (maybe) => {
+      return maybe.matchTap({
+        just: (either) => {
+          return either.matchTap({
+            right: op.resolved,
+            left: op.rejected,
+          });
+        },
+        nothing: op.canceled,
+      });
+    });
+  }
+
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }) {
+    return mapTaskMaybe(this, (maybe) => {
+      return maybe.matchMap<Right<R2 | R3 | R4, any>>({
+        just: (either) => {
+          return either.matchMap({
+            right: op.resolved,
+            left: op.rejected,
+          });
+        },
+        nothing: () => Either.right(op.canceled()),
+      });
+    });
+  }
+
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }) {
+    return chainTaskMaybe(this, (maybe) => {
+      return maybe.matchMap<Task<R2 | R3 | R4>>({
+        just: (either) => {
+          return either.matchMap<Task<R2 | R3>>({
+            right: op.resolved,
+            left: op.rejected,
+          }).right;
+        },
+        nothing: op.canceled,
+      }).just;
+    });
   }
 }
