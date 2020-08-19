@@ -65,12 +65,13 @@ export type TaskGeneratorFunction<A extends unknown[], T, TT extends Task<T>, R>
  */
 export interface Task<R> extends TaskBase<R> {
   /**
-   * Invoke callback when task is canceled (and only then)
+   * Invoke callback when task is resolved (and only then)
    *
    * @param op callback to invoke
    * @returns self
    */
-  tapCanceled(op: () => void): Task<R>;
+  tap(op: (value: R) => void): Task<R>;
+
   /**
    * Invoke callback when task is rejected (and only then)
    *
@@ -78,29 +79,25 @@ export interface Task<R> extends TaskBase<R> {
    * @returns self
    */
   tapRejected(op: (error: any) => void): Task<R>;
+
   /**
-   * Invoke callback when task is resolved (and only then)
+   * Invoke callback when task is canceled (and only then)
    *
    * @param op callback to invoke
    * @returns self
    */
-  tap(op: (value: R) => void): Task<R>;
+  tapCanceled(op: () => void): Task<R>;
+
   /**
-   * Invoke transformer when task is canceled (and only then) and return it's result instead
+   * Invoke a dedicated callback according to task resolution
    *
-   * @template R2 fallback return type
-   * @param op transformer to invoke
-   * @returns task returning fallback result in case of cancelation
+   * @param op.resolved callback to invoke on success
+   * @param op.rejected callback to invoke on failure
+   * @param op.canceled callback to invoke on cancelation
+   * @returns self
    */
-  mapCanceled<R2>(op: () => R2): Task<R | R2>;
-  /**
-   * Invoke transformer when task is rejected (and only then) and return it's result instead
-   *
-   * @template R2 fallback return type
-   * @param op transformer to invoke
-   * @returns task returning fallback result in case of failure
-   */
-  mapRejected<R2>(op: (error: any) => R2): Task<R | R2>;
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }): Task<R>;
+
   /**
    * Invoke transformer when task is resolved (and only then) and return it's result instead
    *
@@ -109,22 +106,38 @@ export interface Task<R> extends TaskBase<R> {
    * @returns task returning transformer result
    */
   map<R2>(op: (value: R) => R2): Task<R2>;
+
   /**
-   * Invoke transformer when task is canceled (and only then) and continue execution with it's result
+   * Invoke transformer when task is rejected (and only then) and return it's result instead
    *
-   * @template R2 fallback task resolve type
+   * @template R2 fallback return type
    * @param op transformer to invoke
-   * @returns task chaining to fallback task in case of cancelation
+   * @returns task returning fallback result in case of failure
    */
-  chainCanceled<R2>(op: () => Task<R2>): Task<R | R2>;
+  mapRejected<R2>(op: (error: any) => R2): Task<R | R2>;
+
   /**
-   * Invoke transformer when task is rejected (and only then) and continue execution with it's result
+   * Invoke transformer when task is canceled (and only then) and return it's result instead
    *
-   * @template R2 fallback task resolve type
+   * @template R2 fallback return type
    * @param op transformer to invoke
-   * @returns task chaining to fallback task in case of failure
+   * @returns task returning fallback result in case of cancelation
    */
-  chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>;
+  mapCanceled<R2>(op: () => R2): Task<R | R2>;
+
+  /**
+   * Invoke a dedicated transformer according to task resolution
+   *
+   * @template R2 success transformer return type
+   * @template R3 failure transformer return type
+   * @template R4 cancelation transformer return type
+   * @param op.resolved transformer to invoke on success
+   * @param op.rejected transformer to invoke on failure
+   * @param op.canceled transformer to invoke on cancelation
+   * @returns task resolving to a corresponding transformer result
+   */
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }): Task<R2 | R3 | R4>;
+
   /**
    * Invoke transformer when task is resolved (and only then) and continue execution with it's result
    *
@@ -133,22 +146,57 @@ export interface Task<R> extends TaskBase<R> {
    * @returns task chaining to transformer result task
    */
   chain<R2>(op: (value: R) => Task<R2>): Task<R2>;
+
+  /**
+   * Invoke transformer when task is rejected (and only then) and continue execution with it's result
+   *
+   * @template R2 fallback task resolve type
+   * @param op transformer to invoke
+   * @returns task chaining to fallback task in case of failure
+   */
+  chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>;
+
+  /**
+   * Invoke transformer when task is canceled (and only then) and continue execution with it's result
+   *
+   * @template R2 fallback task resolve type
+   * @param op transformer to invoke
+   * @returns task chaining to fallback task in case of cancelation
+   */
+  chainCanceled<R2>(op: () => Task<R2>): Task<R | R2>;
+
+  /**
+   * Invoke a dedicated transformer according to task resolution and continue execution with it's result
+   *
+   * @template R2 success transformer resolve type
+   * @template R3 failure transformer resolve type
+   * @template R4 cancelation transformer resolve type
+   * @param op.resolved transformer to invoke on success
+   * @param op.rejected transformer to invoke on failure
+   * @param op.canceled transformer to invoke on cancelation
+   * @returns task chaining to a corresponding transformer result
+   */
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4>;
+
   /**
    * Return underlying promise in order to await result
    *
    * @returns underlying promise
    */
   resolve: () => TaskInvoke<R>;
+
   /**
    * Invoke underlying canel method without error
    */
   cancel: () => void;
+
   /**
    * Invoke underlying canel method with error
    *
    * @param error error value to be injected from outside
    */
   reject: (error: any) => void;
+
   /**
    * Wrap task to singleton generator
    *
@@ -180,10 +228,6 @@ export interface Task<R> extends TaskBase<R> {
    * ```
    */
   generator: TaskGeneratorFunction<[], unknown, Task<R>, R>;
-
-  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }): Task<R>;
-  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }): Task<R2 | R3 | R4>;
-  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4>;
 }
 
 export namespace Task {
@@ -393,8 +437,8 @@ export namespace Task {
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task in order and resolving to the list of results
    */
-  export function sequence<T>(taskFunctions: TaskFunction<[], T>[]): Task<T[]> {
-    return taskFunctions.reduce((prev, taskFunction) => {
+  export function sequence<T>(taskFunctions: Iterable<TaskFunction<[], T>>): Task<T[]> {
+    return Array.from(taskFunctions).reduce((prev, taskFunction) => {
       return prev.chain((list) => {
         return taskFunction().map((value) => list.concat(value));
       });
@@ -402,10 +446,17 @@ export namespace Task {
   }
 
   /**
-   * Start multiple tasks at once
+   * Execute all tasks in parallel and return list of results
    *
-   * @param taskFunctions list of task functions (without arguments)
-   * @returns composite task invoring every task simultaneously and resolving to the list of results when all tasks are finished
+   * Resulting task resolves when all tasks are resolved, returning list of tasks results maintaining result order
+   * In case of failure (external or internal) resulting task is immediately immediately rejected with that error and all pending tasks are canceled
+   * In case of cancelation resulting task is immediately immediately canceled together with all pending tasks
+   *
+   * @note direct equivalent of Promise.all
+   *
+   * @template T underlying task type
+   * @param tasks iterable of tasks to execute
+   * @retuirns task resolving to the list of results
    */
   export function all<T>(tasks: Iterable<Task<T>>) {
     const [resolve, setResolve] = resolver<Cancelable<T[]>>();
@@ -442,6 +493,20 @@ export namespace Task {
     );
   }
 
+  /**
+   * Execute all tasks in parallel and return the result of the first successful one
+   *
+   * Resulting task resolves when the first tasks is successfuly resolved, returning it's result
+   * In case of external task rejecttion all tasks are rejected with that error and resulting task is rejected with an array of errors
+   * In case of internal task rejection the execution is continued untill fthe first task resolves succesfully or all the tasks are rejected this way resulting task is rejected with an array of errors
+   * In case of cancelation resulting task is immediately immediately canceled together with all pending tasks
+   *
+   * @note direct equivalent of Promise.any
+   *
+   * @template T underlying task type
+   * @param tasks iterable of tasks to execute
+   * @retuirns task resolving to the result of first successfull task
+   */
   export function any<T>(tasks: Iterable<Task<T>>) {
     const [resolve, setResolve] = resolver<Cancelable<T>>();
 
@@ -478,14 +543,26 @@ export namespace Task {
   }
 
   /**
-   * Under construction
+   * Limit task execution based on another task
+   *
+   * If the second task resolves sooner than the first, resulting task is canceled
+   * Otherwise the resulting task resolves together with the first one
+   *
+   * @param task task to limit
+   * @param limitTask limiting task
+   * @returns task limites according to limitTask
    */
   export function limit<T>(task: Task<T>, limitTask: Task<void>) {
     return Task.any<T>([task, limitTask.chain<T>(Task.canceled)]).chainRejected((errors) => Task.rejected<T>(errors[0]));
   }
 
   /**
-   * Under construction
+   * Repeat task untill successful
+   *
+   * Given task is re-generated in case of failure (both external and internal)
+   * Resulting task is still cancelable by standard means
+   *
+   * @param taskFunction task preoducing function
    */
   export function repeat<T>(taskFunction: TaskFunction<[], T>) {
     const sequentor = (): Task<T> => taskFunction().chainRejected(sequentor);
