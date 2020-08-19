@@ -337,7 +337,13 @@ export namespace Task {
     const generator = taskGeneratorFunction();
 
     const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
-      return next.done ? Task.resolved(next.value) : next.value.chain((value) => sequentor(generator.next(value))).chainRejected((error) => sequentor(generator.throw(error)));
+      return next.done
+        ? Task.resolved(next.value)
+        : next.value.matchChain<R>({
+            resolved: (value) => sequentor(generator.next(value)),
+            rejected: (error) => sequentor(generator.throw(error)),
+            canceled: Task.canceled,
+          });
     };
 
     return Task.resolved(undefined).chain(() => sequentor(generator.next()));
@@ -471,6 +477,9 @@ export namespace Task {
     );
   }
 
+  /**
+   * Under construction
+   */
   export function limit<T>(task: Task<T>, limitTask: Task<void>) {
     return Task.any<T>([task, limitTask.chain<T>(Task.canceled)]).chainRejected((errors) => Task.rejected<T>(errors[0]));
   }
