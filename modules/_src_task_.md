@@ -22,7 +22,7 @@
 
 Ƭ **Cancelable**: *[Maybe](_src_maybe_.maybe.md)‹[Rejectable](_src_task_.md#rejectable)‹R››*
 
-*Defined in [src/task.ts:16](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L16)*
+*Defined in [src/task.ts:16](https://github.com/lammonaaf/t-tasks/blob/49fba42/src/task.ts#L16)*
 
 Shortcut for underlying task result type
 
@@ -32,7 +32,7 @@ ___
 
 Ƭ **Rejectable**: *[Either](_src_either_.either.md)‹R, any›*
 
-*Defined in [src/task.ts:9](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L9)*
+*Defined in [src/task.ts:9](https://github.com/lammonaaf/t-tasks/blob/49fba42/src/task.ts#L9)*
 
 Shortcut for monadic Either type, where erroneous value is of type any
 
@@ -42,7 +42,7 @@ ___
 
 Ƭ **TaskFunction**: *function*
 
-*Defined in [src/task.ts:24](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L24)*
+*Defined in [src/task.ts:24](https://github.com/lammonaaf/t-tasks/blob/49fba42/src/task.ts#L24)*
 
 Function returning Task
 
@@ -62,13 +62,13 @@ ___
 
 Ƭ **TaskGenerator**: *Generator‹TT, R, T›*
 
-*Defined in [src/task.ts:41](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L41)*
+*Defined in [src/task.ts:41](https://github.com/lammonaaf/t-tasks/blob/49fba42/src/task.ts#L41)*
 
 Task generator
 
 **`example`** 
 ```typescript
-const generatorFunction = function*(): TaskGenerator<Task<string>, number> {
+const generatorFunction = function*(): TaskGenerator<unknown, Task<string>, number> {
   const v = yield* someTaskFunction().generator();
 
   return v.length;
@@ -81,13 +81,13 @@ ___
 
 Ƭ **TaskGeneratorFunction**: *function*
 
-*Defined in [src/task.ts:59](https://github.com/lammonaaf/t-tasks/blob/009a7bd/src/task.ts#L59)*
+*Defined in [src/task.ts:59](https://github.com/lammonaaf/t-tasks/blob/49fba42/src/task.ts#L59)*
 
 Function returning task generator (generator function)
 
 **`example`** 
 ```typescript
-const generatorFunction: TaskGeneratorFunction<[], Task<string>, number> = function*() {
+const generatorFunction: TaskGeneratorFunction<[], unknown, Task<string>, number> = function*() {
   const v = yield* someTaskFunction().generator();
 
   return v.length;

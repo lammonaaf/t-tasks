@@ -64,14 +64,14 @@ const task = Task.generate(function*() {
   let result1: number;
 
   try {
-    result1 = yield* Task.fromPromise(someAsyncFunction()).generator();
+    result1 = yield* Task.promiseGenerator(someAsyncFunction()); // equal to Task.fromPromise(<...>).generator();
   } catch (e) {
     console.error(e);
 
     result1 = 42; // Sometimes we have to give an answer in time i guess
   }
 
-  const result2 = yield* Task.fromPromise(otherAsyncFunction(result1)).generator();
+  const result2 = yield* Task.promiseGenerator(otherAsyncFunction(result1)); // equal to Task.fromPromise(<...>).generator();
   
   setSomething(result2); // side-effects
 });

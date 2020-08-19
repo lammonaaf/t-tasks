@@ -6,9 +6,6 @@
 
 ### Namespaces
 
+* [Just](_src_maybe_.just.md)
 * [Maybe](_src_maybe_.maybe.md)
-
-### Interfaces
-
-* [Just](../interfaces/_src_maybe_.just.md)
-* [Nothing](../interfaces/_src_maybe_.nothing.md)
+* [Nothing](_src_maybe_.nothing.md)

@@ -7,8 +7,5 @@
 ### Namespaces
 
 * [Either](_src_either_.either.md)
-
-### Interfaces
-
-* [Left](../interfaces/_src_either_.left.md)
-* [Right](../interfaces/_src_either_.right.md)
+* [Left](_src_either_.left.md)
+* [Right](_src_either_.right.md)
