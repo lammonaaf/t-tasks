@@ -399,6 +399,8 @@ export namespace Just {
   }
 }
 
+export namespace Nothing {}
+
 export namespace Maybe {
   /**
    * Non-empty monad constructor
