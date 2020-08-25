@@ -1,4 +1,4 @@
-import { Maybe, Either, Task } from '../src';
+import { Maybe, Either, Task } from '../';
 
 describe('Task.resolved()', () => {
   it('creates Task containing specified data', async () => {

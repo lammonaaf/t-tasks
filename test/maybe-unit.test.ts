@@ -1,4 +1,4 @@
-import { Maybe, Just } from '../src';
+import { Maybe, Just } from '../';
 
 describe('Maybe.just("data")', () => {
   // So typescript does not make assumptions about actual type
