@@ -1,6 +1,7 @@
 /* eslint-disable no-throw-literal */ // fore more confinient failure testing
+import 'regenerator-runtime/runtime';
 
-import { Either, Maybe, Task } from '../src';
+import { Either, Maybe, Task } from '../';
 
 const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
 const delayedValuePromise = async <R>(value: R, delay: number) => {

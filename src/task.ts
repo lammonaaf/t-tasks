@@ -461,9 +461,11 @@ export namespace Task {
   export function all<T>(tasks: Iterable<Task<T>>) {
     const [resolve, setResolve] = resolver<Cancelable<T[]>>();
 
-    const cancel = (error: Maybe<any>) => Array.from(tasks, (task) => task._cancel(error));
+    const taskArray = Array.from(tasks);
 
-    const list = Array.from<Task<T>, Maybe<T>>(tasks, Maybe.nothing);
+    const cancel = (error: Maybe<any>) => taskArray.forEach((task) => task._cancel(error));
+
+    const list = taskArray.map<Maybe<T>>(Maybe.nothing);
 
     const resolved = (value: T, i: number) => {
       list[i] = Maybe.just(value);
@@ -481,7 +483,7 @@ export namespace Task {
       new Promise<Cancelable<T[]>>((_resolve) => {
         setResolve(_resolve);
 
-        Array.from(tasks, (task, i) => {
+        taskArray.map((task, i) => {
           return task.matchTap({
             resolved: (value) => resolved(value, i),
             rejected: (error) => rejected(Maybe.just(error)),
@@ -510,9 +512,11 @@ export namespace Task {
   export function any<T>(tasks: Iterable<Task<T>>) {
     const [resolve, setResolve] = resolver<Cancelable<T>>();
 
-    const cancel = (error: Maybe<any>) => Array.from(tasks, (task) => task._cancel(error));
+    const taskArray = Array.from(tasks);
 
-    const list = Array.from<Task<T>, Maybe<any>>(tasks, Maybe.nothing);
+    const cancel = (error: Maybe<any>) => taskArray.forEach((task) => task._cancel(error));
+
+    const list = taskArray.map<Maybe<any>>(Maybe.nothing);
 
     const resolved = (value: Maybe<T>) => {
       resolve(value.map(Either.right));
@@ -530,7 +534,7 @@ export namespace Task {
       new Promise<Cancelable<T>>((_resolve) => {
         setResolve(_resolve);
 
-        Array.from(tasks, (task, i) => {
+        taskArray.map((task, i) => {
           return task.matchTap({
             resolved: (value) => resolved(Maybe.just(value)),
             rejected: (error) => rejected(error, i),

@@ -1,4 +1,4 @@
-import { Either, Right, Left } from '../src';
+import { Either, Right, Left } from '../';
 
 describe('Either.right("data")', () => {
   // So it does not coerse straight to Right
