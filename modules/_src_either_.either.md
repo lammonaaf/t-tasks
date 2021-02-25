@@ -36,9 +36,9 @@ underlying error type
 
 ###  everyLeft
 
-▸ **everyLeft**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Left<never, L>[]*
+▸ **everyLeft**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Left‹never, L›[]*
 
-*Defined in [src/either.ts:542](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L542)*
+*Defined in [src/either.ts:542](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L542)*
 
 Standalone list predicate
 
@@ -54,7 +54,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `eithers` | [Either](_src_either_.either.md)‹R, L›[] | a list of Either |
 
-**Returns:** *eithers is Left<never, L>[]*
+**Returns:** *eithers is Left‹never, L›[]*
 
 true in case every list element is Left
 
@@ -62,9 +62,9 @@ ___
 
 ###  everyRight
 
-▸ **everyRight**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Right<R, never>[]*
+▸ **everyRight**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Right‹R, never›[]*
 
-*Defined in [src/either.ts:522](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L522)*
+*Defined in [src/either.ts:522](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L522)*
 
 Standalone list predicate
 
@@ -80,7 +80,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `eithers` | [Either](_src_either_.either.md)‹R, L›[] | a list of Either |
 
-**Returns:** *eithers is Right<R, never>[]*
+**Returns:** *eithers is Right‹R, never›[]*
 
 true in case every list element is Right
 
@@ -90,7 +90,7 @@ ___
 
 ▸ **fromNullable**‹**L**›(`value`: undefined, `error`: L): *[Left](_src_either_.left.md)‹never, L›*
 
-*Defined in [src/either.ts:482](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L482)*
+*Defined in [src/either.ts:482](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L482)*
 
 Either constructor from optional or nullable value
 
@@ -113,7 +113,7 @@ either 'right value' or 'left error'
 
 ▸ **fromNullable**‹**L**›(`value`: null, `error`: L): *[Left](_src_either_.left.md)‹never, L›*
 
-*Defined in [src/either.ts:483](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L483)*
+*Defined in [src/either.ts:483](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L483)*
 
 **Type parameters:**
 
@@ -130,7 +130,7 @@ Name | Type |
 
 ▸ **fromNullable**‹**R**›(`value`: Exclude‹R, null | undefined›, `error`: unknown): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:484](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L484)*
+*Defined in [src/either.ts:484](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L484)*
 
 **Type parameters:**
 
@@ -147,7 +147,7 @@ Name | Type |
 
 ▸ **fromNullable**‹**R**, **L**›(`value`: R | null | undefined, `error`: L): *[Either](_src_either_.either.md)‹R, L›*
 
-*Defined in [src/either.ts:485](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L485)*
+*Defined in [src/either.ts:485](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L485)*
 
 **Type parameters:**
 
@@ -170,7 +170,7 @@ ___
 
 ▸ **fromOptional**‹**L**›(`value`: undefined, `error`: L): *[Left](_src_either_.left.md)‹never, L›*
 
-*Defined in [src/either.ts:466](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L466)*
+*Defined in [src/either.ts:466](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L466)*
 
 Either constructor from optional value
 
@@ -193,7 +193,7 @@ either 'right value' or 'left error'
 
 ▸ **fromOptional**‹**R**›(`value`: Exclude‹R, undefined›, `error`: unknown): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:467](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L467)*
+*Defined in [src/either.ts:467](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L467)*
 
 **Type parameters:**
 
@@ -210,7 +210,7 @@ Name | Type |
 
 ▸ **fromOptional**‹**R**, **L**›(`value`: R | undefined, `error`: L): *[Either](_src_either_.either.md)‹R, L›*
 
-*Defined in [src/either.ts:468](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L468)*
+*Defined in [src/either.ts:468](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L468)*
 
 **Type parameters:**
 
@@ -231,9 +231,9 @@ ___
 
 ###  isLeft
 
-▸ **isLeft**‹**R**, **L**›(`either`: [Either](_src_either_.either.md)‹R, L›): *either is Left<never, L>*
+▸ **isLeft**‹**R**, **L**›(`either`: [Either](_src_either_.either.md)‹R, L›): *either is Left‹never, L›*
 
-*Defined in [src/either.ts:512](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L512)*
+*Defined in [src/either.ts:512](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L512)*
 
 Standalone type guard for 'left'
 
@@ -253,7 +253,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `either` | [Either](_src_either_.either.md)‹R, L› | Either instance |
 
-**Returns:** *either is Left<never, L>*
+**Returns:** *either is Left‹never, L›*
 
 'true' in case argument is 'left error' (and resolves type to be 'left')
 
@@ -261,9 +261,9 @@ ___
 
 ###  isRight
 
-▸ **isRight**‹**R**, **L**›(`either`: [Either](_src_either_.either.md)‹R, L›): *either is Right<R, never>*
+▸ **isRight**‹**R**, **L**›(`either`: [Either](_src_either_.either.md)‹R, L›): *either is Right‹R, never›*
 
-*Defined in [src/either.ts:499](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L499)*
+*Defined in [src/either.ts:499](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L499)*
 
 Standalone type guard for 'right'
 
@@ -283,7 +283,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `either` | [Either](_src_either_.either.md)‹R, L› | Either instance |
 
-**Returns:** *either is Right<R, never>*
+**Returns:** *either is Right‹R, never›*
 
 'true' in case argument is 'right value' (and resolves type to be 'right')
 
@@ -293,7 +293,7 @@ ___
 
 ▸ **left**‹**L**›(`error`: L): *[Left](_src_either_.left.md)‹never, L›*
 
-*Defined in [src/either.ts:453](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L453)*
+*Defined in [src/either.ts:453](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L453)*
 
 Left monad constructor
 
@@ -319,7 +319,7 @@ ___
 
 ▸ **right**‹**R**›(`value`: R): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:442](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L442)*
+*Defined in [src/either.ts:442](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L442)*
 
 Right monad constructor
 
@@ -343,9 +343,9 @@ ___
 
 ###  someLeft
 
-▸ **someLeft**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Left<never, L>[]*
+▸ **someLeft**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Left‹never, L›[]*
 
-*Defined in [src/either.ts:552](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L552)*
+*Defined in [src/either.ts:552](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L552)*
 
 Standalone list predicate
 
@@ -361,7 +361,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `eithers` | [Either](_src_either_.either.md)‹R, L›[] | a list of Either |
 
-**Returns:** *eithers is Left<never, L>[]*
+**Returns:** *eithers is Left‹never, L›[]*
 
 true in case at least one list element is Left
 
@@ -369,9 +369,9 @@ ___
 
 ###  someRight
 
-▸ **someRight**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Right<R, never>[]*
+▸ **someRight**‹**R**, **L**›(`eithers`: [Either](_src_either_.either.md)‹R, L›[]): *eithers is Right‹R, never›[]*
 
-*Defined in [src/either.ts:532](https://github.com/lammonaaf/t-tasks/blob/4fd4047/src/either.ts#L532)*
+*Defined in [src/either.ts:532](https://github.com/lammonaaf/t-tasks/blob/146fdcd/src/either.ts#L532)*
 
 Standalone list predicate
 
@@ -387,6 +387,6 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `eithers` | [Either](_src_either_.either.md)‹R, L›[] | a list of Either |
 
-**Returns:** *eithers is Right<R, never>[]*
+**Returns:** *eithers is Right‹R, never›[]*
 
 true in case at least one list element is Right
