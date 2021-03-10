@@ -2220,3 +2220,391 @@ describe('Task.any', () => {
     expect(result).toStrictEqual(Maybe.nothing());
   });
 });
+
+describe('self manipulation scenarios', () => {
+  beforeEach(() => jest.useFakeTimers());
+  afterEach(() => jest.useRealTimers());
+
+  const flushPromises = async () => {
+    return new Promise((resolve) => setImmediate(resolve));
+  };
+
+  const advanceTime = async (by: number) => {
+    await flushPromises();
+
+    jest.advanceTimersByTime(by);
+
+    await flushPromises();
+  };
+
+  it('cancels self in chain in 100ms', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = delayedValueTask('data', 100)
+      .chain((data) => {
+        inspect(data);
+
+        task.cancel();
+
+        return Task.resolved(data);
+      })
+      .map((value) => value.length)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(1);
+    expect(rejected).toBeCalledTimes(0);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('cancels self in map in 100ms', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = delayedValueTask('data', 100)
+      .map((data) => {
+        inspect(data);
+
+        task.cancel();
+
+        return data;
+      })
+      .map((value) => value.length)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(1);
+    expect(rejected).toBeCalledTimes(0);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('cancels self in tap in 100ms', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = delayedValueTask('data', 100)
+      .tap((data) => {
+        inspect(data);
+
+        task.cancel();
+      })
+      .map((value) => value.length)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(1);
+    expect(rejected).toBeCalledTimes(0);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('rejects self in chain in 100ms with "some-error"', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = delayedValueTask('data', 100)
+      .chain((data) => {
+        inspect(data);
+
+        task.reject('some-error');
+
+        return Task.resolved(data);
+      })
+      .map((value) => value.length)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(0);
+    expect(rejected).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+
+  it('rejects self in map in 100ms with "some-error"', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = delayedValueTask('data', 100)
+      .map((data) => {
+        inspect(data);
+
+        task.reject('some-error');
+
+        return data;
+      })
+      .map((value) => value.length)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(0);
+    expect(rejected).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+
+  it('rejects self in tap in 100ms with "some-error"', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = delayedValueTask('data', 100)
+      .tap((data) => {
+        inspect(data);
+
+        task.reject('some-error');
+      })
+      .map((value) => value.length)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(0);
+    expect(rejected).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+
+  it('cancels self in generator in 100ms', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
+
+      inspect(data);
+
+      task.cancel();
+
+      return data.length;
+    })
+      .tap(resolved)
+      .tapCanceled(canceled)
+      .tapRejected(rejected);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(1);
+    expect(rejected).toBeCalledTimes(0);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('rejects self in generator in 100ms with "some-error"', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
+
+      inspect(data);
+
+      task.reject('some-error');
+
+      return data.length;
+    })
+      .tap(resolved)
+      .tapCanceled(canceled)
+      .tapRejected(rejected);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(0);
+    expect(rejected).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+
+  it('self reject can not be caught', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const inspect = jest.fn();
+
+    const task: Task<number> = Task.generate(function*() {
+      const data = yield* delayedValueTask('data', 100).generator();
+
+      inspect(data);
+
+      try {
+        task.reject('some-error');
+
+        return data.length;
+      } catch (e) {
+        console.log(e);
+
+        return 63;
+      }
+    })
+      .tap(resolved)
+      .tapCanceled(canceled)
+      .tapRejected(rejected);
+
+    await advanceTime(99);
+
+    expect(inspect).not.toBeCalled();
+
+    expect(canceled).not.toBeCalled();
+    expect(rejected).not.toBeCalled();
+    expect(resolved).not.toBeCalled();
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(inspect).toBeCalledWith('data');
+
+    expect(canceled).toBeCalledTimes(0);
+    expect(rejected).toBeCalledTimes(1);
+    expect(resolved).toBeCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+});
