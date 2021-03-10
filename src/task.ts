@@ -305,9 +305,51 @@ export namespace Task {
           .then(Maybe.just)
           .then(resolve);
       }),
-      (error: Maybe<any>) => {
-        resolve(error.map(Either.left));
-      },
+      (error: Maybe<any>) => resolve(error.map(Either.left)),
+    );
+  }
+
+  /**
+   * Lift from sync function to task resolving to said function result
+   *
+   * Generally, functions are not considered tasks as they cannot be interrupted in any way
+   * However there may be cases when impure function performs actions leading to cancelling or failing the task they are called from
+   * Without such wrapper such cases would lead to ignoring said cancelation and continuilg task chain
+   * This function is mostly used internally and is not expected to be widely used except of some edge scenarios
+   *
+   * If converted task is canceled or failed externally return value will be ignored without side-effects
+   * All tasks are no-trowing by default, any occured errors are returned as Left<any>
+   *
+   * @template R returned task resolve type
+   * @param producer function to be wrapped to a task
+   * @param cancelRef reference object allowing to set cancelation function prior to invoking function
+   * @returns task resolving to the specified function's result
+   *
+   * @example
+   * ```typescript
+   * const cancelRef = { cancel: () => {} };
+   *
+   * const task = Task.fromFunction(() => someFunction('someData'), cancelRef).map((result) => result.length);
+   * ```
+   */
+  export function fromFunction<R>(producer: () => R, cancelRef: { cancel: TaskCancel }): Task<R> {
+    const [resolve, setResolve] = resolver<Cancelable<R>>();
+
+    const cancel = (error: Maybe<any>) => resolve(error.map(Either.left));
+
+    cancelRef.cancel = cancel;
+
+    return Task.create(
+      new Promise<Cancelable<R>>((_resolve) => {
+        setResolve(_resolve);
+
+        try {
+          resolve(Maybe.just(Either.right(producer())));
+        } catch (e) {
+          resolve(Maybe.just(Either.left(e)));
+        }
+      }),
+      cancel,
     );
   }
 
@@ -602,8 +644,11 @@ const resolver = <T>() => {
   let globalResolve = stub;
 
   const resolve = (value: T) => {
-    globalResolve(value);
+    const r = globalResolve;
+
     globalResolve = stub;
+
+    r(value);
   };
 
   const setResolve = (value: typeof resolve) => {
@@ -613,17 +658,55 @@ const resolver = <T>() => {
   return [resolve, setResolve] as [typeof resolve, typeof setResolve];
 };
 
-function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
+function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
+  const globalCancel = { cancel: _task._cancel };
+
   return Task.create(
-    _task._invoke.then((maybe) => {
+    _task._invoke.then(async (result) => {
+      // Tecnically it's not possible to throw here anymore as op is lifted into task now, but just in case
       try {
-        return op(maybe);
+        const { _invoke: invoke2, _cancel: cancel2 } = Task.fromFunction(() => op(result), globalCancel);
+
+        globalCancel.cancel = cancel2;
+
+        const produced = await invoke2;
+
+        if (produced.isNothing()) {
+          return Maybe.nothing();
+        }
+
+        if (produced.just.isLeft()) {
+          return Maybe.just(Either.left(produced.just.left));
+        }
+
+        const { _invoke: invoke3, _cancel: cancel3 } = produced.just.right;
+
+        globalCancel.cancel = cancel3;
+
+        return invoke3;
       } catch (e) {
         return Maybe.just(Either.left(e));
       }
     }),
-    _task._cancel,
+    (error: Maybe<any>) => globalCancel.cancel(error),
   );
+}
+
+function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
+  return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op).orMap<Task<R2>>(Task.canceled).just);
+}
+
+function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
+  return chainTaskMaybe<R, R2>(_task, (maybe) => {
+    return op(maybe).matchMap<Task<R2>>({
+      just: (either) =>
+        either.matchMap<Task<R2>>({
+          right: Task.resolved,
+          left: Task.rejected,
+        }).right,
+      nothing: Task.canceled,
+    }).just;
+  });
 }
 
 function mapTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Rejectable<R2>) {
@@ -640,29 +723,6 @@ function tapTaskMaybe<R>(_task: TaskBase<R>, op: (value: Cancelable<R>) => void)
 
 function tapTaskEither<R>(_task: TaskBase<R>, op: (value: Rejectable<R>) => void) {
   return tapTaskMaybe<R>(_task, (maybe) => maybe.tap(op));
-}
-
-function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
-  let globalCancel = _task._cancel;
-
-  return Task.create(
-    _task._invoke.then((result) => {
-      try {
-        const { _invoke: invoke2, _cancel: cancel2 } = op(result);
-
-        globalCancel = cancel2;
-
-        return invoke2;
-      } catch (e) {
-        return Maybe.just(Either.left(e));
-      }
-    }),
-    (error: Maybe<any>) => globalCancel(error),
-  );
-}
-
-function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
-  return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op).orMap<Task<R2>>(Task.canceled).just);
 }
 
 class TaskClass<R> implements Task<R> {
