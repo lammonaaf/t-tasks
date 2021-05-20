@@ -34,7 +34,7 @@ underlying value
 
 ▸ **everyJust**‹**R**›(`maybes`: [Maybe](_src_maybe_.maybe.md)‹R›[]): *maybes is Just‹R›[]*
 
-*Defined in [src/maybe.ts:488](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L488)*
+*Defined in [src/maybe.ts:488](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L488)*
 
 Standalone list predicate
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **everyNothing**‹**R**›(`maybes`: [Maybe](_src_maybe_.maybe.md)‹R›[]): *maybes is Nothing‹never›[]*
 
-*Defined in [src/maybe.ts:508](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L508)*
+*Defined in [src/maybe.ts:508](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L508)*
 
 Standalone list predicate
 
@@ -82,7 +82,7 @@ ___
 
 ▸ **fromNullable**‹**R**›(`value`: undefined): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:448](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L448)*
+*Defined in [src/maybe.ts:448](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L448)*
 
 Maybe constructor from optional or nullable value
 
@@ -104,7 +104,7 @@ either 'just value' or 'nothing'
 
 ▸ **fromNullable**‹**R**›(`value`: null): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:449](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L449)*
+*Defined in [src/maybe.ts:449](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L449)*
 
 **Type parameters:**
 
@@ -120,7 +120,7 @@ Name | Type |
 
 ▸ **fromNullable**‹**R**›(`value`: Exclude‹R, null | undefined›): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:450](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L450)*
+*Defined in [src/maybe.ts:450](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L450)*
 
 **Type parameters:**
 
@@ -136,7 +136,7 @@ Name | Type |
 
 ▸ **fromNullable**‹**R**›(`value`: R | null | undefined): *[Maybe](_src_maybe_.maybe.md)‹R›*
 
-*Defined in [src/maybe.ts:451](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L451)*
+*Defined in [src/maybe.ts:451](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L451)*
 
 **Type parameters:**
 
@@ -156,7 +156,7 @@ ___
 
 ▸ **fromOptional**‹**R**›(`value`: undefined): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L433)*
+*Defined in [src/maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L433)*
 
 Maybe constructor from optional value
 
@@ -178,7 +178,7 @@ either 'just value' or 'nothing'
 
 ▸ **fromOptional**‹**R**›(`value`: Exclude‹R, undefined›): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:434](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L434)*
+*Defined in [src/maybe.ts:434](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L434)*
 
 **Type parameters:**
 
@@ -194,7 +194,7 @@ Name | Type |
 
 ▸ **fromOptional**‹**R**›(`value`: R | undefined): *[Maybe](_src_maybe_.maybe.md)‹R›*
 
-*Defined in [src/maybe.ts:435](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L435)*
+*Defined in [src/maybe.ts:435](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L435)*
 
 **Type parameters:**
 
@@ -214,7 +214,7 @@ ___
 
 ▸ **isJust**‹**R**›(`maybe`: [Maybe](_src_maybe_.maybe.md)‹R›): *maybe is Just‹R›*
 
-*Defined in [src/maybe.ts:465](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L465)*
+*Defined in [src/maybe.ts:465](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L465)*
 
 Standalone type guard for 'just'
 
@@ -242,7 +242,7 @@ ___
 
 ▸ **isNothing**‹**R**›(`maybe`: [Maybe](_src_maybe_.maybe.md)‹R›): *maybe is Nothing‹never›*
 
-*Defined in [src/maybe.ts:478](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L478)*
+*Defined in [src/maybe.ts:478](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L478)*
 
 Standalone type guard for 'nothing'
 
@@ -270,7 +270,7 @@ ___
 
 ▸ **just**‹**R**›(`value`: R): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:412](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L412)*
+*Defined in [src/maybe.ts:412](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L412)*
 
 Non-empty monad constructor
 
@@ -296,7 +296,7 @@ ___
 
 ▸ **nothing**(): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:421](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L421)*
+*Defined in [src/maybe.ts:421](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L421)*
 
 Empty monad constructor
 
@@ -310,7 +310,7 @@ ___
 
 ▸ **someJust**‹**R**›(`maybes`: [Maybe](_src_maybe_.maybe.md)‹R›[]): *maybes is Just‹R›[]*
 
-*Defined in [src/maybe.ts:498](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L498)*
+*Defined in [src/maybe.ts:498](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L498)*
 
 Standalone list predicate
 
@@ -334,7 +334,7 @@ ___
 
 ▸ **someNothing**‹**R**›(`maybes`: [Maybe](_src_maybe_.maybe.md)‹R›[]): *maybes is Nothing‹never›[]*
 
-*Defined in [src/maybe.ts:518](https://github.com/lammonaaf/t-tasks/blob/11464c5/src/maybe.ts#L518)*
+*Defined in [src/maybe.ts:518](https://github.com/lammonaaf/t-tasks/blob/3b48ee6/src/maybe.ts#L518)*
 
 Standalone list predicate
 
