@@ -38,7 +38,7 @@ underlying value
 
 ▸ **just**‹**R**›(`just`: [Just](_src_maybe_.just.md)‹R›): *R*
 
-*Defined in [src/maybe.ts:397](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L397)*
+*Defined in [src/maybe.ts:397](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L397)*
 
 Standalone Just value extractor
 
@@ -66,7 +66,7 @@ underlying value
 
 ▸ **chain**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:102](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L102)*
+*Defined in [src/maybe.ts:102](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L102)*
 
 Maybe composition function
 
@@ -101,7 +101,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:103](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L103)*
+*Defined in [src/maybe.ts:103](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L103)*
 
 **Type parameters:**
 
@@ -125,7 +125,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:104](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L104)*
+*Defined in [src/maybe.ts:104](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L104)*
 
 **Type parameters:**
 
@@ -149,7 +149,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:106](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L106)*
+*Defined in [src/maybe.ts:106](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L106)*
 
 **Type parameters:**
 
@@ -173,7 +173,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:107](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L107)*
+*Defined in [src/maybe.ts:107](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L107)*
 
 **Type parameters:**
 
@@ -197,7 +197,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:108](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L108)*
+*Defined in [src/maybe.ts:108](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L108)*
 
 **Type parameters:**
 
@@ -225,7 +225,7 @@ ___
 
 ▸ **isJust**(): *this is Just‹R›*
 
-*Defined in [src/maybe.ts:174](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L174)*
+*Defined in [src/maybe.ts:174](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L174)*
 
 Maybe type guard for 'just'
 
@@ -246,7 +246,7 @@ ___
 
 ▸ **isNothing**(): *this is Nothing‹R›*
 
-*Defined in [src/maybe.ts:188](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L188)*
+*Defined in [src/maybe.ts:188](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L188)*
 
 Maybe type guard for 'nothing'
 
@@ -267,7 +267,7 @@ ___
 
 ▸ **map**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:56](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L56)*
+*Defined in [src/maybe.ts:56](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L56)*
 
 Maybe transformer function
 
@@ -302,7 +302,7 @@ Name | Type |
 
 ▸ **map**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:58](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L58)*
+*Defined in [src/maybe.ts:58](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L58)*
 
 **Type parameters:**
 
@@ -330,7 +330,7 @@ ___
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:142](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L142)*
+*Defined in [src/maybe.ts:142](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L142)*
 
 Maybe patter matching composition function
 
@@ -364,7 +364,7 @@ Name | Type | Description |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:143](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L143)*
+*Defined in [src/maybe.ts:143](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L143)*
 
 **Type parameters:**
 
@@ -387,7 +387,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:144](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L144)*
+*Defined in [src/maybe.ts:144](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L144)*
 
 **Type parameters:**
 
@@ -410,7 +410,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:145](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L145)*
+*Defined in [src/maybe.ts:145](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L145)*
 
 **Type parameters:**
 
@@ -433,7 +433,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:146](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L146)*
+*Defined in [src/maybe.ts:146](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L146)*
 
 **Type parameters:**
 
@@ -456,7 +456,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:147](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L147)*
+*Defined in [src/maybe.ts:147](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L147)*
 
 **Type parameters:**
 
@@ -479,7 +479,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:148](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L148)*
+*Defined in [src/maybe.ts:148](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L148)*
 
 **Type parameters:**
 
@@ -502,7 +502,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:149](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L149)*
+*Defined in [src/maybe.ts:149](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L149)*
 
 **Type parameters:**
 
@@ -525,7 +525,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:150](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L150)*
+*Defined in [src/maybe.ts:150](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L150)*
 
 **Type parameters:**
 
@@ -548,7 +548,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Just](_src_maybe_.just.md)‹R2 | R3›*
 
-*Defined in [src/maybe.ts:152](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L152)*
+*Defined in [src/maybe.ts:152](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L152)*
 
 **Type parameters:**
 
@@ -571,7 +571,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:153](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L153)*
+*Defined in [src/maybe.ts:153](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L153)*
 
 **Type parameters:**
 
@@ -594,7 +594,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R3›*
 
-*Defined in [src/maybe.ts:154](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L154)*
+*Defined in [src/maybe.ts:154](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L154)*
 
 **Type parameters:**
 
@@ -617,7 +617,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Nothing](_src_maybe_.nothing.md)‹never›*
 
-*Defined in [src/maybe.ts:155](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L155)*
+*Defined in [src/maybe.ts:155](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L155)*
 
 **Type parameters:**
 
@@ -640,7 +640,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2 | R3›*
 
-*Defined in [src/maybe.ts:156](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L156)*
+*Defined in [src/maybe.ts:156](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L156)*
 
 **Type parameters:**
 
@@ -663,7 +663,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R3›*
 
-*Defined in [src/maybe.ts:157](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L157)*
+*Defined in [src/maybe.ts:157](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L157)*
 
 **Type parameters:**
 
@@ -686,7 +686,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2 | R3›*
 
-*Defined in [src/maybe.ts:158](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L158)*
+*Defined in [src/maybe.ts:158](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L158)*
 
 **Type parameters:**
 
@@ -709,7 +709,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2›*
 
-*Defined in [src/maybe.ts:159](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L159)*
+*Defined in [src/maybe.ts:159](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L159)*
 
 **Type parameters:**
 
@@ -732,7 +732,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Maybe](_src_maybe_.maybe.md)‹R2 | R3›*
 
-*Defined in [src/maybe.ts:160](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L160)*
+*Defined in [src/maybe.ts:160](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L160)*
 
 **Type parameters:**
 
@@ -759,7 +759,7 @@ ___
 
 ▸ **matchMap**‹**R2**, **R3**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: object): *[Just](_src_maybe_.just.md)‹R2›*
 
-*Defined in [src/maybe.ts:87](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L87)*
+*Defined in [src/maybe.ts:87](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L87)*
 
 Maybe patter matching transformer function
 
@@ -793,7 +793,7 @@ Name | Type | Description |
 
 ▸ **matchMap**‹**R2**, **R3**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: object): *[Just](_src_maybe_.just.md)‹R2 | R3›*
 
-*Defined in [src/maybe.ts:89](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L89)*
+*Defined in [src/maybe.ts:89](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L89)*
 
 **Type parameters:**
 
@@ -820,7 +820,7 @@ ___
 
 ▸ **matchTap**(`op`: object): *this*
 
-*Defined in [src/maybe.ts:43](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L43)*
+*Defined in [src/maybe.ts:43](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L43)*
 
 Maybe patter matching peeker function
 
@@ -846,7 +846,7 @@ ___
 
 ▸ **orChain**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:121](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L121)*
+*Defined in [src/maybe.ts:121](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L121)*
 
 Maybe fallback composition function
 
@@ -875,7 +875,7 @@ transformer to be invoked
 
 ▸ **orChain**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:122](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L122)*
+*Defined in [src/maybe.ts:122](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L122)*
 
 **Type parameters:**
 
@@ -893,7 +893,7 @@ transformer to be invoked
 
 ▸ **orChain**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:123](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L123)*
+*Defined in [src/maybe.ts:123](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L123)*
 
 **Type parameters:**
 
@@ -911,7 +911,7 @@ transformer to be invoked
 
 ▸ **orChain**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R | R2›*
 
-*Defined in [src/maybe.ts:125](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L125)*
+*Defined in [src/maybe.ts:125](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L125)*
 
 **Type parameters:**
 
@@ -929,7 +929,7 @@ transformer to be invoked
 
 ▸ **orChain**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Maybe](_src_maybe_.maybe.md)‹R›*
 
-*Defined in [src/maybe.ts:126](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L126)*
+*Defined in [src/maybe.ts:126](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L126)*
 
 **Type parameters:**
 
@@ -947,7 +947,7 @@ transformer to be invoked
 
 ▸ **orChain**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Maybe](_src_maybe_.maybe.md)‹R | R2›*
 
-*Defined in [src/maybe.ts:127](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L127)*
+*Defined in [src/maybe.ts:127](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L127)*
 
 **Type parameters:**
 
@@ -969,7 +969,7 @@ ___
 
 ▸ **orMap**‹**R2**›(`this`: [Just](_src_maybe_.just.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R›*
 
-*Defined in [src/maybe.ts:70](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L70)*
+*Defined in [src/maybe.ts:70](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L70)*
 
 Maybe fallback transformer function
 
@@ -996,7 +996,7 @@ function to be invoked
 
 ▸ **orMap**‹**R2**›(`this`: [Maybe](_src_maybe_.maybe.md)‹R›, `op`: function): *[Just](_src_maybe_.just.md)‹R | R2›*
 
-*Defined in [src/maybe.ts:72](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L72)*
+*Defined in [src/maybe.ts:72](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L72)*
 
 **Type parameters:**
 
@@ -1018,7 +1018,7 @@ ___
 
 ▸ **orTap**(`op`: function): *this*
 
-*Defined in [src/maybe.ts:31](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L31)*
+*Defined in [src/maybe.ts:31](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L31)*
 
 Maybe fallback peeker function
 
@@ -1043,7 +1043,7 @@ ___
 
 ▸ **tap**(`op`: function): *this*
 
-*Defined in [src/maybe.ts:20](https://github.com/lammonaaf/t-tasks/blob/77f617e/src/maybe.ts#L20)*
+*Defined in [src/maybe.ts:20](https://github.com/lammonaaf/t-tasks/blob/043d95e/src/maybe.ts#L20)*
 
 Maybe peeker function
 
