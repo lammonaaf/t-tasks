@@ -42,7 +42,7 @@ underlying error type (needed for type merging, in fact alwas considered to be n
 
 ▸ **right**‹**R**, **L**›(`right`: [Right](_src_either_.right.md)‹R, L›): *R*
 
-*Defined in [src/either.ts:413](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L413)*
+*Defined in [src/either.ts:413](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L413)*
 
 Standalone Right value extractor
 
@@ -74,7 +74,7 @@ underlying value
 
 ▸ **chain**‹**R2**, **L2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R2, never›*
 
-*Defined in [src/either.ts:104](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L104)*
+*Defined in [src/either.ts:104](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L104)*
 
 Either composition function
 
@@ -113,7 +113,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**, **L2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Left](_src_either_.left.md)‹never, L2›*
 
-*Defined in [src/either.ts:105](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L105)*
+*Defined in [src/either.ts:105](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L105)*
 
 **Type parameters:**
 
@@ -139,7 +139,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**, **L2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Either](_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:106](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L106)*
+*Defined in [src/either.ts:106](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L106)*
 
 **Type parameters:**
 
@@ -165,7 +165,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**, **L2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Either](_src_either_.either.md)‹R2, L›*
 
-*Defined in [src/either.ts:108](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L108)*
+*Defined in [src/either.ts:108](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L108)*
 
 **Type parameters:**
 
@@ -191,7 +191,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**, **L2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Left](_src_either_.left.md)‹never, L | L2›*
 
-*Defined in [src/either.ts:109](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L109)*
+*Defined in [src/either.ts:109](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L109)*
 
 **Type parameters:**
 
@@ -217,7 +217,7 @@ Name | Type |
 
 ▸ **chain**‹**R2**, **L2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Either](_src_either_.either.md)‹R2, L | L2›*
 
-*Defined in [src/either.ts:110](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L110)*
+*Defined in [src/either.ts:110](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L110)*
 
 **Type parameters:**
 
@@ -247,7 +247,7 @@ ___
 
 ▸ **isLeft**(): *this is Left‹R, L›*
 
-*Defined in [src/either.ts:193](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L193)*
+*Defined in [src/either.ts:193](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L193)*
 
 Either type guard for 'left'
 
@@ -268,7 +268,7 @@ ___
 
 ▸ **isRight**(): *this is Right‹R, L›*
 
-*Defined in [src/either.ts:179](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L179)*
+*Defined in [src/either.ts:179](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L179)*
 
 Either type guard for 'right'
 
@@ -289,7 +289,7 @@ ___
 
 ▸ **map**‹**R2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R2, never›*
 
-*Defined in [src/either.ts:57](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L57)*
+*Defined in [src/either.ts:57](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L57)*
 
 Either transformer function
 
@@ -324,7 +324,7 @@ Name | Type |
 
 ▸ **map**‹**R2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Either](_src_either_.either.md)‹R2, L›*
 
-*Defined in [src/either.ts:59](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L59)*
+*Defined in [src/either.ts:59](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L59)*
 
 **Type parameters:**
 
@@ -352,7 +352,7 @@ ___
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Right](_src_either_.right.md)‹R2, never›*
 
-*Defined in [src/either.ts:147](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L147)*
+*Defined in [src/either.ts:147](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L147)*
 
 Either pattern matching composition function
 
@@ -394,7 +394,7 @@ Name | Type | Description |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Left](_src_either_.left.md)‹never, L2›*
 
-*Defined in [src/either.ts:148](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L148)*
+*Defined in [src/either.ts:148](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L148)*
 
 **Type parameters:**
 
@@ -421,7 +421,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Right](_src_either_.right.md)‹R2, never›*
 
-*Defined in [src/either.ts:149](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L149)*
+*Defined in [src/either.ts:149](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L149)*
 
 **Type parameters:**
 
@@ -448,7 +448,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Left](_src_either_.left.md)‹never, L2›*
 
-*Defined in [src/either.ts:150](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L150)*
+*Defined in [src/either.ts:150](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L150)*
 
 **Type parameters:**
 
@@ -475,7 +475,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:151](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L151)*
+*Defined in [src/either.ts:151](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L151)*
 
 **Type parameters:**
 
@@ -502,7 +502,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:152](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L152)*
+*Defined in [src/either.ts:152](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L152)*
 
 **Type parameters:**
 
@@ -529,7 +529,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Right](_src_either_.right.md)‹R2, never›*
 
-*Defined in [src/either.ts:153](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L153)*
+*Defined in [src/either.ts:153](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L153)*
 
 **Type parameters:**
 
@@ -556,7 +556,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Left](_src_either_.left.md)‹never, L2›*
 
-*Defined in [src/either.ts:154](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L154)*
+*Defined in [src/either.ts:154](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L154)*
 
 **Type parameters:**
 
@@ -583,7 +583,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2, L2›*
 
-*Defined in [src/either.ts:155](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L155)*
+*Defined in [src/either.ts:155](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L155)*
 
 **Type parameters:**
 
@@ -610,7 +610,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Right](_src_either_.right.md)‹R2 | R3, never›*
 
-*Defined in [src/either.ts:157](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L157)*
+*Defined in [src/either.ts:157](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L157)*
 
 **Type parameters:**
 
@@ -637,7 +637,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R3, L2›*
 
-*Defined in [src/either.ts:158](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L158)*
+*Defined in [src/either.ts:158](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L158)*
 
 **Type parameters:**
 
@@ -664,7 +664,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2, L3›*
 
-*Defined in [src/either.ts:159](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L159)*
+*Defined in [src/either.ts:159](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L159)*
 
 **Type parameters:**
 
@@ -691,7 +691,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Left](_src_either_.left.md)‹never, L2 | L3›*
 
-*Defined in [src/either.ts:160](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L160)*
+*Defined in [src/either.ts:160](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L160)*
 
 **Type parameters:**
 
@@ -718,7 +718,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2 | R3, L2›*
 
-*Defined in [src/either.ts:161](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L161)*
+*Defined in [src/either.ts:161](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L161)*
 
 **Type parameters:**
 
@@ -745,7 +745,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2, L2 | L3›*
 
-*Defined in [src/either.ts:162](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L162)*
+*Defined in [src/either.ts:162](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L162)*
 
 **Type parameters:**
 
@@ -772,7 +772,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2 | R3, L3›*
 
-*Defined in [src/either.ts:163](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L163)*
+*Defined in [src/either.ts:163](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L163)*
 
 **Type parameters:**
 
@@ -799,7 +799,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R3, L2 | L3›*
 
-*Defined in [src/either.ts:164](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L164)*
+*Defined in [src/either.ts:164](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L164)*
 
 **Type parameters:**
 
@@ -826,7 +826,7 @@ Name | Type |
 
 ▸ **matchChain**‹**R2**, **L2**, **R3**, **L3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Either](_src_either_.either.md)‹R2 | R3, L2 | L3›*
 
-*Defined in [src/either.ts:165](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L165)*
+*Defined in [src/either.ts:165](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L165)*
 
 **Type parameters:**
 
@@ -857,7 +857,7 @@ ___
 
 ▸ **matchMap**‹**R2**, **R3**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: object): *[Right](_src_either_.right.md)‹R2, never›*
 
-*Defined in [src/either.ts:88](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L88)*
+*Defined in [src/either.ts:88](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L88)*
 
 Either pattern matching transformer function
 
@@ -891,7 +891,7 @@ Name | Type | Description |
 
 ▸ **matchMap**‹**R2**, **R3**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: object): *[Right](_src_either_.right.md)‹R2 | R3, never›*
 
-*Defined in [src/either.ts:90](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L90)*
+*Defined in [src/either.ts:90](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L90)*
 
 **Type parameters:**
 
@@ -918,7 +918,7 @@ ___
 
 ▸ **matchTap**(`op`: object): *this*
 
-*Defined in [src/either.ts:44](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L44)*
+*Defined in [src/either.ts:44](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L44)*
 
 Either pattern matching peeker function
 
@@ -944,7 +944,7 @@ ___
 
 ▸ **orChain**‹**R2**, **L2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:124](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L124)*
+*Defined in [src/either.ts:124](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L124)*
 
 Either composition function
 
@@ -983,7 +983,7 @@ Name | Type |
 
 ▸ **orChain**‹**R2**, **L2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:125](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L125)*
+*Defined in [src/either.ts:125](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L125)*
 
 **Type parameters:**
 
@@ -1009,7 +1009,7 @@ Name | Type |
 
 ▸ **orChain**‹**R2**, **L2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:126](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L126)*
+*Defined in [src/either.ts:126](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L126)*
 
 **Type parameters:**
 
@@ -1035,7 +1035,7 @@ Name | Type |
 
 ▸ **orChain**‹**R2**, **L2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R | R2, never›*
 
-*Defined in [src/either.ts:128](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L128)*
+*Defined in [src/either.ts:128](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L128)*
 
 **Type parameters:**
 
@@ -1061,7 +1061,7 @@ Name | Type |
 
 ▸ **orChain**‹**R2**, **L2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Either](_src_either_.either.md)‹R, L2›*
 
-*Defined in [src/either.ts:129](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L129)*
+*Defined in [src/either.ts:129](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L129)*
 
 **Type parameters:**
 
@@ -1087,7 +1087,7 @@ Name | Type |
 
 ▸ **orChain**‹**R2**, **L2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Either](_src_either_.either.md)‹R | R2, L2›*
 
-*Defined in [src/either.ts:130](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L130)*
+*Defined in [src/either.ts:130](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L130)*
 
 **Type parameters:**
 
@@ -1117,7 +1117,7 @@ ___
 
 ▸ **orMap**‹**R2**›(`this`: [Right](_src_either_.right.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R, never›*
 
-*Defined in [src/either.ts:71](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L71)*
+*Defined in [src/either.ts:71](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L71)*
 
 Either fallback transformer function
 
@@ -1150,7 +1150,7 @@ Name | Type |
 
 ▸ **orMap**‹**R2**›(`this`: [Either](_src_either_.either.md)‹R, L›, `op`: function): *[Right](_src_either_.right.md)‹R | R2, never›*
 
-*Defined in [src/either.ts:73](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L73)*
+*Defined in [src/either.ts:73](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L73)*
 
 **Type parameters:**
 
@@ -1178,7 +1178,7 @@ ___
 
 ▸ **orTap**(`op`: function): *this*
 
-*Defined in [src/either.ts:32](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L32)*
+*Defined in [src/either.ts:32](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L32)*
 
 Either fallback peeker function
 
@@ -1209,7 +1209,7 @@ ___
 
 ▸ **tap**(`op`: function): *this*
 
-*Defined in [src/either.ts:21](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/either.ts#L21)*
+*Defined in [src/either.ts:21](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/either.ts#L21)*
 
 Either peeker function
 

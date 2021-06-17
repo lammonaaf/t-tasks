@@ -22,7 +22,7 @@
 
 Ƭ **Cancelable**: *[Maybe](_src_maybe_.maybe.md)‹[Rejectable](_src_task_.md#rejectable)‹R››*
 
-*Defined in [src/task.ts:16](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L16)*
+*Defined in [src/task.ts:16](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/task.ts#L16)*
 
 Shortcut for underlying task result type
 
@@ -32,7 +32,7 @@ ___
 
 Ƭ **Rejectable**: *[Either](_src_either_.either.md)‹R, any›*
 
-*Defined in [src/task.ts:9](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L9)*
+*Defined in [src/task.ts:9](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/task.ts#L9)*
 
 Shortcut for monadic Either type, where erroneous value is of type any
 
@@ -42,7 +42,7 @@ ___
 
 Ƭ **TaskFunction**: *function*
 
-*Defined in [src/task.ts:24](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L24)*
+*Defined in [src/task.ts:24](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/task.ts#L24)*
 
 Function returning Task
 
@@ -62,7 +62,7 @@ ___
 
 Ƭ **TaskGenerator**: *Generator‹TT, R, T›*
 
-*Defined in [src/task.ts:41](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L41)*
+*Defined in [src/task.ts:41](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/task.ts#L41)*
 
 Task generator
 
@@ -81,7 +81,7 @@ ___
 
 Ƭ **TaskGeneratorFunction**: *function*
 
-*Defined in [src/task.ts:59](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L59)*
+*Defined in [src/task.ts:59](https://github.com/lammonaaf/t-tasks/blob/26c5046/src/task.ts#L59)*
 
 Function returning task generator (generator function)
 
