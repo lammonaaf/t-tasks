@@ -58,7 +58,7 @@ task resolve type
 
 • **cancel**: *function*
 
-*Defined in [src/task.ts:191](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L191)*
+*Defined in [src/task.ts:191](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L191)*
 
 Invoke underlying canel method without error
 
@@ -72,7 +72,7 @@ ___
 
 • **generator**: *[TaskGeneratorFunction](_src_task_.md#taskgeneratorfunction)‹[], unknown, [Task](_src_task_.task.md)‹R›, R›*
 
-*Defined in [src/task.ts:230](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L230)*
+*Defined in [src/task.ts:230](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L230)*
 
 Wrap task to singleton generator
 
@@ -110,7 +110,7 @@ ___
 
 • **reject**: *function*
 
-*Defined in [src/task.ts:198](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L198)*
+*Defined in [src/task.ts:198](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L198)*
 
 Invoke underlying canel method with error
 
@@ -132,7 +132,7 @@ ___
 
 • **resolve**: *function*
 
-*Defined in [src/task.ts:186](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L186)*
+*Defined in [src/task.ts:186](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L186)*
 
 Return underlying promise in order to await result
 
@@ -148,7 +148,7 @@ Return underlying promise in order to await result
 
 ▸ **all**‹**T**›(`tasks`: Iterable‹[Task](_src_task_.task.md)‹T››): *[Task](_src_task_.task.md)‹T[]›*
 
-*Defined in [src/task.ts:503](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L503)*
+*Defined in [src/task.ts:503](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L503)*
 
 Execute all tasks in parallel and return list of results
 
@@ -180,7 +180,7 @@ ___
 
 ▸ **any**‹**T**›(`tasks`: Iterable‹[Task](_src_task_.task.md)‹T››): *[Task](_src_task_.task.md)‹T›*
 
-*Defined in [src/task.ts:554](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L554)*
+*Defined in [src/task.ts:554](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L554)*
 
 Execute all tasks in parallel and return the result of the first successful one
 
@@ -213,7 +213,7 @@ ___
 
 ▸ **canceled**‹**R**›(): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:276](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L276)*
+*Defined in [src/task.ts:276](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L276)*
 
 Invariant task constructor creating canceled task
 
@@ -233,7 +233,7 @@ ___
 
 ▸ **create**‹**R**›(`invoke`: TaskInvoke‹R›, `cancel`: TaskCancel): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:244](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L244)*
+*Defined in [src/task.ts:244](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L244)*
 
 Custom task monad constructor
 
@@ -262,7 +262,7 @@ ___
 
 ▸ **fromFunction**‹**R**›(`producer`: function, `cancelRef`: object): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:335](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L335)*
+*Defined in [src/task.ts:335](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L335)*
 
 Lift from sync function to task resolving to said function result
 
@@ -313,7 +313,7 @@ ___
 
 ▸ **fromPromise**‹**R**›(`promise`: PromiseLike‹R›): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:296](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L296)*
+*Defined in [src/task.ts:296](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L296)*
 
 Lift from promise to task resolving to that promise result
 
@@ -348,7 +348,7 @@ ___
 
 ▸ **generate**‹**T**, **TT**, **R**›(`taskGeneratorFunction`: [TaskGeneratorFunction](_src_task_.md#taskgeneratorfunction)‹[], T, TT, R›): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:422](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L422)*
+*Defined in [src/task.ts:422](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L422)*
 
 Create compound task from generator function
 
@@ -406,7 +406,7 @@ ___
 
 ▸ **lift**‹**A**, **R**›(`promiseFunction`: function): *[TaskFunction](_src_task_.md#taskfunction)‹A, R›*
 
-*Defined in [src/task.ts:385](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L385)*
+*Defined in [src/task.ts:385](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L385)*
 
 Lift from function returning value/promise to function returning task resolving to that value
 
@@ -455,7 +455,7 @@ ___
 
 ▸ **limit**‹**T**›(`task`: [Task](_src_task_.task.md)‹T›, `limitTask`: [Task](_src_task_.task.md)‹void›): *[Task](_src_task_.task.md)‹T›*
 
-*Defined in [src/task.ts:601](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L601)*
+*Defined in [src/task.ts:601](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L601)*
 
 Limit task execution based on another task
 
@@ -483,7 +483,7 @@ ___
 
 ▸ **promiseGenerator**‹**R**›(`promise`: PromiseLike‹R›): *Generator‹[Task](_src_task_.task.md)‹R›, R, unknown›*
 
-*Defined in [src/task.ts:363](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L363)*
+*Defined in [src/task.ts:363](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L363)*
 
 Convinience shortcut for yielding async functions as tasks
 
@@ -509,7 +509,7 @@ ___
 
 ▸ **rejected**‹**R**›(`error`: any): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:266](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L266)*
+*Defined in [src/task.ts:266](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L266)*
 
 Invariant task constructor creating rejected task from error value
 
@@ -535,7 +535,7 @@ ___
 
 ▸ **repeat**‹**T**›(`taskFunction`: [TaskFunction](_src_task_.md#taskfunction)‹[], T›): *[Task](_src_task_.task.md)‹T›*
 
-*Defined in [src/task.ts:613](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L613)*
+*Defined in [src/task.ts:613](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L613)*
 
 Repeat task untill successful
 
@@ -560,7 +560,7 @@ ___
 
 ▸ **resolved**‹**R**›(`value`: R): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:255](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L255)*
+*Defined in [src/task.ts:255](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L255)*
 
 Invariant task constructor creating resolved task from plain value
 
@@ -586,7 +586,7 @@ ___
 
 ▸ **sequence**‹**T**›(`taskFunctions`: Iterable‹[TaskFunction](_src_task_.md#taskfunction)‹[], T››): *[Task](_src_task_.task.md)‹T[]›*
 
-*Defined in [src/task.ts:482](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L482)*
+*Defined in [src/task.ts:482](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L482)*
 
 Start multiple tasks one after another
 
@@ -610,7 +610,7 @@ ___
 
 ▸ **timeout**(`delay`: number): *[Task](_src_task_.task.md)‹void›*
 
-*Defined in [src/task.ts:455](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L455)*
+*Defined in [src/task.ts:455](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L455)*
 
 Generic timeout task
 
@@ -641,7 +641,7 @@ task resolving to void (undefined) after specified delay
 
 ▸ **chain**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:148](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L148)*
+*Defined in [src/task.ts:148](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L148)*
 
 Invoke transformer when task is resolved (and only then) and continue execution with it's result
 
@@ -675,7 +675,7 @@ ___
 
 ▸ **chainCanceled**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:166](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L166)*
+*Defined in [src/task.ts:166](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L166)*
 
 Invoke transformer when task is canceled (and only then) and continue execution with it's result
 
@@ -703,7 +703,7 @@ ___
 
 ▸ **chainRejected**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:157](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L157)*
+*Defined in [src/task.ts:157](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L157)*
 
 Invoke transformer when task is rejected (and only then) and continue execution with it's result
 
@@ -737,7 +737,7 @@ ___
 
 ▸ **map**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R2›*
 
-*Defined in [src/task.ts:108](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L108)*
+*Defined in [src/task.ts:108](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L108)*
 
 Invoke transformer when task is resolved (and only then) and return it's result instead
 
@@ -771,7 +771,7 @@ ___
 
 ▸ **mapCanceled**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:126](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L126)*
+*Defined in [src/task.ts:126](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L126)*
 
 Invoke transformer when task is canceled (and only then) and return it's result instead
 
@@ -799,7 +799,7 @@ ___
 
 ▸ **mapRejected**‹**R2**›(`op`: function): *[Task](_src_task_.task.md)‹R | R2›*
 
-*Defined in [src/task.ts:117](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L117)*
+*Defined in [src/task.ts:117](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L117)*
 
 Invoke transformer when task is rejected (and only then) and return it's result instead
 
@@ -833,7 +833,7 @@ ___
 
 ▸ **matchChain**‹**R2**, **R3**, **R4**›(`op`: object): *[Task](_src_task_.task.md)‹R2 | R3 | R4›*
 
-*Defined in [src/task.ts:179](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L179)*
+*Defined in [src/task.ts:179](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L179)*
 
 Invoke a dedicated transformer according to task resolution and continue execution with it's result
 
@@ -871,7 +871,7 @@ ___
 
 ▸ **matchMap**‹**R2**, **R3**, **R4**›(`op`: object): *[Task](_src_task_.task.md)‹R2 | R3 | R4›*
 
-*Defined in [src/task.ts:139](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L139)*
+*Defined in [src/task.ts:139](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L139)*
 
 Invoke a dedicated transformer according to task resolution
 
@@ -909,7 +909,7 @@ ___
 
 ▸ **matchTap**(`op`: object): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:99](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L99)*
+*Defined in [src/task.ts:99](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L99)*
 
 Invoke a dedicated callback according to task resolution
 
@@ -933,7 +933,7 @@ ___
 
 ▸ **tap**(`op`: function): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:73](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L73)*
+*Defined in [src/task.ts:73](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L73)*
 
 Invoke callback when task is resolved (and only then)
 
@@ -961,7 +961,7 @@ ___
 
 ▸ **tapCanceled**(`op`: function): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:89](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L89)*
+*Defined in [src/task.ts:89](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L89)*
 
 Invoke callback when task is canceled (and only then)
 
@@ -983,7 +983,7 @@ ___
 
 ▸ **tapRejected**(`op`: function): *[Task](_src_task_.task.md)‹R›*
 
-*Defined in [src/task.ts:81](https://github.com/lammonaaf/t-tasks/blob/dad49ec/src/task.ts#L81)*
+*Defined in [src/task.ts:81](https://github.com/lammonaaf/t-tasks/blob/ef685cd/src/task.ts#L81)*
 
 Invoke callback when task is rejected (and only then)
 
