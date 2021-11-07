@@ -438,7 +438,7 @@ export namespace Task {
   /**
    * Generic timeout task
    *
-   * Userfull for creating delays in task chains or implementing limiting tasks
+   * Usefull for creating delays in task chains or implementing limiting tasks
    *
    * @param delay duration in ms after that the task resolves to void
    * @returns task resolving to void (undefined) after specified delay
@@ -453,22 +453,43 @@ export namespace Task {
    * ```
    */
   export function timeout(delay: number) {
-    let handler: NodeJS.Timeout;
+    return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(() => resolve(), delay), clearTimeout);
+  }
 
-    const [resolve, setResolve] = resolver<Cancelable<void>>();
+  /**
+   * Generic callback task
+   *
+   * Usefull for creating custom tasks from success and error callbacks and cancelaton function. Synchronous callbacks are not supported, @see fromFuction
+   *
+   * @param create task body with success and error callbacks
+   * @param cancel cancelation function intended for stopping task execution
+   * @returns task resolving to success value
+   *
+   * @example
+   * ```typescript
+   * export function timeout(delay: number) {
+   *   return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(() => resolve(), delay), clearTimeout);
+   * }
+   * ```
+   */
+  export function fromCallback<H, R>(create: (resolve: (result: R) => void, reject: (error: any) => void) => H, cancel: (handler: H) => void): Task<R> {
+    let handler: H;
+
+    const [resolve, setResolve] = resolver<Cancelable<R>>();
 
     return Task.create(
-      new Promise<Cancelable<void>>((_resolve) => {
+      new Promise<Cancelable<R>>((_resolve) => {
         setResolve(_resolve);
 
-        handler = setTimeout(() => {
-          resolve(Maybe.just(Either.right(undefined)));
-        }, delay);
+        handler = create(
+          (r) => resolve(Maybe.just(Either.right(r))),
+          (e) => resolve(Maybe.just(Either.left(e))),
+        );
       }),
       (error: Maybe<any>) => {
         resolve(error.map(Either.left));
 
-        clearTimeout(handler);
+        cancel(handler);
       },
     );
   }
