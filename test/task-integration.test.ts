@@ -9,7 +9,7 @@ const delayedValuePromise = async <R>(value: R, delay: number) => {
 };
 
 describe('basic scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -244,7 +244,7 @@ describe('basic scenarios', () => {
 });
 
 describe('chained scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -765,7 +765,7 @@ describe('chained scenarios', () => {
 });
 
 describe('generated scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1302,7 +1302,7 @@ describe('generated scenarios', () => {
 });
 
 describe('Task.liftPromise scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1533,7 +1533,7 @@ describe('Task.liftPromise scenarios', () => {
 });
 
 describe('Task.lift scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1583,7 +1583,7 @@ describe('Task.lift scenarios', () => {
 });
 
 describe('Task.repeat scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1657,7 +1657,7 @@ describe('Task.repeat scenarios', () => {
 });
 
 describe('Task.limit scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1771,7 +1771,7 @@ describe('Task.limit scenarios', () => {
 });
 
 describe('Task.all', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1885,7 +1885,7 @@ describe('Task.all', () => {
 });
 
 describe('Task.sequence', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -2084,7 +2084,7 @@ describe('Task.sequence', () => {
 });
 
 describe('Task.any', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -2222,7 +2222,7 @@ describe('Task.any', () => {
 });
 
 describe('self manipulation scenarios', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {

@@ -430,7 +430,7 @@ export namespace Maybe {
    * @param value possibly undefined value
    * @returns either 'just value' or 'nothing'
    */
-  export function fromOptional<R>(value: undefined): Nothing<never>;
+  export function fromOptional(value: undefined): Nothing<never>;
   export function fromOptional<R>(value: Exclude<R, undefined>): Just<R>;
   export function fromOptional<R>(value: R | undefined): Maybe<R>;
   export function fromOptional<R>(value: R | undefined) {
@@ -445,8 +445,8 @@ export namespace Maybe {
    * @param value possibly undefined value
    * @returns either 'just value' or 'nothing'
    */
-  export function fromNullable<R>(value: undefined): Nothing<never>;
-  export function fromNullable<R>(value: null): Nothing<never>;
+  export function fromNullable(value: undefined): Nothing<never>;
+  export function fromNullable(value: null): Nothing<never>;
   export function fromNullable<R>(value: Exclude<R, null | undefined>): Just<R>;
   export function fromNullable<R>(value: R | null | undefined): Maybe<R>;
   export function fromNullable<R>(value: R | null | undefined) {

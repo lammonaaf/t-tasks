@@ -253,7 +253,7 @@ export namespace Task {
    * @returns task resolving to specified value
    */
   export function resolved<R>(value: R) {
-    return Task.create<R>(Promise.resolve(Maybe.just(Either.right(value))), () => {});
+    return Task.create<R>(Promise.resolve(Maybe.just(Either.right(value))), () => void undefined);
   }
 
   /**
@@ -264,7 +264,7 @@ export namespace Task {
    * @returns task resolving to specified value
    */
   export function rejected<R>(error: any) {
-    return Task.create<R>(Promise.resolve(Maybe.just(Either.left(error))), () => {});
+    return Task.create<R>(Promise.resolve(Maybe.just(Either.left(error))), () => void undefined);
   }
 
   /**
@@ -274,7 +274,7 @@ export namespace Task {
    * @returns task resolving to specified value
    */
   export function canceled<R>() {
-    return Task.create<R>(Promise.resolve(Maybe.nothing()), () => {});
+    return Task.create<R>(Promise.resolve(Maybe.nothing()), () => void undefined);
   }
 
   /**
@@ -660,7 +660,7 @@ interface TaskBase<R> {
 }
 
 const resolver = <T>() => {
-  const stub = (_: T) => {};
+  const stub: (t: T) => void = () => void undefined;
 
   let globalResolve = stub;
 
