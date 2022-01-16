@@ -17,7 +17,8 @@
     "build": "microbundle",
     "start": "microbundle watch",
     "lint": "eslint src --ext js,ts",
-    "test": "jest"
+    "test": "jest",
+    "docs": "typedoc --out ./docs ./src"
   },
   "peerDependencies": {},
   "author": "Alexander Yushkov",
@@ -32,6 +33,8 @@
     "eslint-plugin-promise": "^5.2.0",
     "jest": "^27.4.7",
     "microbundle": "^0.14.2",
+    "typedoc": "^0.22.10",
+    "typedoc-plugin-markdown": "^3.11.11",
     "typescript": "^4.5.4"
   },
   "homepage": "https://lammonaaf.github.io/t-tasks",
