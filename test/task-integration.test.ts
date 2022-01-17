@@ -1786,6 +1786,16 @@ describe('Task.all', () => {
     await flushPromises();
   };
 
+  it('succeed immediately with []', async () => {
+    const task = Task.all([]);
+
+    await flushPromises();
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.right([])));
+  });
+
   it('succeed in 600ms', async () => {
     const promiseFunction1 = jest.fn(() => 40);
     const promiseFunction2 = jest.fn(() => 41);
@@ -2098,6 +2108,16 @@ describe('Task.any', () => {
 
     await flushPromises();
   };
+
+  it('cancel immediately with []', async () => {
+    const task = Task.any([]);
+
+    await flushPromises();
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
 
   it('succeed in 200ms with 42', async () => {
     const promiseFunction1 = jest.fn(() => 40);
