@@ -1,6 +1,4 @@
-[t-tasks](README.md) › [Globals](globals.md)
-
-# t-tasks
+t-tasks / [Exports](modules.md)
 
 ![CI](https://github.com/lammonaaf/t-ask/workflows/CI/badge.svg?branch=master)
 
