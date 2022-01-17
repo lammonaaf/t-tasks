@@ -1,6 +1,6 @@
 {
   "name": "t-tasks",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "license": "MIT",
   "source": "src/index.ts",
   "main": "dist/t-tasks.js",
