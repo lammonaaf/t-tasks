@@ -38,4 +38,4 @@ underlying value
 
 #### Defined in
 
-[maybe.ts:397](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/maybe.ts#L397)
+[maybe.ts:397](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L397)
