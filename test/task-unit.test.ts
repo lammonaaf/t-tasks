@@ -119,7 +119,7 @@ describe('Task.canceled()', () => {
 });
 
 describe('Task.timeout', () => {
-  beforeEach(() => jest.useFakeTimers());
+  beforeEach(() => jest.useFakeTimers('legacy'));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
