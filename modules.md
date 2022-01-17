@@ -48,7 +48,7 @@ Shortcut for underlying task result type
 
 #### Defined in
 
-[task.ts:16](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/task.ts#L16)
+[task.ts:16](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/task.ts#L16)
 
 ___
 
@@ -70,7 +70,7 @@ Used throughout the library to represent the result of failable operations, name
 
 #### Defined in
 
-[either.ts:400](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/either.ts#L400)
+[either.ts:400](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/either.ts#L400)
 
 ___
 
@@ -91,7 +91,7 @@ Used throughout the library to represent optional return type, specifically retu
 
 #### Defined in
 
-[maybe.ts:385](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/maybe.ts#L385)
+[maybe.ts:385](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/maybe.ts#L385)
 
 ___
 
@@ -109,7 +109,7 @@ Shortcut for monadic Either type, where erroneous value is of type any
 
 #### Defined in
 
-[task.ts:9](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/task.ts#L9)
+[task.ts:9](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/task.ts#L9)
 
 ___
 
@@ -142,7 +142,7 @@ Function returning Task
 
 #### Defined in
 
-[task.ts:24](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/task.ts#L24)
+[task.ts:24](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/task.ts#L24)
 
 ___
 
@@ -171,7 +171,7 @@ const generatorFunction = function*(): TaskGenerator<unknown, Task<string>, numb
 
 #### Defined in
 
-[task.ts:41](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/task.ts#L41)
+[task.ts:41](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/task.ts#L41)
 
 ___
 
@@ -215,4 +215,4 @@ const generatorFunction: TaskGeneratorFunction<[], unknown, Task<string>, number
 
 #### Defined in
 
-[task.ts:59](https://github.com/lammonaaf/t-tasks/blob/861b4ff/src/task.ts#L59)
+[task.ts:59](https://github.com/lammonaaf/t-tasks/blob/8145cc3/src/task.ts#L59)
