@@ -240,3 +240,52 @@ describe('Task.timeout', () => {
     expect(callback).toBeCalledWith(Maybe.just(Either.left('some-error')));
   });
 });
+
+describe('Task.fromCallback', () => {
+  beforeEach(() => jest.useFakeTimers('legacy'));
+  afterEach(() => jest.useRealTimers());
+
+  const flushPromises = async () => {
+    return new Promise((resolve) => setImmediate(resolve));
+  };
+
+  const advanceTime = async (by: number) => {
+    await flushPromises();
+
+    jest.advanceTimersByTime(by);
+
+    await flushPromises();
+  };
+
+  it('creates Task resolving with undefined in exactly 100ms', async () => {
+    const task = Task.fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(() => resolve(), 100), clearTimeout);
+
+    const callback = jest.fn();
+
+    task.resolve().then(callback);
+
+    await advanceTime(99);
+
+    expect(callback).not.toBeCalled();
+
+    await advanceTime(1);
+
+    expect(callback).toBeCalledWith(Maybe.just(Either.right(undefined)));
+  });
+
+  it('creates Task rejecting with some-error in exactly 100ms', async () => {
+    const task = Task.fromCallback<NodeJS.Timeout, void>((resolve, reject) => setTimeout(() => reject('some-error'), 100), clearTimeout);
+
+    const callback = jest.fn();
+
+    task.resolve().then(callback);
+
+    await advanceTime(99);
+
+    expect(callback).not.toBeCalled();
+
+    await advanceTime(1);
+
+    expect(callback).toBeCalledWith(Maybe.just(Either.left('some-error')));
+  });
+});

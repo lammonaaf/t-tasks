@@ -546,6 +546,10 @@ export namespace Task {
       new Promise<Cancelable<T[]>>((_resolve) => {
         setResolve(_resolve);
 
+        if (taskArray.length < 1) {
+          return resolve(Maybe.just(Either.right([])));
+        }
+
         taskArray.map((task, i) => {
           return task.matchTap({
             resolved: (value) => resolved(value, i),
@@ -596,6 +600,10 @@ export namespace Task {
     return Task.create(
       new Promise<Cancelable<T>>((_resolve) => {
         setResolve(_resolve);
+
+        if (taskArray.length < 1) {
+          return resolve(Maybe.nothing());
+        }
 
         taskArray.map((task, i) => {
           return task.matchTap({
