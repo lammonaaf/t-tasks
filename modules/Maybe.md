@@ -45,7 +45,7 @@ true in case every list element is Just
 
 #### Defined in
 
-[maybe.ts:488](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L488)
+[maybe.ts:488](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L488)
 
 ___
 
@@ -75,7 +75,7 @@ true in case every list element is Nothing
 
 #### Defined in
 
-[maybe.ts:508](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L508)
+[maybe.ts:508](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L508)
 
 ___
 
@@ -101,7 +101,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:448](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L448)
+[maybe.ts:448](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L448)
 
 ▸ **fromNullable**(`value`): [`Nothing`](../interfaces/Nothing.md)<`never`\>
 
@@ -117,7 +117,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:449](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L449)
+[maybe.ts:449](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L449)
 
 ▸ **fromNullable**<`R`\>(`value`): [`Just`](../interfaces/Just.md)<`R`\>
 
@@ -139,7 +139,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:450](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L450)
+[maybe.ts:450](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L450)
 
 ▸ **fromNullable**<`R`\>(`value`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -161,7 +161,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:451](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L451)
+[maybe.ts:451](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L451)
 
 ___
 
@@ -187,7 +187,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L433)
+[maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L433)
 
 ▸ **fromOptional**<`R`\>(`value`): [`Just`](../interfaces/Just.md)<`R`\>
 
@@ -209,7 +209,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:434](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L434)
+[maybe.ts:434](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L434)
 
 ▸ **fromOptional**<`R`\>(`value`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -231,7 +231,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:435](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L435)
+[maybe.ts:435](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L435)
 
 ___
 
@@ -263,7 +263,7 @@ maybe is Just<R\>
 
 #### Defined in
 
-[maybe.ts:465](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L465)
+[maybe.ts:465](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L465)
 
 ___
 
@@ -295,7 +295,7 @@ maybe is Nothing<never\>
 
 #### Defined in
 
-[maybe.ts:478](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L478)
+[maybe.ts:478](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L478)
 
 ___
 
@@ -325,7 +325,7 @@ Non-empty monad constructor
 
 #### Defined in
 
-[maybe.ts:412](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L412)
+[maybe.ts:412](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L412)
 
 ___
 
@@ -343,7 +343,7 @@ Empty monad constructor
 
 #### Defined in
 
-[maybe.ts:421](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L421)
+[maybe.ts:421](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L421)
 
 ___
 
@@ -373,7 +373,7 @@ true in case al east one list element is Just
 
 #### Defined in
 
-[maybe.ts:498](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L498)
+[maybe.ts:498](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L498)
 
 ___
 
@@ -403,4 +403,4 @@ true in case at least one list element is Nothing
 
 #### Defined in
 
-[maybe.ts:518](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L518)
+[maybe.ts:518](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L518)

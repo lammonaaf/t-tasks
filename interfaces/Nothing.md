@@ -59,7 +59,7 @@ Applied to 'nothing' returns self without invoking composition function
 
 #### Defined in
 
-[maybe.ts:288](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L288)
+[maybe.ts:288](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L288)
 
 ▸ **chain**<`R2`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -81,7 +81,7 @@ Applied to 'nothing' returns self without invoking composition function
 
 #### Defined in
 
-[maybe.ts:289](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L289)
+[maybe.ts:289](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L289)
 
 ▸ **chain**<`R2`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -103,7 +103,7 @@ Applied to 'nothing' returns self without invoking composition function
 
 #### Defined in
 
-[maybe.ts:290](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L290)
+[maybe.ts:290](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L290)
 
 ▸ **chain**<`R2`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2`\>
 
@@ -125,7 +125,7 @@ Applied to 'nothing' returns self without invoking composition function
 
 #### Defined in
 
-[maybe.ts:292](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L292)
+[maybe.ts:292](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L292)
 
 ▸ **chain**<`R2`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -147,7 +147,7 @@ Applied to 'nothing' returns self without invoking composition function
 
 #### Defined in
 
-[maybe.ts:293](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L293)
+[maybe.ts:293](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L293)
 
 ▸ **chain**<`R2`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2`\>
 
@@ -169,7 +169,7 @@ Applied to 'nothing' returns self without invoking composition function
 
 #### Defined in
 
-[maybe.ts:294](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L294)
+[maybe.ts:294](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L294)
 
 ___
 
@@ -194,7 +194,7 @@ this is Just<R\>
 
 #### Defined in
 
-[maybe.ts:360](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L360)
+[maybe.ts:360](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L360)
 
 ___
 
@@ -219,7 +219,7 @@ this is Nothing<R\>
 
 #### Defined in
 
-[maybe.ts:374](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L374)
+[maybe.ts:374](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L374)
 
 ___
 
@@ -252,7 +252,7 @@ Applied to 'nothing' returns self without invoking transformer
 
 #### Defined in
 
-[maybe.ts:242](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L242)
+[maybe.ts:242](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L242)
 
 ▸ **map**<`R2`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2`\>
 
@@ -274,7 +274,7 @@ Applied to 'nothing' returns self without invoking transformer
 
 #### Defined in
 
-[maybe.ts:244](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L244)
+[maybe.ts:244](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L244)
 
 ___
 
@@ -310,7 +310,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:328](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L328)
+[maybe.ts:328](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L328)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -335,7 +335,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:329](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L329)
+[maybe.ts:329](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L329)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Just`](Just.md)<`R3`\>
 
@@ -360,7 +360,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:330](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L330)
+[maybe.ts:330](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L330)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -385,7 +385,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:331](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L331)
+[maybe.ts:331](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L331)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R3`\>
 
@@ -410,7 +410,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:332](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L332)
+[maybe.ts:332](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L332)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R3`\>
 
@@ -435,7 +435,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:333](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L333)
+[maybe.ts:333](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L333)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Just`](Just.md)<`R3`\>
 
@@ -460,7 +460,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:334](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L334)
+[maybe.ts:334](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L334)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -485,7 +485,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:335](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L335)
+[maybe.ts:335](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L335)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R3`\>
 
@@ -510,7 +510,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:336](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L336)
+[maybe.ts:336](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L336)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Just`](Just.md)<`R2` \| `R3`\>
 
@@ -535,7 +535,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:338](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L338)
+[maybe.ts:338](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L338)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2`\>
 
@@ -560,7 +560,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:339](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L339)
+[maybe.ts:339](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L339)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R3`\>
 
@@ -585,7 +585,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:340](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L340)
+[maybe.ts:340](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L340)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -610,7 +610,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:341](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L341)
+[maybe.ts:341](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L341)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2` \| `R3`\>
 
@@ -635,7 +635,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:342](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L342)
+[maybe.ts:342](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L342)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R3`\>
 
@@ -660,7 +660,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:343](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L343)
+[maybe.ts:343](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L343)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2` \| `R3`\>
 
@@ -685,7 +685,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:344](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L344)
+[maybe.ts:344](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L344)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2`\>
 
@@ -710,7 +710,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:345](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L345)
+[maybe.ts:345](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L345)
 
 ▸ **matchChain**<`R2`, `R3`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2` \| `R3`\>
 
@@ -735,7 +735,7 @@ Applied to 'nothing' returns op.nothing()
 
 #### Defined in
 
-[maybe.ts:346](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L346)
+[maybe.ts:346](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L346)
 
 ___
 
@@ -771,7 +771,7 @@ Applied to 'nothing' returns 'just op.nothing()'
 
 #### Defined in
 
-[maybe.ts:273](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L273)
+[maybe.ts:273](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L273)
 
 ▸ **matchMap**<`R2`, `R3`\>(`op`): [`Just`](Just.md)<`R2` \| `R3`\>
 
@@ -796,7 +796,7 @@ Applied to 'nothing' returns 'just op.nothing()'
 
 #### Defined in
 
-[maybe.ts:275](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L275)
+[maybe.ts:275](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L275)
 
 ___
 
@@ -825,7 +825,7 @@ self
 
 #### Defined in
 
-[maybe.ts:229](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L229)
+[maybe.ts:229](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L229)
 
 ___
 
@@ -858,7 +858,7 @@ Applied to 'nothing' returns op()
 
 #### Defined in
 
-[maybe.ts:307](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L307)
+[maybe.ts:307](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L307)
 
 ▸ **orChain**<`R2`\>(`op`): [`Nothing`](Nothing.md)<`never`\>
 
@@ -880,7 +880,7 @@ Applied to 'nothing' returns op()
 
 #### Defined in
 
-[maybe.ts:308](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L308)
+[maybe.ts:308](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L308)
 
 ▸ **orChain**<`R2`\>(`op`): [`Maybe`](../modules.md#maybe)<`R2`\>
 
@@ -902,7 +902,7 @@ Applied to 'nothing' returns op()
 
 #### Defined in
 
-[maybe.ts:309](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L309)
+[maybe.ts:309](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L309)
 
 ▸ **orChain**<`R2`\>(`op`): [`Just`](Just.md)<`R` \| `R2`\>
 
@@ -924,7 +924,7 @@ Applied to 'nothing' returns op()
 
 #### Defined in
 
-[maybe.ts:311](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L311)
+[maybe.ts:311](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L311)
 
 ▸ **orChain**<`R2`\>(`op`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -946,7 +946,7 @@ Applied to 'nothing' returns op()
 
 #### Defined in
 
-[maybe.ts:312](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L312)
+[maybe.ts:312](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L312)
 
 ▸ **orChain**<`R2`\>(`op`): [`Maybe`](../modules.md#maybe)<`R` \| `R2`\>
 
@@ -968,7 +968,7 @@ Applied to 'nothing' returns op()
 
 #### Defined in
 
-[maybe.ts:313](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L313)
+[maybe.ts:313](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L313)
 
 ___
 
@@ -1001,7 +1001,7 @@ Applied to 'nothing' returns 'just op()'
 
 #### Defined in
 
-[maybe.ts:256](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L256)
+[maybe.ts:256](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L256)
 
 ▸ **orMap**<`R2`\>(`op`): [`Just`](Just.md)<`R` \| `R2`\>
 
@@ -1023,7 +1023,7 @@ Applied to 'nothing' returns 'just op()'
 
 #### Defined in
 
-[maybe.ts:258](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L258)
+[maybe.ts:258](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L258)
 
 ___
 
@@ -1050,7 +1050,7 @@ self
 
 #### Defined in
 
-[maybe.ts:217](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L217)
+[maybe.ts:217](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L217)
 
 ___
 
@@ -1077,4 +1077,4 @@ self
 
 #### Defined in
 
-[maybe.ts:206](https://github.com/lammonaaf/t-tasks/blob/a02b49d/src/maybe.ts#L206)
+[maybe.ts:206](https://github.com/lammonaaf/t-tasks/blob/2965c75/src/maybe.ts#L206)
