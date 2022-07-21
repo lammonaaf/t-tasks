@@ -78,7 +78,7 @@ Task.generate(function* () {
 
 #### Defined in
 
-[task.ts:230](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L230)
+[task.ts:230](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L230)
 
 ## Methods
 
@@ -94,7 +94,7 @@ Invoke underlying canel method without error
 
 #### Defined in
 
-[task.ts:191](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L191)
+[task.ts:191](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L191)
 
 ___
 
@@ -124,7 +124,7 @@ task chaining to transformer result task
 
 #### Defined in
 
-[task.ts:148](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L148)
+[task.ts:148](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L148)
 
 ___
 
@@ -154,7 +154,7 @@ task chaining to fallback task in case of cancelation
 
 #### Defined in
 
-[task.ts:166](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L166)
+[task.ts:166](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L166)
 
 ___
 
@@ -184,7 +184,7 @@ task chaining to fallback task in case of failure
 
 #### Defined in
 
-[task.ts:157](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L157)
+[task.ts:157](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L157)
 
 ___
 
@@ -214,7 +214,7 @@ task returning transformer result
 
 #### Defined in
 
-[task.ts:108](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L108)
+[task.ts:108](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L108)
 
 ___
 
@@ -244,7 +244,7 @@ task returning fallback result in case of cancelation
 
 #### Defined in
 
-[task.ts:126](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L126)
+[task.ts:126](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L126)
 
 ___
 
@@ -274,7 +274,7 @@ task returning fallback result in case of failure
 
 #### Defined in
 
-[task.ts:117](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L117)
+[task.ts:117](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L117)
 
 ___
 
@@ -309,7 +309,7 @@ task chaining to a corresponding transformer result
 
 #### Defined in
 
-[task.ts:179](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L179)
+[task.ts:179](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L179)
 
 ___
 
@@ -344,7 +344,7 @@ task resolving to a corresponding transformer result
 
 #### Defined in
 
-[task.ts:139](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L139)
+[task.ts:139](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L139)
 
 ___
 
@@ -371,7 +371,7 @@ self
 
 #### Defined in
 
-[task.ts:99](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L99)
+[task.ts:99](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L99)
 
 ___
 
@@ -393,7 +393,7 @@ Invoke underlying canel method with error
 
 #### Defined in
 
-[task.ts:198](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L198)
+[task.ts:198](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L198)
 
 ___
 
@@ -411,7 +411,7 @@ underlying promise
 
 #### Defined in
 
-[task.ts:186](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L186)
+[task.ts:186](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L186)
 
 ___
 
@@ -435,7 +435,7 @@ self
 
 #### Defined in
 
-[task.ts:73](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L73)
+[task.ts:73](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L73)
 
 ___
 
@@ -459,7 +459,7 @@ self
 
 #### Defined in
 
-[task.ts:89](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L89)
+[task.ts:89](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L89)
 
 ___
 
@@ -483,4 +483,4 @@ self
 
 #### Defined in
 
-[task.ts:81](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/task.ts#L81)
+[task.ts:81](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L81)
