@@ -39,4 +39,4 @@ underlying error
 
 #### Defined in
 
-[either.ts:429](https://github.com/lammonaaf/t-tasks/blob/9af376c/src/either.ts#L429)
+[either.ts:429](https://github.com/lammonaaf/t-tasks/blob/1760ee2/src/either.ts#L429)
