@@ -186,6 +186,15 @@ export interface Just<R> {
    * ```
    */
   isNothing(): this is Nothing<R>;
+
+  /**
+   * Wrap Maybe to singleton generator
+   *
+   * Userful in order to avoid ambiguous yied types
+   *
+   * @returns generator of Maybe wrapping this
+   */
+  generator: MaybeGeneratorFunction<[], R, Just<R>, R>
 }
 
 /**
@@ -372,6 +381,15 @@ export interface Nothing<R> {
    * ```
    */
   isNothing(): this is Nothing<R>;
+
+  /**
+   * Wrap Maybe to singleton generator
+   *
+   * Userful in order to avoid ambiguous yied types
+   *
+   * @returns generator of Maybe wrapping this
+   */
+  generator: MaybeGeneratorFunction<[], R, Nothing<R>, R>
 }
 
 /**
@@ -400,6 +418,9 @@ export namespace Just {
 }
 
 export namespace Nothing {}
+
+export type MaybeGenerator<T, TT extends Maybe<T>, R> = Generator<TT, R, T>;
+export type MaybeGeneratorFunction<A extends unknown[], T, TT extends Maybe<T>, R> = (...args: A) => MaybeGenerator<T, TT, R>;
 
 export namespace Maybe {
   /**
@@ -495,7 +516,7 @@ export namespace Maybe {
    * @param maybes a list of Maybe
    * @returns true in case al east one list element is Just
    */
-  export function someJust<R>(maybes: Maybe<R>[]): maybes is Just<R>[] {
+  export function someJust<R>(maybes: Maybe<R>[]): boolean {
     return maybes.some(Maybe.isJust);
   }
 
@@ -515,8 +536,37 @@ export namespace Maybe {
    * @param maybes a list of Maybe
    * @returns true in case at least one list element is Nothing
    */
-  export function someNothing<R>(maybes: Maybe<R>[]): maybes is Nothing<never>[] {
+  export function someNothing<R>(maybes: Maybe<R>[]): boolean {
     return maybes.some(Maybe.isNothing);
+  }
+
+  /**
+   * Create compound Maybe from generator function
+   *
+   * Applying yield to a Maybe within the generator function unwraps the Maybe and returns underlying value in case of success
+   * However the convinient option for typescript is to use ```yield* maybe.generator()``` as othervise one may have to deal with union types
+   *
+   * @template TT yielded Maybe type
+   * @template R returned underlying type
+   * @param maybeGeneratorFunction Maybe generator function
+   * @returns Just wrapping the result of generator function or Nothing
+   * ```
+   */
+  export function generate<T, TT extends Maybe<T>, R>(maybeGeneratorFunction: MaybeGeneratorFunction<[], T, TT, R>): Maybe<R> {
+    const generator = maybeGeneratorFunction();
+
+    const sequentor = (next: IteratorResult<TT, R>): Maybe<R> => {
+      return next.done ? (
+        Maybe.just(next.value)
+      ) : (
+        next.value.matchChain<R>({
+          just: (value) => sequentor(generator.next(value)),
+          nothing: Maybe.nothing,
+        })
+      );
+    };
+
+    return Maybe.just(undefined).chain(() => sequentor(generator.next()));
   }
 }
 
@@ -562,6 +612,11 @@ class JustClass<R> implements Just<R> {
   matchChain<RR extends Maybe<unknown>>(op: { just: (value: R) => RR }) {
     return this.chain(op.just);
   }
+  generator() {
+    return (function*(value) {
+      return (yield value) as R;
+    })(this);
+  }
 }
 
 class NothingClass implements Nothing<never> {
@@ -599,6 +654,11 @@ class NothingClass implements Nothing<never> {
   }
   matchChain<RR extends Maybe<unknown>>(op: { nothing: () => RR }) {
     return this.orChain(op.nothing);
+  }
+  generator() {
+    return (function*(value) {
+      return (yield value) as never;
+    })(this);
   }
 }
 

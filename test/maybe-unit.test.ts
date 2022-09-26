@@ -1,3 +1,5 @@
+import 'regenerator-runtime/runtime';
+
 import { Maybe, Just } from '../';
 
 describe('Maybe.just("data")', () => {
@@ -381,5 +383,22 @@ describe('[Maybe.nothing(), Maybe.just("data"), Maybe.nothing()]', () => {
 
   it('is not all Nothing', () => {
     expect(Maybe.everyNothing(subjects)).toBeFalsy();
+  });
+});
+
+describe('generate()', () => {
+  it('does stuff', () => {
+    const f = (one: number | null, two: number | undefined) => Maybe.generate(function* () {
+      return (
+        yield* Maybe.fromNullable(one).generator()
+      ) + (
+        yield* Maybe.fromOptional(two).generator()
+      );
+    });
+
+    expect(f(null, undefined)).toStrictEqual(Maybe.nothing());
+    expect(f(null, 2)).toStrictEqual(Maybe.nothing());
+    expect(f(3, undefined)).toStrictEqual(Maybe.nothing());
+    expect(f(3, 2)).toStrictEqual(Maybe.just(5));
   });
 });

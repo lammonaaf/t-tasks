@@ -1,3 +1,5 @@
+import 'regenerator-runtime/runtime';
+
 import { Either, Right, Left } from '../';
 
 describe('Either.right("data")', () => {
@@ -385,5 +387,22 @@ describe('[Either.left(), Either.right("data"), Either.left()]', () => {
 
   it('is not all left', () => {
     expect(Either.everyLeft(subjects)).toBeFalsy();
+  });
+});
+
+describe('generate()', () => {
+  it('does stuff', () => {
+    const f = (one: number | null, two: number | undefined) => Either.generate(function* () {
+      return (
+        yield* Either.fromNullable(one, 'one error').generator()
+      ) + (
+        yield* Either.fromOptional(two, 'two error').generator()
+      );
+    });
+
+    expect(f(null, undefined)).toStrictEqual(Either.left('one error'));
+    expect(f(null, 2)).toStrictEqual(Either.left('one error'));
+    expect(f(3, undefined)).toStrictEqual(Either.left('two error'));
+    expect(f(3, 2)).toStrictEqual(Either.right(5));
   });
 });
