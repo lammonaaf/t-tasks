@@ -17,6 +17,7 @@ Either data type specialization representing a correct value
 
 ### Properties
 
+- [generator](Right.md#generator)
 - [right](Right.md#right)
 
 ### Methods
@@ -35,13 +36,29 @@ Either data type specialization representing a correct value
 
 ## Properties
 
+### generator
+
+• **generator**: [`EitherGeneratorFunction`](../modules.md#eithergeneratorfunction)<[], `R`, [`Right`](Right.md)<`R`, `L`\>, `R`\>
+
+Wrap Maybe to singleton generator
+
+Userful in order to avoid ambiguous yied types
+
+**`returns`** generator of Maybe wrapping this
+
+#### Defined in
+
+[either.ts:202](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L202)
+
+___
+
 ### right
 
 • `Readonly` **right**: `R`
 
 #### Defined in
 
-[either.ts:10](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L10)
+[either.ts:10](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L10)
 
 ## Methods
 
@@ -75,7 +92,7 @@ Applied to 'left error' returns self without invoking composition function
 
 #### Defined in
 
-[either.ts:104](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L104)
+[either.ts:104](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L104)
 
 ▸ **chain**<`R2`, `L2`\>(`op`): [`Left`](Left.md)<`never`, `L2`\>
 
@@ -98,7 +115,7 @@ Applied to 'left error' returns self without invoking composition function
 
 #### Defined in
 
-[either.ts:105](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L105)
+[either.ts:105](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L105)
 
 ▸ **chain**<`R2`, `L2`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L2`\>
 
@@ -121,7 +138,7 @@ Applied to 'left error' returns self without invoking composition function
 
 #### Defined in
 
-[either.ts:106](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L106)
+[either.ts:106](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L106)
 
 ▸ **chain**<`R2`, `L2`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L`\>
 
@@ -144,7 +161,7 @@ Applied to 'left error' returns self without invoking composition function
 
 #### Defined in
 
-[either.ts:108](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L108)
+[either.ts:108](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L108)
 
 ▸ **chain**<`R2`, `L2`\>(`op`): [`Left`](Left.md)<`never`, `L` \| `L2`\>
 
@@ -167,7 +184,7 @@ Applied to 'left error' returns self without invoking composition function
 
 #### Defined in
 
-[either.ts:109](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L109)
+[either.ts:109](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L109)
 
 ▸ **chain**<`R2`, `L2`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L` \| `L2`\>
 
@@ -190,7 +207,7 @@ Applied to 'left error' returns self without invoking composition function
 
 #### Defined in
 
-[either.ts:110](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L110)
+[either.ts:110](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L110)
 
 ___
 
@@ -215,7 +232,7 @@ this is Left<R, L\>
 
 #### Defined in
 
-[either.ts:193](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L193)
+[either.ts:193](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L193)
 
 ___
 
@@ -240,7 +257,7 @@ this is Right<R, L\>
 
 #### Defined in
 
-[either.ts:179](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L179)
+[either.ts:179](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L179)
 
 ___
 
@@ -273,7 +290,7 @@ Applied to 'left error' returns self without invoking transformer
 
 #### Defined in
 
-[either.ts:57](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L57)
+[either.ts:57](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L57)
 
 ▸ **map**<`R2`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L`\>
 
@@ -295,7 +312,7 @@ Applied to 'left error' returns self without invoking transformer
 
 #### Defined in
 
-[either.ts:59](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L59)
+[either.ts:59](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L59)
 
 ___
 
@@ -322,7 +339,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Right`](Right.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Right`](Right.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Right`](Right.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -333,7 +350,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:147](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L147)
+[either.ts:147](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L147)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Left`](Left.md)<`never`, `L2`\>
 
@@ -351,7 +368,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Right`](Right.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Right`](Right.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Left`](Left.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -360,7 +377,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:148](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L148)
+[either.ts:148](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L148)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Right`](Right.md)<`R2`, `never`\>
 
@@ -378,7 +395,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Left`](Left.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Left`](Left.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Right`](Right.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -387,7 +404,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:149](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L149)
+[either.ts:149](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L149)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Left`](Left.md)<`never`, `L2`\>
 
@@ -405,7 +422,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Left`](Left.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Left`](Left.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Left`](Left.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -414,7 +431,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:150](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L150)
+[either.ts:150](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L150)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L2`\>
 
@@ -432,7 +449,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Right`](Right.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Right`](Right.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Either`](../modules.md#either)<`R2`, `L2`\> |
 
 #### Returns
@@ -441,7 +458,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:151](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L151)
+[either.ts:151](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L151)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L2`\>
 
@@ -459,7 +476,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Left`](Left.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Left`](Left.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Either`](../modules.md#either)<`R2`, `L2`\> |
 
 #### Returns
@@ -468,7 +485,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:152](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L152)
+[either.ts:152](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L152)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Right`](Right.md)<`R2`, `never`\>
 
@@ -486,7 +503,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Right`](Right.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -495,7 +512,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:153](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L153)
+[either.ts:153](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L153)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Left`](Left.md)<`never`, `L2`\>
 
@@ -513,7 +530,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Left`](Left.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -522,7 +539,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:154](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L154)
+[either.ts:154](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L154)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L2`\>
 
@@ -540,7 +557,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Either`](../modules.md#either)<`R2`, `L2`\> |
 
 #### Returns
@@ -549,7 +566,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:155](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L155)
+[either.ts:155](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L155)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Right`](Right.md)<`R2` \| `R3`, `never`\>
 
@@ -567,7 +584,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Right`](Right.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Right`](Right.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Right`](Right.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -576,7 +593,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:157](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L157)
+[either.ts:157](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L157)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R3`, `L2`\>
 
@@ -594,7 +611,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Right`](Right.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Right`](Right.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Left`](Left.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -603,7 +620,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:158](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L158)
+[either.ts:158](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L158)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L3`\>
 
@@ -621,7 +638,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Left`](Left.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Left`](Left.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Right`](Right.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -630,7 +647,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:159](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L159)
+[either.ts:159](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L159)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Left`](Left.md)<`never`, `L2` \| `L3`\>
 
@@ -648,7 +665,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Left`](Left.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Left`](Left.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Left`](Left.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -657,7 +674,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:160](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L160)
+[either.ts:160](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L160)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2` \| `R3`, `L2`\>
 
@@ -675,7 +692,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Right`](Right.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Right`](Right.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Either`](../modules.md#either)<`R2`, `L2`\> |
 
 #### Returns
@@ -684,7 +701,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:161](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L161)
+[either.ts:161](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L161)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2`, `L2` \| `L3`\>
 
@@ -702,7 +719,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Left`](Left.md)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Left`](Left.md)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Either`](../modules.md#either)<`R2`, `L2`\> |
 
 #### Returns
@@ -711,7 +728,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:162](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L162)
+[either.ts:162](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L162)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2` \| `R3`, `L3`\>
 
@@ -729,7 +746,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Right`](Right.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -738,7 +755,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:163](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L163)
+[either.ts:163](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L163)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R3`, `L2` \| `L3`\>
 
@@ -756,7 +773,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Left`](Left.md)<`R2`, `L2`\> |
 
 #### Returns
@@ -765,7 +782,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:164](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L164)
+[either.ts:164](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L164)
 
 ▸ **matchChain**<`R2`, `L2`, `R3`, `L3`\>(`op`): [`Either`](../modules.md#either)<`R2` \| `R3`, `L2` \| `L3`\>
 
@@ -783,7 +800,7 @@ Applied to 'left error' returns 'op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
+| `op.left` | (`error`: `L`) => [`Either`](../modules.md#either)<`R3`, `L3`\> |
 | `op.right` | (`value`: `R`) => [`Either`](../modules.md#either)<`R2`, `L2`\> |
 
 #### Returns
@@ -792,7 +809,7 @@ Applied to 'left error' returns 'op.left(error)'
 
 #### Defined in
 
-[either.ts:165](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L165)
+[either.ts:165](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L165)
 
 ___
 
@@ -817,7 +834,7 @@ Applied to 'left error' returns 'right op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => `R3` |
+| `op.left` | (`error`: `L`) => `R3` |
 | `op.right` | (`value`: `R`) => `R2` |
 
 #### Returns
@@ -828,7 +845,7 @@ Applied to 'left error' returns 'right op.left(error)'
 
 #### Defined in
 
-[either.ts:88](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L88)
+[either.ts:88](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L88)
 
 ▸ **matchMap**<`R2`, `R3`\>(`op`): [`Right`](Right.md)<`R2` \| `R3`, `never`\>
 
@@ -844,7 +861,7 @@ Applied to 'left error' returns 'right op.left(error)'
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => `R3` |
+| `op.left` | (`error`: `L`) => `R3` |
 | `op.right` | (`value`: `R`) => `R2` |
 
 #### Returns
@@ -853,7 +870,7 @@ Applied to 'left error' returns 'right op.left(error)'
 
 #### Defined in
 
-[either.ts:90](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L90)
+[either.ts:90](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L90)
 
 ___
 
@@ -871,7 +888,7 @@ Applied to 'left error' returns self invoking op.left(error) in process
 | Name | Type |
 | :------ | :------ |
 | `op` | `Object` |
-| `op.left` | (`error`: `any`) => `void` |
+| `op.left` | (`error`: `L`) => `void` |
 | `op.right` | (`value`: `R`) => `void` |
 
 #### Returns
@@ -882,7 +899,7 @@ self
 
 #### Defined in
 
-[either.ts:44](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L44)
+[either.ts:44](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L44)
 
 ___
 
@@ -916,7 +933,7 @@ Applied to 'left error' returns 'op(error)'
 
 #### Defined in
 
-[either.ts:124](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L124)
+[either.ts:124](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L124)
 
 ▸ **orChain**<`R2`, `L2`\>(`op`): [`Right`](Right.md)<`R`, `never`\>
 
@@ -939,7 +956,7 @@ Applied to 'left error' returns 'op(error)'
 
 #### Defined in
 
-[either.ts:125](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L125)
+[either.ts:125](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L125)
 
 ▸ **orChain**<`R2`, `L2`\>(`op`): [`Right`](Right.md)<`R`, `never`\>
 
@@ -962,7 +979,7 @@ Applied to 'left error' returns 'op(error)'
 
 #### Defined in
 
-[either.ts:126](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L126)
+[either.ts:126](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L126)
 
 ▸ **orChain**<`R2`, `L2`\>(`op`): [`Right`](Right.md)<`R` \| `R2`, `never`\>
 
@@ -985,7 +1002,7 @@ Applied to 'left error' returns 'op(error)'
 
 #### Defined in
 
-[either.ts:128](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L128)
+[either.ts:128](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L128)
 
 ▸ **orChain**<`R2`, `L2`\>(`op`): [`Either`](../modules.md#either)<`R`, `L2`\>
 
@@ -1008,7 +1025,7 @@ Applied to 'left error' returns 'op(error)'
 
 #### Defined in
 
-[either.ts:129](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L129)
+[either.ts:129](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L129)
 
 ▸ **orChain**<`R2`, `L2`\>(`op`): [`Either`](../modules.md#either)<`R` \| `R2`, `L2`\>
 
@@ -1031,7 +1048,7 @@ Applied to 'left error' returns 'op(error)'
 
 #### Defined in
 
-[either.ts:130](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L130)
+[either.ts:130](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L130)
 
 ___
 
@@ -1064,7 +1081,7 @@ Applied to 'left error' returns 'right op(error)'
 
 #### Defined in
 
-[either.ts:71](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L71)
+[either.ts:71](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L71)
 
 ▸ **orMap**<`R2`\>(`op`): [`Right`](Right.md)<`R` \| `R2`, `never`\>
 
@@ -1086,7 +1103,7 @@ Applied to 'left error' returns 'right op(error)'
 
 #### Defined in
 
-[either.ts:73](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L73)
+[either.ts:73](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L73)
 
 ___
 
@@ -1113,7 +1130,7 @@ self
 
 #### Defined in
 
-[either.ts:32](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L32)
+[either.ts:32](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L32)
 
 ___
 
@@ -1140,4 +1157,4 @@ self
 
 #### Defined in
 
-[either.ts:21](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L21)
+[either.ts:21](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L21)

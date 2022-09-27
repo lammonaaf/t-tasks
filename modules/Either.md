@@ -10,6 +10,7 @@
 - [everyRight](Either.md#everyright)
 - [fromNullable](Either.md#fromnullable)
 - [fromOptional](Either.md#fromoptional)
+- [generate](Either.md#generate)
 - [isLeft](Either.md#isleft)
 - [isRight](Either.md#isright)
 - [left](Either.md#left)
@@ -46,7 +47,7 @@ true in case every list element is Left
 
 #### Defined in
 
-[either.ts:542](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L542)
+[either.ts:563](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L563)
 
 ___
 
@@ -77,7 +78,7 @@ true in case every list element is Right
 
 #### Defined in
 
-[either.ts:522](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L522)
+[either.ts:543](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L543)
 
 ___
 
@@ -110,7 +111,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:482](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L482)
+[either.ts:503](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L503)
 
 ▸ **fromNullable**<`L`\>(`value`, `error`): [`Left`](../interfaces/Left.md)<`never`, `L`\>
 
@@ -133,7 +134,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:483](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L483)
+[either.ts:504](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L504)
 
 ▸ **fromNullable**<`R`\>(`value`, `error`): [`Right`](../interfaces/Right.md)<`R`, `never`\>
 
@@ -156,7 +157,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:484](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L484)
+[either.ts:505](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L505)
 
 ▸ **fromNullable**<`R`, `L`\>(`value`, `error`): [`Either`](../modules.md#either)<`R`, `L`\>
 
@@ -180,7 +181,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:485](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L485)
+[either.ts:506](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L506)
 
 ___
 
@@ -213,7 +214,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:466](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L466)
+[either.ts:487](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L487)
 
 ▸ **fromOptional**<`R`\>(`value`, `error`): [`Right`](../interfaces/Right.md)<`R`, `never`\>
 
@@ -236,7 +237,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:467](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L467)
+[either.ts:488](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L488)
 
 ▸ **fromOptional**<`R`, `L`\>(`value`, `error`): [`Either`](../modules.md#either)<`R`, `L`\>
 
@@ -260,7 +261,43 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:468](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L468)
+[either.ts:489](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L489)
+
+___
+
+### generate
+
+▸ **generate**<`T`, `TT`, `R`\>(`eitherGeneratorFunction`): [`Either`](../modules.md#either)<`R`, `any`\>
+
+Create compound Either from generator function
+
+Applying yield to a Maybe within the generator function unwraps the Maybe and returns underlying value in case of success
+However the convinient option for typescript is to use ```yield* maybe.generator()``` as othervise one may have to deal with union types
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `T` | - |
+| `TT` | extends [`Either`](../modules.md#either)<`T`, `any`\> | yielded Maybe type |
+| `R` | `R` | returned underlying type |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `eitherGeneratorFunction` | [`EitherGeneratorFunction`](../modules.md#eithergeneratorfunction)<[], `T`, `TT`, `R`\> |
+
+#### Returns
+
+[`Either`](../modules.md#either)<`R`, `any`\>
+
+Just wrapping the result of generator function or Nothing
+```
+
+#### Defined in
+
+[either.ts:589](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L589)
 
 ___
 
@@ -293,7 +330,7 @@ either is Left<never, L\>
 
 #### Defined in
 
-[either.ts:512](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L512)
+[either.ts:533](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L533)
 
 ___
 
@@ -326,7 +363,7 @@ either is Right<R, never\>
 
 #### Defined in
 
-[either.ts:499](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L499)
+[either.ts:520](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L520)
 
 ___
 
@@ -356,7 +393,7 @@ Left monad constructor
 
 #### Defined in
 
-[either.ts:453](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L453)
+[either.ts:474](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L474)
 
 ___
 
@@ -386,13 +423,13 @@ Right monad constructor
 
 #### Defined in
 
-[either.ts:442](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L442)
+[either.ts:463](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L463)
 
 ___
 
 ### someLeft
 
-▸ **someLeft**<`R`, `L`\>(`eithers`): eithers is Left<never, L\>[]
+▸ **someLeft**<`R`, `L`\>(`eithers`): `boolean`
 
 Standalone list predicate
 
@@ -411,19 +448,19 @@ Standalone list predicate
 
 #### Returns
 
-eithers is Left<never, L\>[]
+`boolean`
 
 true in case at least one list element is Left
 
 #### Defined in
 
-[either.ts:552](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L552)
+[either.ts:573](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L573)
 
 ___
 
 ### someRight
 
-▸ **someRight**<`R`, `L`\>(`eithers`): eithers is Right<R, never\>[]
+▸ **someRight**<`R`, `L`\>(`eithers`): `boolean`
 
 Standalone list predicate
 
@@ -442,10 +479,10 @@ Standalone list predicate
 
 #### Returns
 
-eithers is Right<R, never\>[]
+`boolean`
 
 true in case at least one list element is Right
 
 #### Defined in
 
-[either.ts:532](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L532)
+[either.ts:553](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L553)

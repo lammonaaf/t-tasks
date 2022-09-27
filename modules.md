@@ -26,7 +26,11 @@
 
 - [Cancelable](modules.md#cancelable)
 - [Either](modules.md#either)
+- [EitherGenerator](modules.md#eithergenerator)
+- [EitherGeneratorFunction](modules.md#eithergeneratorfunction)
 - [Maybe](modules.md#maybe)
+- [MaybeGenerator](modules.md#maybegenerator)
+- [MaybeGeneratorFunction](modules.md#maybegeneratorfunction)
 - [Rejectable](modules.md#rejectable)
 - [TaskFunction](modules.md#taskfunction)
 - [TaskGenerator](modules.md#taskgenerator)
@@ -48,7 +52,7 @@ Shortcut for underlying task result type
 
 #### Defined in
 
-[task.ts:16](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L16)
+[task.ts:16](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L16)
 
 ___
 
@@ -70,7 +74,58 @@ Used throughout the library to represent the result of failable operations, name
 
 #### Defined in
 
-[either.ts:400](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L400)
+[either.ts:418](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L418)
+
+___
+
+### EitherGenerator
+
+Ƭ **EitherGenerator**<`T`, `TT`, `R`\>: `Generator`<`TT`, `R`, `T`\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `T` |
+| `TT` | extends [`Either`](modules.md#either)<`T`, `any`\> |
+| `R` | `R` |
+
+#### Defined in
+
+[either.ts:452](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L452)
+
+___
+
+### EitherGeneratorFunction
+
+Ƭ **EitherGeneratorFunction**<`A`, `T`, `TT`, `R`\>: (...`args`: `A`) => [`EitherGenerator`](modules.md#eithergenerator)<`T`, `TT`, `R`\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `A` | extends `unknown`[] |
+| `T` | `T` |
+| `TT` | extends [`Either`](modules.md#either)<`T`, `any`\> |
+| `R` | `R` |
+
+#### Type declaration
+
+▸ (...`args`): [`EitherGenerator`](modules.md#eithergenerator)<`T`, `TT`, `R`\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `...args` | `A` |
+
+##### Returns
+
+[`EitherGenerator`](modules.md#eithergenerator)<`T`, `TT`, `R`\>
+
+#### Defined in
+
+[either.ts:453](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L453)
 
 ___
 
@@ -91,7 +146,58 @@ Used throughout the library to represent optional return type, specifically retu
 
 #### Defined in
 
-[maybe.ts:385](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L385)
+[maybe.ts:403](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L403)
+
+___
+
+### MaybeGenerator
+
+Ƭ **MaybeGenerator**<`T`, `TT`, `R`\>: `Generator`<`TT`, `R`, `T`\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | `T` |
+| `TT` | extends [`Maybe`](modules.md#maybe)<`T`\> |
+| `R` | `R` |
+
+#### Defined in
+
+[maybe.ts:422](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L422)
+
+___
+
+### MaybeGeneratorFunction
+
+Ƭ **MaybeGeneratorFunction**<`A`, `T`, `TT`, `R`\>: (...`args`: `A`) => [`MaybeGenerator`](modules.md#maybegenerator)<`T`, `TT`, `R`\>
+
+#### Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `A` | extends `unknown`[] |
+| `T` | `T` |
+| `TT` | extends [`Maybe`](modules.md#maybe)<`T`\> |
+| `R` | `R` |
+
+#### Type declaration
+
+▸ (...`args`): [`MaybeGenerator`](modules.md#maybegenerator)<`T`, `TT`, `R`\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `...args` | `A` |
+
+##### Returns
+
+[`MaybeGenerator`](modules.md#maybegenerator)<`T`, `TT`, `R`\>
+
+#### Defined in
+
+[maybe.ts:423](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L423)
 
 ___
 
@@ -109,7 +215,7 @@ Shortcut for monadic Either type, where erroneous value is of type any
 
 #### Defined in
 
-[task.ts:9](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L9)
+[task.ts:9](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L9)
 
 ___
 
@@ -142,7 +248,7 @@ Function returning Task
 
 #### Defined in
 
-[task.ts:24](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L24)
+[task.ts:24](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L24)
 
 ___
 
@@ -171,7 +277,7 @@ const generatorFunction = function*(): TaskGenerator<unknown, Task<string>, numb
 
 #### Defined in
 
-[task.ts:41](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L41)
+[task.ts:41](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L41)
 
 ___
 
@@ -215,4 +321,4 @@ const generatorFunction: TaskGeneratorFunction<[], unknown, Task<string>, number
 
 #### Defined in
 
-[task.ts:59](https://github.com/lammonaaf/t-tasks/blob/9184653/src/task.ts#L59)
+[task.ts:59](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L59)

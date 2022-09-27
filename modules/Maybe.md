@@ -10,6 +10,7 @@
 - [everyNothing](Maybe.md#everynothing)
 - [fromNullable](Maybe.md#fromnullable)
 - [fromOptional](Maybe.md#fromoptional)
+- [generate](Maybe.md#generate)
 - [isJust](Maybe.md#isjust)
 - [isNothing](Maybe.md#isnothing)
 - [just](Maybe.md#just)
@@ -45,7 +46,7 @@ true in case every list element is Just
 
 #### Defined in
 
-[maybe.ts:488](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L488)
+[maybe.ts:509](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L509)
 
 ___
 
@@ -75,7 +76,7 @@ true in case every list element is Nothing
 
 #### Defined in
 
-[maybe.ts:508](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L508)
+[maybe.ts:529](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L529)
 
 ___
 
@@ -101,7 +102,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:448](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L448)
+[maybe.ts:469](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L469)
 
 ▸ **fromNullable**(`value`): [`Nothing`](../interfaces/Nothing.md)<`never`\>
 
@@ -117,7 +118,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:449](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L449)
+[maybe.ts:470](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L470)
 
 ▸ **fromNullable**<`R`\>(`value`): [`Just`](../interfaces/Just.md)<`R`\>
 
@@ -139,7 +140,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:450](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L450)
+[maybe.ts:471](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L471)
 
 ▸ **fromNullable**<`R`\>(`value`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -161,7 +162,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:451](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L451)
+[maybe.ts:472](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L472)
 
 ___
 
@@ -187,7 +188,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L433)
+[maybe.ts:454](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L454)
 
 ▸ **fromOptional**<`R`\>(`value`): [`Just`](../interfaces/Just.md)<`R`\>
 
@@ -209,7 +210,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:434](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L434)
+[maybe.ts:455](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L455)
 
 ▸ **fromOptional**<`R`\>(`value`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -231,7 +232,43 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:435](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L435)
+[maybe.ts:456](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L456)
+
+___
+
+### generate
+
+▸ **generate**<`T`, `TT`, `R`\>(`maybeGeneratorFunction`): [`Maybe`](../modules.md#maybe)<`R`\>
+
+Create compound Maybe from generator function
+
+Applying yield to a Maybe within the generator function unwraps the Maybe and returns underlying value in case of success
+However the convinient option for typescript is to use ```yield* maybe.generator()``` as othervise one may have to deal with union types
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `T` | - |
+| `TT` | extends [`Maybe`](../modules.md#maybe)<`T`\> | yielded Maybe type |
+| `R` | `R` | returned underlying type |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `maybeGeneratorFunction` | [`MaybeGeneratorFunction`](../modules.md#maybegeneratorfunction)<[], `T`, `TT`, `R`\> | Maybe generator function |
+
+#### Returns
+
+[`Maybe`](../modules.md#maybe)<`R`\>
+
+Just wrapping the result of generator function or Nothing
+```
+
+#### Defined in
+
+[maybe.ts:555](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L555)
 
 ___
 
@@ -263,7 +300,7 @@ maybe is Just<R\>
 
 #### Defined in
 
-[maybe.ts:465](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L465)
+[maybe.ts:486](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L486)
 
 ___
 
@@ -295,7 +332,7 @@ maybe is Nothing<never\>
 
 #### Defined in
 
-[maybe.ts:478](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L478)
+[maybe.ts:499](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L499)
 
 ___
 
@@ -325,7 +362,7 @@ Non-empty monad constructor
 
 #### Defined in
 
-[maybe.ts:412](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L412)
+[maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L433)
 
 ___
 
@@ -343,13 +380,13 @@ Empty monad constructor
 
 #### Defined in
 
-[maybe.ts:421](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L421)
+[maybe.ts:442](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L442)
 
 ___
 
 ### someJust
 
-▸ **someJust**<`R`\>(`maybes`): maybes is Just<R\>[]
+▸ **someJust**<`R`\>(`maybes`): `boolean`
 
 Standalone list predicate
 
@@ -367,19 +404,19 @@ Standalone list predicate
 
 #### Returns
 
-maybes is Just<R\>[]
+`boolean`
 
 true in case al east one list element is Just
 
 #### Defined in
 
-[maybe.ts:498](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L498)
+[maybe.ts:519](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L519)
 
 ___
 
 ### someNothing
 
-▸ **someNothing**<`R`\>(`maybes`): maybes is Nothing<never\>[]
+▸ **someNothing**<`R`\>(`maybes`): `boolean`
 
 Standalone list predicate
 
@@ -397,10 +434,10 @@ Standalone list predicate
 
 #### Returns
 
-maybes is Nothing<never\>[]
+`boolean`
 
 true in case at least one list element is Nothing
 
 #### Defined in
 
-[maybe.ts:518](https://github.com/lammonaaf/t-tasks/blob/9184653/src/maybe.ts#L518)
+[maybe.ts:539](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/maybe.ts#L539)

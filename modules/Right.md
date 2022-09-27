@@ -39,4 +39,4 @@ underlying value
 
 #### Defined in
 
-[either.ts:413](https://github.com/lammonaaf/t-tasks/blob/9184653/src/either.ts#L413)
+[either.ts:431](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/either.ts#L431)
