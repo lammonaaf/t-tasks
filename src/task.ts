@@ -365,6 +365,17 @@ export namespace Task {
   }
 
   /**
+   * Convinience shortcut for yielding timers
+   *
+   * @template R returned generator resolve type
+   * @param promise promise to be resolved
+   * @returns generator to be be used with yield*
+   */
+   export function timeoutGenerator(delay: number) {
+    return Task.timeout(delay).generator();
+  }
+
+  /**
    * Lift from function returning value/promise to function returning task resolving to that value
    *
    * Userfull for converting exising async functions to task functions for further use
@@ -423,13 +434,15 @@ export namespace Task {
     const generator = taskGeneratorFunction();
 
     const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
-      return next.done
-        ? Task.resolved(next.value)
-        : next.value.matchChain<R>({
-            resolved: (value) => sequentor(generator.next(value)),
-            rejected: (error) => sequentor(generator.throw(error)),
-            canceled: Task.canceled,
-          });
+      return next.done ? (
+        Task.resolved(next.value)
+      ) : (
+        next.value.matchChain<R>({
+          resolved: (value) => sequentor(generator.next(value)),
+          rejected: (error) => sequentor(generator.throw(error)),
+          canceled: Task.canceled,
+        })
+      );
     };
 
     return Task.resolved(undefined).chain(() => sequentor(generator.next()));

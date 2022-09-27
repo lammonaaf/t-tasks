@@ -41,7 +41,7 @@ export interface Right<R, L> {
    * @param op.left function to be invoked with underlying error in case of 'left'
    * @returns self
    */
-  matchTap(op: { right: (value: R) => void; left: (error: any) => void }): this;
+  matchTap(op: { right: (value: R) => void; left: (error: L) => void }): this;
 
   /**
    * Either transformer function
@@ -85,9 +85,9 @@ export interface Right<R, L> {
    * @returns 'right op.right(value)' or 'right op.left(error)'
    */
   // Right case
-  matchMap<R2, R3 = R2>(this: Right<R, L>, op: { right: (value: R) => R2; left: (error: any) => R3 }): Right<R2, never>;
+  matchMap<R2, R3 = R2>(this: Right<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2, never>;
   // General case
-  matchMap<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: any) => R3 }): Right<R2 | R3, never>;
+  matchMap<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2 | R3, never>;
 
   /**
    * Either composition function
@@ -144,25 +144,25 @@ export interface Right<R, L> {
    * @returns 'op(value)' or 'op(error)'
    */
   // Right cases
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Right<R3, L3> }): Right<R2, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Right<R3, L3> }): Left<never, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Left<R3, L3> }): Right<R2, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Left<R3, L3> }): Left<never, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Right<R3, L3> }): Either<R2, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Left<R3, L3> }): Either<R2, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Either<R3, L3> }): Right<R2, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Either<R3, L3> }): Left<never, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R2, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R2, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Right<R3, L3> }): Left<never, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Left<R3, L3> }): Right<R2, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Left<R3, L3> }): Left<never, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Right<R3, L3> }): Either<R2, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Left<R3, L3> }): Either<R2, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Either<R3, L3> }): Right<R2, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Either<R3, L3> }): Left<never, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R2, L2>;
   // General cases
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Right<R3, L3> }): Right<R2 | R3, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Right<R3, L3> }): Either<R3, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Left<R3, L3> }): Either<R2, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Left<R3, L3> }): Left<never, L2 | L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Right<R3, L3> }): Either<R2 | R3, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Left<R3, L3> }): Either<R2, L2 | L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R2 | R3, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R3, L2 | L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R2 | R3, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R2 | R3, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Right<R3, L3> }): Either<R3, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Left<R3, L3> }): Either<R2, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Left<R3, L3> }): Left<never, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Right<R3, L3> }): Either<R2 | R3, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Left<R3, L3> }): Either<R2, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R2 | R3, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R3, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R2 | R3, L2 | L3>;
 
   /**
    * Either type guard for 'right'
@@ -191,6 +191,15 @@ export interface Right<R, L> {
    * ```
    */
   isLeft(): this is Left<R, L>;
+
+  /**
+   * Wrap Maybe to singleton generator
+   *
+   * Userful in order to avoid ambiguous yied types
+   *
+   * @returns generator of Maybe wrapping this
+   */
+   generator: EitherGeneratorFunction<[], R, Right<R, L>, R>
 }
 
 /**
@@ -236,7 +245,7 @@ export interface Left<R, L> {
    * @param op.left function to be invoked with underlying error in case of 'left'
    * @returns self
    */
-  matchTap(op: { right: (value: R) => void; left: (error: any) => void }): this;
+  matchTap(op: { right: (value: R) => void; left: (error: L) => void }): this;
 
   /**
    * Either transformer function
@@ -280,9 +289,9 @@ export interface Left<R, L> {
    * @returns 'right op.right(value)' or 'right op.left(error)'
    */
   // Left case
-  matchMap<R2, R3 = R2>(this: Left<R, L>, op: { right: (value: R) => R2; left: (error: any) => R3 }): Right<R3, never>;
+  matchMap<R2, R3 = R2>(this: Left<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R3, never>;
   // General case
-  matchMap<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: any) => R3 }): Right<R2 | R3, never>;
+  matchMap<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2 | R3, never>;
 
   /**
    * Either composition function
@@ -339,25 +348,25 @@ export interface Left<R, L> {
    * @returns 'op(value)' or 'op(error)'
    */
   // Left cases
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Right<R3, L3> }): Right<R3, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Right<R3, L3> }): Right<R3, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Left<R3, L3> }): Left<never, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Left<R3, L3> }): Left<never, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Right<R3, L3> }): Right<R3, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Left<R3, L3> }): Left<never, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R3, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R3, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R3, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R3, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R3, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Left<R3, L3> }): Left<never, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Left<R3, L3> }): Left<never, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R3, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Left<R3, L3> }): Left<never, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R3, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R3, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R3, L3>;
   // General cases
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Right<R3, L3> }): Right<R2 | R3, never>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Right<R3, L3> }): Either<R3, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Left<R3, L3> }): Either<R2, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Left<R3, L3> }): Left<never, L2 | L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Right<R3, L3> }): Either<R2 | R3, L2>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Left<R3, L3> }): Either<R2, L2 | L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R2 | R3, L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R3, L2 | L3>;
-  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: any) => Either<R3, L3> }): Either<R2 | R3, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R2 | R3, never>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Right<R3, L3> }): Either<R3, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Left<R3, L3> }): Either<R2, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Left<R3, L3> }): Left<never, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Right<R3, L3> }): Either<R2 | R3, L2>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Left<R3, L3> }): Either<R2, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R2 | R3, L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Left<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R3, L2 | L3>;
+  matchChain<R2, L2, R3 = R2, L3 = L2>(this: Either<R, L>, op: { right: (value: R) => Either<R2, L2>; left: (error: L) => Either<R3, L3> }): Either<R2 | R3, L2 | L3>;
 
   /**
    * Either type guard for 'right'
@@ -386,6 +395,15 @@ export interface Left<R, L> {
    * ```
    */
   isLeft(): this is Left<R, L>;
+
+  /**
+   * Wrap Maybe to singleton generator
+   *
+   * Userful in order to avoid ambiguous yied types
+   *
+   * @returns generator of Maybe wrapping this
+   */
+   generator: EitherGeneratorFunction<[], R, Left<R, L>, R>
 }
 
 /**
@@ -430,6 +448,9 @@ export namespace Left {
     return left.left;
   }
 }
+
+export type EitherGenerator<T, TT extends Either<T, any>, R> = Generator<TT, R, T>;
+export type EitherGeneratorFunction<A extends unknown[], T, TT extends Either<T, any>, R> = (...args: A) => EitherGenerator<T, TT, R>;
 
 export namespace Either {
   /**
@@ -529,7 +550,7 @@ export namespace Either {
    * @param eithers a list of Either
    * @returns true in case at least one list element is Right
    */
-  export function someRight<R, L>(eithers: Either<R, L>[]): eithers is Right<R, never>[] {
+  export function someRight<R, L>(eithers: Either<R, L>[]): boolean {
     return eithers.some(Either.isRight);
   }
 
@@ -549,8 +570,37 @@ export namespace Either {
    * @param eithers a list of Either
    * @returns true in case at least one list element is Left
    */
-  export function someLeft<R, L>(eithers: Either<R, L>[]): eithers is Left<never, L>[] {
+  export function someLeft<R, L>(eithers: Either<R, L>[]): boolean {
     return eithers.some(Either.isLeft);
+  }
+
+  /**
+   * Create compound Either from generator function
+   *
+   * Applying yield to a Maybe within the generator function unwraps the Maybe and returns underlying value in case of success
+   * However the convinient option for typescript is to use ```yield* maybe.generator()``` as othervise one may have to deal with union types
+   *
+   * @template TT yielded Maybe type
+   * @template R returned underlying type
+   * @param maybeGeneratorFunction Maybe generator function
+   * @returns Just wrapping the result of generator function or Nothing
+   * ```
+   */
+  export function generate<T, TT extends Either<T, any>, R>(eitherGeneratorFunction: EitherGeneratorFunction<[], T, TT, R>): Either<R, any> {
+    const generator = eitherGeneratorFunction();
+
+    const sequentor = (next: IteratorResult<TT, R>): Either<R, any> => {
+      return next.done ? (
+        Either.right(next.value)
+      ) : (
+        next.value.matchChain<R, any>({
+          right: (value) => sequentor(generator.next(value)),
+          left: Either.left,
+        })
+      );
+    };
+
+    return Either.right(undefined).chain(() => sequentor(generator.next()));
   }
 }
 
@@ -596,6 +646,11 @@ class RightClass<R> implements Right<R, never> {
   matchChain<TT extends Either<unknown, unknown>>(op: { right: (value: R) => TT }) {
     return this.chain(op.right);
   }
+  generator() {
+    return (function*(value) {
+      return (yield value) as R;
+    })(this);
+  }
 }
 
 class LeftClass<L> implements Left<never, L> {
@@ -627,13 +682,18 @@ class LeftClass<L> implements Left<never, L> {
   isLeft(): this is Left<never, L> {
     return true;
   }
-  matchTap(op: { left: (error: any) => void }) {
+  matchTap(op: { left: (error: L) => void }) {
     return this.orTap(op.left);
   }
-  matchMap<R2>(op: { left: (error: any) => R2 }) {
+  matchMap<R2>(op: { left: (error: L) => R2 }) {
     return this.orMap(op.left);
   }
-  matchChain<TT extends Either<unknown, unknown>>(op: { left: (error: any) => TT }) {
+  matchChain<TT extends Either<unknown, unknown>>(op: { left: (error: L) => TT }) {
     return this.orChain(op.left);
+  }
+  generator() {
+    return (function*(value) {
+      return (yield value) as never;
+    })(this);
   }
 }
