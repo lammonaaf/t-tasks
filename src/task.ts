@@ -502,7 +502,7 @@ export namespace Task {
    * }
    * ```
    */
-  export function fromCallback<H, R>(create: (resolve: (result: R) => void, reject: (error: any) => void) => H, cancel: (handler: H) => void): Task<R> {
+  export function fromCallback<H, R>(create: (resolve: (result: R) => void, reject: (error: any) => void, cancel: () => void) => H, onCancel: (handler: H) => void): Task<R> {
     let handler: H;
 
     const [resolve, setResolve] = resolver<Cancelable<R>>();
@@ -514,12 +514,13 @@ export namespace Task {
         handler = create(
           (r) => resolve(Maybe.just(Either.right(r))),
           (e) => resolve(Maybe.just(Either.left(e))),
+          () => resolve(Maybe.nothing())
         );
       }),
       (error: Maybe<any>) => {
         resolve(error.map(Either.left));
 
-        cancel(handler);
+        onCancel(handler);
       },
     );
   }
