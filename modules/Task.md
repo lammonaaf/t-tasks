@@ -14,6 +14,7 @@
 - [fromFunction](Task.md#fromfunction)
 - [fromPromise](Task.md#frompromise)
 - [generate](Task.md#generate)
+- [generateFunction](Task.md#generatefunction)
 - [lift](Task.md#lift)
 - [limit](Task.md#limit)
 - [promiseGenerator](Task.md#promisegenerator)
@@ -58,7 +59,7 @@ In case of cancelation resulting task is immediately immediately canceled togeth
 
 #### Defined in
 
-[task.ts:537](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L537)
+[task.ts:554](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L554)
 
 ___
 
@@ -95,7 +96,7 @@ In case of cancelation resulting task is immediately immediately canceled togeth
 
 #### Defined in
 
-[task.ts:592](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L592)
+[task.ts:609](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L609)
 
 ___
 
@@ -119,7 +120,7 @@ task resolving to specified value
 
 #### Defined in
 
-[task.ts:276](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L276)
+[task.ts:276](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L276)
 
 ___
 
@@ -152,7 +153,7 @@ task resolving to resolve value of invoke
 
 #### Defined in
 
-[task.ts:244](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L244)
+[task.ts:244](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L244)
 
 ___
 
@@ -193,7 +194,7 @@ task resolving to success value
 
 #### Defined in
 
-[task.ts:488](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L488)
+[task.ts:505](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L505)
 
 ___
 
@@ -240,7 +241,7 @@ task resolving to the specified function's result
 
 #### Defined in
 
-[task.ts:335](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L335)
+[task.ts:335](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L335)
 
 ___
 
@@ -279,7 +280,7 @@ task resolving to specified promise value
 
 #### Defined in
 
-[task.ts:296](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L296)
+[task.ts:296](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L296)
 
 ___
 
@@ -337,7 +338,60 @@ task resolving to generator's return type
 
 #### Defined in
 
-[task.ts:433](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L433)
+[task.ts:433](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L433)
+
+___
+
+### generateFunction
+
+▸ **generateFunction**<`Args`, `T`, `TT`, `R`\>(`taskGeneratorFunction`): (...`args`: `Args`) => [`Task`](../interfaces/Task.md)<`R`\>
+
+Task function generator
+
+Simplifies wrighting functions returning generated tasks
+
+#### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `Args` | extends `any`[] | generator arguments |
+| `T` | `T` | - |
+| `TT` | extends [`Task`](../interfaces/Task.md)<`T`, `TT`\> | yielded task type |
+| `R` | `R` | returned task resolve type |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `taskGeneratorFunction` | [`TaskGeneratorFunction`](../modules.md#taskgeneratorfunction)<`Args`, `T`, `TT`, `R`\> | function* (...args) task generator function |
+
+#### Returns
+
+`fn`
+
+task resolving to generator's return type
+
+▸ (...`args`): [`Task`](../interfaces/Task.md)<`R`\>
+
+Task function generator
+
+Simplifies wrighting functions returning generated tasks
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `...args` | `Args` |
+
+##### Returns
+
+[`Task`](../interfaces/Task.md)<`R`\>
+
+task resolving to generator's return type
+
+#### Defined in
+
+[task.ts:462](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L462)
 
 ___
 
@@ -379,7 +433,7 @@ task function wrapping specified promise function
 
 #### Defined in
 
-[task.ts:396](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L396)
+[task.ts:396](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L396)
 
 ___
 
@@ -413,7 +467,7 @@ task limites according to limitTask
 
 #### Defined in
 
-[task.ts:643](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L643)
+[task.ts:660](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L660)
 
 ___
 
@@ -443,7 +497,7 @@ generator to be be used with yield*
 
 #### Defined in
 
-[task.ts:363](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L363)
+[task.ts:363](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L363)
 
 ___
 
@@ -473,7 +527,7 @@ task resolving to specified value
 
 #### Defined in
 
-[task.ts:266](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L266)
+[task.ts:266](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L266)
 
 ___
 
@@ -504,7 +558,7 @@ Resulting task is still cancelable by standard means
 
 #### Defined in
 
-[task.ts:655](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L655)
+[task.ts:672](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L672)
 
 ___
 
@@ -534,7 +588,7 @@ task resolving to specified value
 
 #### Defined in
 
-[task.ts:255](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L255)
+[task.ts:255](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L255)
 
 ___
 
@@ -564,7 +618,7 @@ composite task invoring every task in order and resolving to the list of results
 
 #### Defined in
 
-[task.ts:516](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L516)
+[task.ts:533](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L533)
 
 ___
 
@@ -599,7 +653,7 @@ task resolving to void (undefined) after specified delay
 
 #### Defined in
 
-[task.ts:468](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L468)
+[task.ts:485](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L485)
 
 ___
 
@@ -623,4 +677,4 @@ generator to be be used with yield*
 
 #### Defined in
 
-[task.ts:374](https://github.com/lammonaaf/t-tasks/blob/70988eb/src/task.ts#L374)
+[task.ts:374](https://github.com/lammonaaf/t-tasks/blob/3ca5360/src/task.ts#L374)
