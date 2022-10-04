@@ -449,6 +449,23 @@ export namespace Task {
   }
 
   /**
+   * Task function generator
+   * 
+   * Simplifies wrighting functions returning generated tasks
+   * 
+   * @template Args generator arguments
+   * @template TT yielded task type
+   * @template R returned task resolve type
+   * @param taskGeneratorFunction function* (...args) task generator function
+   * @returns task resolving to generator's return type
+   */
+  export function generateFunction<Args extends any[], T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<Args, T, TT, R>): (...args: Args) => Task<R> {
+    return (...args: Args) => generate(function* () {
+      return yield* taskGeneratorFunction(...args);
+    });
+  }
+
+  /**
    * Generic timeout task
    *
    * Usefull for creating delays in task chains or implementing limiting tasks
