@@ -47,7 +47,7 @@ true in case every list element is Left
 
 #### Defined in
 
-[either.ts:563](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L563)
+[either.ts:563](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L563)
 
 ___
 
@@ -78,7 +78,7 @@ true in case every list element is Right
 
 #### Defined in
 
-[either.ts:543](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L543)
+[either.ts:543](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L543)
 
 ___
 
@@ -111,7 +111,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:503](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L503)
+[either.ts:503](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L503)
 
 ▸ **fromNullable**<`L`\>(`value`, `error`): [`Left`](../interfaces/Left.md)<`never`, `L`\>
 
@@ -134,7 +134,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:504](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L504)
+[either.ts:504](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L504)
 
 ▸ **fromNullable**<`R`\>(`value`, `error`): [`Right`](../interfaces/Right.md)<`R`, `never`\>
 
@@ -157,7 +157,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:505](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L505)
+[either.ts:505](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L505)
 
 ▸ **fromNullable**<`R`, `L`\>(`value`, `error`): [`Either`](../modules.md#either)<`R`, `L`\>
 
@@ -181,7 +181,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:506](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L506)
+[either.ts:506](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L506)
 
 ___
 
@@ -214,7 +214,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:487](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L487)
+[either.ts:487](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L487)
 
 ▸ **fromOptional**<`R`\>(`value`, `error`): [`Right`](../interfaces/Right.md)<`R`, `never`\>
 
@@ -237,7 +237,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:488](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L488)
+[either.ts:488](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L488)
 
 ▸ **fromOptional**<`R`, `L`\>(`value`, `error`): [`Either`](../modules.md#either)<`R`, `L`\>
 
@@ -261,7 +261,7 @@ either 'right value' or 'left error'
 
 #### Defined in
 
-[either.ts:489](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L489)
+[either.ts:489](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L489)
 
 ___
 
@@ -297,7 +297,7 @@ Just wrapping the result of generator function or Nothing
 
 #### Defined in
 
-[either.ts:589](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L589)
+[either.ts:589](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L589)
 
 ___
 
@@ -330,7 +330,7 @@ either is Left<never, L\>
 
 #### Defined in
 
-[either.ts:533](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L533)
+[either.ts:533](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L533)
 
 ___
 
@@ -363,7 +363,7 @@ either is Right<R, never\>
 
 #### Defined in
 
-[either.ts:520](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L520)
+[either.ts:520](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L520)
 
 ___
 
@@ -393,7 +393,7 @@ Left monad constructor
 
 #### Defined in
 
-[either.ts:474](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L474)
+[either.ts:474](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L474)
 
 ___
 
@@ -423,7 +423,7 @@ Right monad constructor
 
 #### Defined in
 
-[either.ts:463](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L463)
+[either.ts:463](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L463)
 
 ___
 
@@ -454,7 +454,7 @@ true in case at least one list element is Left
 
 #### Defined in
 
-[either.ts:573](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L573)
+[either.ts:573](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L573)
 
 ___
 
@@ -485,4 +485,4 @@ true in case at least one list element is Right
 
 #### Defined in
 
-[either.ts:553](https://github.com/lammonaaf/t-tasks/blob/6eb2b96/src/either.ts#L553)
+[either.ts:553](https://github.com/lammonaaf/t-tasks/blob/69289b9/src/either.ts#L553)
