@@ -46,7 +46,7 @@ true in case every list element is Just
 
 #### Defined in
 
-[maybe.ts:509](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L509)
+[maybe.ts:509](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L509)
 
 ___
 
@@ -76,7 +76,7 @@ true in case every list element is Nothing
 
 #### Defined in
 
-[maybe.ts:529](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L529)
+[maybe.ts:529](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L529)
 
 ___
 
@@ -102,7 +102,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:469](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L469)
+[maybe.ts:469](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L469)
 
 ▸ **fromNullable**(`value`): [`Nothing`](../interfaces/Nothing.md)<`never`\>
 
@@ -118,7 +118,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:470](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L470)
+[maybe.ts:470](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L470)
 
 ▸ **fromNullable**<`R`\>(`value`): [`Just`](../interfaces/Just.md)<`R`\>
 
@@ -140,7 +140,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:471](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L471)
+[maybe.ts:471](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L471)
 
 ▸ **fromNullable**<`R`\>(`value`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -162,7 +162,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:472](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L472)
+[maybe.ts:472](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L472)
 
 ___
 
@@ -188,7 +188,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:454](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L454)
+[maybe.ts:454](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L454)
 
 ▸ **fromOptional**<`R`\>(`value`): [`Just`](../interfaces/Just.md)<`R`\>
 
@@ -210,7 +210,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:455](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L455)
+[maybe.ts:455](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L455)
 
 ▸ **fromOptional**<`R`\>(`value`): [`Maybe`](../modules.md#maybe)<`R`\>
 
@@ -232,7 +232,7 @@ either 'just value' or 'nothing'
 
 #### Defined in
 
-[maybe.ts:456](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L456)
+[maybe.ts:456](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L456)
 
 ___
 
@@ -268,7 +268,7 @@ Just wrapping the result of generator function or Nothing
 
 #### Defined in
 
-[maybe.ts:555](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L555)
+[maybe.ts:555](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L555)
 
 ___
 
@@ -300,7 +300,7 @@ maybe is Just<R\>
 
 #### Defined in
 
-[maybe.ts:486](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L486)
+[maybe.ts:486](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L486)
 
 ___
 
@@ -332,7 +332,7 @@ maybe is Nothing<never\>
 
 #### Defined in
 
-[maybe.ts:499](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L499)
+[maybe.ts:499](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L499)
 
 ___
 
@@ -362,7 +362,7 @@ Non-empty monad constructor
 
 #### Defined in
 
-[maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L433)
+[maybe.ts:433](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L433)
 
 ___
 
@@ -380,7 +380,7 @@ Empty monad constructor
 
 #### Defined in
 
-[maybe.ts:442](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L442)
+[maybe.ts:442](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L442)
 
 ___
 
@@ -410,7 +410,7 @@ true in case al east one list element is Just
 
 #### Defined in
 
-[maybe.ts:519](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L519)
+[maybe.ts:519](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L519)
 
 ___
 
@@ -440,4 +440,4 @@ true in case at least one list element is Nothing
 
 #### Defined in
 
-[maybe.ts:539](https://github.com/lammonaaf/t-tasks/blob/6cda431/src/maybe.ts#L539)
+[maybe.ts:539](https://github.com/lammonaaf/t-tasks/blob/0641861/src/maybe.ts#L539)
