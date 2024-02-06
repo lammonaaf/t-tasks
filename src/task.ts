@@ -459,8 +459,8 @@ export namespace Task {
    * @param taskGeneratorFunction function* (...args) task generator function
    * @returns task resolving to generator's return type
    */
-  export function generateFunction<Args extends any[], T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<Args, T, TT, R>): (...args: Args) => Task<R> {
-    return (...args: Args) => generate(function* () {
+  export function generateFunction<A extends any[], T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<A, T, TT, R>): TaskFunction<A, R> {
+    return (...args: A) => generate(function* () {
       return yield* taskGeneratorFunction(...args);
     });
   }
