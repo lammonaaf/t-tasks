@@ -26,8 +26,8 @@ describe('Either.right("data")', () => {
 
     const tapped = subject.tap(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -36,7 +36,7 @@ describe('Either.right("data")', () => {
 
     const tapped = subject.orTap(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -49,9 +49,9 @@ describe('Either.right("data")', () => {
       left: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(1);
-    expect(callback1).toBeCalledWith('data');
-    expect(callback2).toBeCalledTimes(0);
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -60,8 +60,8 @@ describe('Either.right("data")', () => {
 
     const mapped = subject.map(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(mapped).toStrictEqual(Either.right(4));
   });
 
@@ -70,7 +70,7 @@ describe('Either.right("data")', () => {
 
     const mapped = subject.orMap(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -83,9 +83,9 @@ describe('Either.right("data")', () => {
       left: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(1);
-    expect(callback1).toBeCalledWith('data');
-    expect(callback2).toBeCalledTimes(0);
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(Either.right(4));
   });
 
@@ -94,8 +94,8 @@ describe('Either.right("data")', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(chained).toStrictEqual(Either.right(4));
   });
 
@@ -104,8 +104,8 @@ describe('Either.right("data")', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(chained).toStrictEqual(Either.left('none'));
   });
 
@@ -114,7 +114,7 @@ describe('Either.right("data")', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -123,7 +123,7 @@ describe('Either.right("data")', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -136,9 +136,9 @@ describe('Either.right("data")', () => {
       left: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(1);
-    expect(callback1).toBeCalledWith('data');
-    expect(callback2).toBeCalledTimes(0);
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(Either.right(4));
   });
 });
@@ -167,7 +167,7 @@ describe('Either.left(false)', () => {
 
     const tapped = subject.tap(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -176,8 +176,8 @@ describe('Either.left(false)', () => {
 
     const tapped = subject.orTap(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith(false);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(false);
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -190,9 +190,9 @@ describe('Either.left(false)', () => {
       left: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(0);
-    expect(callback2).toBeCalledTimes(1);
-    expect(callback2).toBeCalledWith(false);
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith(false);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -201,7 +201,7 @@ describe('Either.left(false)', () => {
 
     const mapped = subject.map(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -210,8 +210,8 @@ describe('Either.left(false)', () => {
 
     const mapped = subject.orMap(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith(false);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(false);
     expect(mapped).toStrictEqual(Either.right(3));
   });
 
@@ -224,9 +224,9 @@ describe('Either.left(false)', () => {
       left: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(0);
-    expect(callback2).toBeCalledTimes(1);
-    expect(callback2).toBeCalledWith(false);
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith(false);
     expect(mapped).toStrictEqual(Either.right(false));
   });
 
@@ -235,7 +235,7 @@ describe('Either.left(false)', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(chained).toStrictEqual(subject);
   });
 
@@ -244,7 +244,7 @@ describe('Either.left(false)', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(chained).toStrictEqual(subject);
   });
 
@@ -253,8 +253,8 @@ describe('Either.left(false)', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith(false);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(false);
     expect(mapped).toStrictEqual(Either.right(3));
   });
 
@@ -263,8 +263,8 @@ describe('Either.left(false)', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith(false);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith(false);
     expect(mapped).toStrictEqual(Either.left('none'));
   });
 
@@ -277,9 +277,9 @@ describe('Either.left(false)', () => {
       left: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(0);
-    expect(callback2).toBeCalledTimes(1);
-    expect(callback2).toBeCalledWith(false);
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith(false);
     expect(mapped).toStrictEqual(Either.right('none'));
   });
 });
