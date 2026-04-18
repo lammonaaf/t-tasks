@@ -1,7 +1,9 @@
 /* eslint-disable no-throw-literal */ // fore more confinient failure testing
-import 'regenerator-runtime/runtime';
-
 import { Either, Maybe, Task } from '../';
+
+import { setImmediate } from 'timers';
+
+import 'regenerator-runtime/runtime';
 
 const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
 const delayedValuePromise = async <R>(value: R, delay: number) => {
@@ -9,7 +11,7 @@ const delayedValuePromise = async <R>(value: R, delay: number) => {
 };
 
 describe('basic scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -17,6 +19,8 @@ describe('basic scenarios', () => {
   };
 
   const advanceTime = async (by: number) => {
+    await flushPromises();
+
     jest.advanceTimersByTime(by);
 
     return flushPromises();
@@ -35,21 +39,21 @@ describe('basic scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(42);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(42);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
@@ -71,17 +75,17 @@ describe('basic scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -103,17 +107,17 @@ describe('basic scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalledWith();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledWith();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
@@ -135,17 +139,17 @@ describe('basic scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -167,17 +171,17 @@ describe('basic scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(46)));
   });
@@ -197,17 +201,17 @@ describe('basic scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -227,24 +231,24 @@ describe('basic scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(63);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(63);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 });
 
 describe('chained scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -252,6 +256,8 @@ describe('chained scenarios', () => {
   };
 
   const advanceTime = async (by: number) => {
+    await flushPromises();
+
     jest.advanceTimersByTime(by);
 
     return flushPromises();
@@ -274,33 +280,33 @@ describe('chained scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).not.toHaveBeenCalledWith(4);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(4);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(2);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(2);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(4)));
   });
@@ -325,17 +331,17 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(250);
 
-    expect(canceled).toBeCalledTimes(2);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(2);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -360,15 +366,15 @@ describe('chained scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(50);
 
@@ -376,17 +382,17 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).not.toHaveBeenCalledWith(4);
 
     const result = await task.resolve();
 
     await advanceTime(150);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -411,27 +417,27 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(199);
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalledWith(5);
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).not.toHaveBeenCalledWith(5);
 
     await advanceTime(1);
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(5);
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(5);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
@@ -457,17 +463,17 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(250);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(2);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(2);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -488,15 +494,15 @@ describe('chained scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(50);
 
@@ -504,17 +510,17 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(4);
 
     const result = await task.resolve();
 
     await advanceTime(150);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -536,17 +542,17 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(300);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(2);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(2);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -570,17 +576,17 @@ describe('chained scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(200);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(2);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(2);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -606,24 +612,24 @@ describe('chained scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith('data');
-    expect(resolved).not.toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('data');
+    expect(resolved).not.toHaveBeenCalledWith(4);
 
     const result = await task.resolve();
 
     await advanceTime(200);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -647,29 +653,29 @@ describe('chained scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(4);
 
     const result = await task.resolve();
 
     await advanceTime(150);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -694,27 +700,27 @@ describe('chained scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalledWith(5);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(5);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(5);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(5);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
@@ -738,34 +744,34 @@ describe('chained scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalledWith(5);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(5);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(5);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(5);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
 });
 
 describe('generated scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -777,7 +783,7 @@ describe('generated scenarios', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('resolve in 300ms', async () => {
@@ -801,33 +807,33 @@ describe('generated scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).not.toHaveBeenCalledWith(4);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(4);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(4);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(2);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(2);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(4)));
   });
@@ -857,17 +863,17 @@ describe('generated scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(250);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -893,15 +899,15 @@ describe('generated scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(50);
 
@@ -909,17 +915,17 @@ describe('generated scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     const result = await task.resolve();
 
     await advanceTime(150);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -949,17 +955,17 @@ describe('generated scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(250);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -985,15 +991,15 @@ describe('generated scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(50);
 
@@ -1001,17 +1007,17 @@ describe('generated scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('data');
 
     const result = await task.resolve();
 
     await advanceTime(150);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1040,17 +1046,17 @@ describe('generated scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(250);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1080,17 +1086,17 @@ describe('generated scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(250);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1119,17 +1125,17 @@ describe('generated scenarios', () => {
 
     await advanceTime(100);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('data');
 
     const result = await task.resolve();
 
     await advanceTime(200);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1159,29 +1165,29 @@ describe('generated scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith('data');
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith('data');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('data');
 
     const result = await task.resolve();
 
     await advanceTime(150);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1218,27 +1224,27 @@ describe('generated scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith('cat');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('cat');
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalledWith(3);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(3);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(3);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(3);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(2);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(2);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(3)));
   });
@@ -1275,34 +1281,34 @@ describe('generated scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith('cat');
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('cat');
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalledWith(3);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(3);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(3);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(3);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(2);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(2);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(3)));
   });
 });
 
 describe('Task.liftPromise scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1314,7 +1320,7 @@ describe('Task.liftPromise scenarios', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('resolve in 100ms', async () => {
@@ -1329,21 +1335,21 @@ describe('Task.liftPromise scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(42);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(42);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
@@ -1364,17 +1370,17 @@ describe('Task.liftPromise scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -1395,17 +1401,17 @@ describe('Task.liftPromise scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(63);
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(63);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
@@ -1426,17 +1432,17 @@ describe('Task.liftPromise scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1457,17 +1463,17 @@ describe('Task.liftPromise scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(63);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(63);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
@@ -1487,17 +1493,17 @@ describe('Task.liftPromise scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -1516,24 +1522,24 @@ describe('Task.liftPromise scenarios', () => {
 
     await advanceTime(50);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).toBeCalledWith(63);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(63);
 
     const result = await task.resolve();
 
     await advanceTime(50);
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
   });
 });
 
 describe('Task.lift scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1545,7 +1551,7 @@ describe('Task.lift scenarios', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('resolve in 100ms', async () => {
@@ -1562,28 +1568,28 @@ describe('Task.lift scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(42);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(42);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
 });
 
 describe('Task.repeat scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1595,7 +1601,7 @@ describe('Task.repeat scenarios', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('resolve in 1300ms', async () => {
@@ -1622,33 +1628,33 @@ describe('Task.repeat scenarios', () => {
 
     await advanceTime(300);
 
-    expect(taskFunction).toBeCalledTimes(1);
-    expect(promiseFunction).toBeCalledTimes(1);
-    expect(promiseFunction).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(1);
+    expect(promiseFunction).toHaveBeenCalledTimes(1);
+    expect(promiseFunction).toHaveReturnedTimes(0);
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(2);
-    expect(promiseFunction).toBeCalledTimes(1);
-    expect(promiseFunction).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction).toHaveBeenCalledTimes(1);
+    expect(promiseFunction).toHaveReturnedTimes(0);
 
     await advanceTime(400);
 
-    expect(taskFunction).toBeCalledTimes(2);
-    expect(promiseFunction).toBeCalledTimes(2);
-    expect(promiseFunction).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction).toHaveReturnedTimes(0);
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(3);
-    expect(promiseFunction).toBeCalledTimes(2);
-    expect(promiseFunction).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(3);
+    expect(promiseFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction).toHaveReturnedTimes(0);
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(3);
-    expect(promiseFunction).toBeCalledTimes(3);
-    expect(promiseFunction).toReturnTimes(1);
+    expect(taskFunction).toHaveBeenCalledTimes(3);
+    expect(promiseFunction).toHaveBeenCalledTimes(3);
+    expect(promiseFunction).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -1657,7 +1663,7 @@ describe('Task.repeat scenarios', () => {
 });
 
 describe('Task.limit scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1669,7 +1675,7 @@ describe('Task.limit scenarios', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('resolve in 200ms', async () => {
@@ -1684,23 +1690,23 @@ describe('Task.limit scenarios', () => {
 
     await advanceTime(199);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).toBeCalledWith(42);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(42);
 
     await advanceTime(100);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(1);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(42)));
   });
@@ -1717,23 +1723,23 @@ describe('Task.limit scenarios', () => {
 
     await advanceTime(99);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
-    expect(canceled).toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(100);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -1754,24 +1760,24 @@ describe('Task.limit scenarios', () => {
 
     await flushPromises();
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).toBeCalledWith('some-error');
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(200);
 
     const result = await task.resolve();
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 });
 
 describe('Task.all', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1783,7 +1789,7 @@ describe('Task.all', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('succeed immediately with []', async () => {
@@ -1805,12 +1811,12 @@ describe('Task.all', () => {
 
     await advanceTime(600);
 
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(1);
-    expect(promiseFunction2).toBeCalledTimes(1);
-    expect(promiseFunction2).toReturnTimes(1);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(1);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(1);
+    expect(promiseFunction2).toHaveBeenCalledTimes(1);
+    expect(promiseFunction2).toHaveReturnedTimes(1);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -1830,12 +1836,12 @@ describe('Task.all', () => {
 
     await flushPromises();
 
-    expect(promiseFunction1).toBeCalledTimes(0);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(1);
+    expect(promiseFunction1).toHaveBeenCalledTimes(0);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -1855,12 +1861,12 @@ describe('Task.all', () => {
 
     await flushPromises();
 
-    expect(promiseFunction1).toBeCalledTimes(0);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(1);
+    expect(promiseFunction1).toHaveBeenCalledTimes(0);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -1881,12 +1887,12 @@ describe('Task.all', () => {
 
     await advanceTime(400);
 
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(1);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -1895,7 +1901,7 @@ describe('Task.all', () => {
 });
 
 describe('Task.sequence', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -1907,7 +1913,7 @@ describe('Task.sequence', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('succeed in 600ms', async () => {
@@ -1929,13 +1935,13 @@ describe('Task.sequence', () => {
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(3);
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(1);
-    expect(promiseFunction2).toBeCalledTimes(1);
-    expect(promiseFunction2).toReturnTimes(1);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(1);
+    expect(taskFunction).toHaveBeenCalledTimes(3);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(1);
+    expect(promiseFunction2).toHaveBeenCalledTimes(1);
+    expect(promiseFunction2).toHaveReturnedTimes(1);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -1967,13 +1973,13 @@ describe('Task.sequence', () => {
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(2);
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(1);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(0);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(1);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(0);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2005,13 +2011,13 @@ describe('Task.sequence', () => {
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(2);
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(1);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(0);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(1);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(0);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2042,13 +2048,13 @@ describe('Task.sequence', () => {
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(1);
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(0);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(0);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2079,13 +2085,13 @@ describe('Task.sequence', () => {
 
     await advanceTime(200);
 
-    expect(taskFunction).toBeCalledTimes(2);
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(1);
-    expect(promiseFunction2).toBeCalledTimes(1);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(0);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(taskFunction).toHaveBeenCalledTimes(2);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(1);
+    expect(promiseFunction2).toHaveBeenCalledTimes(1);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(0);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2094,7 +2100,7 @@ describe('Task.sequence', () => {
 });
 
 describe('Task.any', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -2106,7 +2112,7 @@ describe('Task.any', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('cancel immediately with []', async () => {
@@ -2128,12 +2134,12 @@ describe('Task.any', () => {
 
     await advanceTime(200);
 
-    expect(promiseFunction1).toBeCalledTimes(0);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(1);
+    expect(promiseFunction1).toHaveBeenCalledTimes(0);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(1);
 
     const result = await task.resolve();
 
@@ -2153,12 +2159,12 @@ describe('Task.any', () => {
 
     await flushPromises();
 
-    expect(promiseFunction1).toBeCalledTimes(0);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(0);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(promiseFunction1).toHaveBeenCalledTimes(0);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(0);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2176,12 +2182,12 @@ describe('Task.any', () => {
 
     await advanceTime(400);
 
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(1);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(1);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2203,12 +2209,12 @@ describe('Task.any', () => {
 
     await advanceTime(600);
 
-    expect(promiseFunction1).toBeCalledTimes(1);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(1);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(1);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(promiseFunction1).toHaveBeenCalledTimes(1);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(1);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(1);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2228,12 +2234,12 @@ describe('Task.any', () => {
 
     await flushPromises();
 
-    expect(promiseFunction1).toBeCalledTimes(0);
-    expect(promiseFunction1).toReturnTimes(0);
-    expect(promiseFunction2).toBeCalledTimes(0);
-    expect(promiseFunction2).toReturnTimes(0);
-    expect(promiseFunction3).toBeCalledTimes(0);
-    expect(promiseFunction3).toReturnTimes(0);
+    expect(promiseFunction1).toHaveBeenCalledTimes(0);
+    expect(promiseFunction1).toHaveReturnedTimes(0);
+    expect(promiseFunction2).toHaveBeenCalledTimes(0);
+    expect(promiseFunction2).toHaveReturnedTimes(0);
+    expect(promiseFunction3).toHaveBeenCalledTimes(0);
+    expect(promiseFunction3).toHaveReturnedTimes(0);
 
     const result = await task.resolve();
 
@@ -2242,7 +2248,7 @@ describe('Task.any', () => {
 });
 
 describe('self manipulation scenarios', () => {
-  beforeEach(() => jest.useFakeTimers('legacy'));
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
   afterEach(() => jest.useRealTimers());
 
   const flushPromises = async () => {
@@ -2254,7 +2260,7 @@ describe('self manipulation scenarios', () => {
 
     jest.advanceTimersByTime(by);
 
-    await flushPromises();
+    return flushPromises();
   };
 
   it('cancels self in chain in 100ms', async () => {
@@ -2279,21 +2285,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -2320,21 +2326,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -2359,21 +2365,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -2400,21 +2406,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -2441,21 +2447,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -2480,21 +2486,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -2521,21 +2527,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(1);
-    expect(rejected).toBeCalledTimes(0);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.nothing());
   });
@@ -2562,21 +2568,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
@@ -2609,21 +2615,21 @@ describe('self manipulation scenarios', () => {
 
     await advanceTime(99);
 
-    expect(inspect).not.toBeCalled();
+    expect(inspect).toHaveBeenCalledTimes(0);
 
-    expect(canceled).not.toBeCalled();
-    expect(rejected).not.toBeCalled();
-    expect(resolved).not.toBeCalled();
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     await advanceTime(1);
 
     const result = await task.resolve();
 
-    expect(inspect).toBeCalledWith('data');
+    expect(inspect).toHaveBeenCalledWith('data');
 
-    expect(canceled).toBeCalledTimes(0);
-    expect(rejected).toBeCalledTimes(1);
-    expect(resolved).toBeCalledTimes(0);
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });

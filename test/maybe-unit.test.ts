@@ -26,8 +26,8 @@ describe('Maybe.just("data")', () => {
 
     const tapped = subject.tap(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -36,7 +36,7 @@ describe('Maybe.just("data")', () => {
 
     const tapped = subject.orTap(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -49,9 +49,9 @@ describe('Maybe.just("data")', () => {
       nothing: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(1);
-    expect(callback1).toBeCalledWith('data');
-    expect(callback2).toBeCalledTimes(0);
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -60,8 +60,8 @@ describe('Maybe.just("data")', () => {
 
     const mapped = subject.map(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(mapped).toStrictEqual(Maybe.just(4));
   });
 
@@ -70,7 +70,7 @@ describe('Maybe.just("data")', () => {
 
     const mapped = subject.orMap(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -83,9 +83,9 @@ describe('Maybe.just("data")', () => {
       nothing: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(1);
-    expect(callback1).toBeCalledWith('data');
-    expect(callback2).toBeCalledTimes(0);
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(Maybe.just(4));
   });
 
@@ -94,8 +94,8 @@ describe('Maybe.just("data")', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(chained).toStrictEqual(Maybe.just(4));
   });
 
@@ -104,8 +104,8 @@ describe('Maybe.just("data")', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith('data');
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith('data');
     expect(chained).toStrictEqual(Maybe.nothing());
   });
 
@@ -114,7 +114,7 @@ describe('Maybe.just("data")', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -123,7 +123,7 @@ describe('Maybe.just("data")', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -136,9 +136,9 @@ describe('Maybe.just("data")', () => {
       nothing: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(1);
-    expect(callback1).toBeCalledWith('data');
-    expect(callback2).toBeCalledTimes(0);
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
     expect(chained).toStrictEqual(Maybe.just(4));
   });
 });
@@ -163,7 +163,7 @@ describe('Maybe.nothing()', () => {
 
     const tapped = subject.tap(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -172,8 +172,8 @@ describe('Maybe.nothing()', () => {
 
     const tapped = subject.orTap(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith();
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith();
     expect(tapped).toStrictEqual(subject);
   });
 
@@ -186,9 +186,9 @@ describe('Maybe.nothing()', () => {
       nothing: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(0);
-    expect(callback2).toBeCalledTimes(1);
-    expect(callback2).toBeCalledWith();
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith();
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -197,7 +197,7 @@ describe('Maybe.nothing()', () => {
 
     const mapped = subject.map(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(mapped).toStrictEqual(subject);
   });
 
@@ -206,8 +206,8 @@ describe('Maybe.nothing()', () => {
 
     const mapped = subject.orMap(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith();
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith();
     expect(mapped).toStrictEqual(Maybe.just(false));
   });
 
@@ -220,9 +220,9 @@ describe('Maybe.nothing()', () => {
       nothing: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(0);
-    expect(callback2).toBeCalledTimes(1);
-    expect(callback2).toBeCalledWith();
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith();
     expect(mapped).toStrictEqual(Maybe.just(false));
   });
 
@@ -231,7 +231,7 @@ describe('Maybe.nothing()', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(chained).toStrictEqual(subject);
   });
 
@@ -240,7 +240,7 @@ describe('Maybe.nothing()', () => {
 
     const chained = subject.chain(callback);
 
-    expect(callback).not.toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(0);
     expect(chained).toStrictEqual(subject);
   });
 
@@ -249,8 +249,8 @@ describe('Maybe.nothing()', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith();
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith();
     expect(mapped).toStrictEqual(Maybe.just(false));
   });
 
@@ -259,8 +259,8 @@ describe('Maybe.nothing()', () => {
 
     const mapped = subject.orChain(callback);
 
-    expect(callback).toBeCalledTimes(1);
-    expect(callback).toBeCalledWith();
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(callback).toHaveBeenCalledWith();
     expect(mapped).toStrictEqual(Maybe.nothing());
   });
 
@@ -273,9 +273,9 @@ describe('Maybe.nothing()', () => {
       nothing: callback2,
     });
 
-    expect(callback1).toBeCalledTimes(0);
-    expect(callback2).toBeCalledTimes(1);
-    expect(callback2).toBeCalledWith();
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith();
     expect(chained).toStrictEqual(Maybe.just(false));
   });
 });
