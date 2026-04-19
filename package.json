@@ -1,6 +1,6 @@
 {
   "name": "t-tasks",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "source": "src/index.ts",
   "main": "dist/t-tasks.js",
@@ -14,7 +14,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "microbundle",
+    "build": "microbundle --tsconfig tsconfig.build.json",
     "start": "microbundle watch",
     "lint": "eslint src --ext js,ts",
     "test": "jest",
