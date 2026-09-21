@@ -760,10 +760,10 @@ function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => C
   return chainTaskMaybe<R, R2>(_task, (maybe) => {
     return op(maybe).match<Task<R2>>({
       just: (either) =>
-        either.matchMap<Task<R2>>({
+        either.match<Task<R2>>({
           right: Task.resolved,
           left: Task.rejected,
-        }).right,
+        }),
       nothing: Task.canceled,
     });
   });
@@ -854,10 +854,10 @@ class TaskClass<R> implements Task<R> {
     return mapTaskMaybe(this, (maybe) => {
       return Maybe.just(maybe.match<Right<R2 | R3 | R4, any>>({
         just: (either) => {
-          return either.matchMap({
+          return Either.right(either.match({
             right: op.resolved,
             left: op.rejected,
-          });
+          }));
         },
         nothing: () => Either.right(op.canceled()),
       }));
@@ -868,10 +868,10 @@ class TaskClass<R> implements Task<R> {
     return chainTaskMaybe(this, (maybe) => {
       return maybe.match<Task<R2 | R3 | R4>>({
         just: (either) => {
-          return either.matchMap<Task<R2 | R3>>({
+          return either.match<Task<R2 | R3>>({
             right: op.resolved,
             left: op.rejected,
-          }).right;
+          });
         },
         nothing: op.canceled,
       });

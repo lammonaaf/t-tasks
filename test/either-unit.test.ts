@@ -74,11 +74,11 @@ describe('Either.right("data")', () => {
     expect(mapped).toStrictEqual(subject);
   });
 
-  it('match maps to Either.right(4)', () => {
+  it('matches to 4', () => {
     const callback1 = jest.fn((data: string) => data.length);
     const callback2 = jest.fn(() => 'none');
 
-    const mapped = subject.matchMap({
+    const matched = subject.match({
       right: callback1,
       left: callback2,
     });
@@ -86,7 +86,7 @@ describe('Either.right("data")', () => {
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback1).toHaveBeenCalledWith('data');
     expect(callback2).toHaveBeenCalledTimes(0);
-    expect(mapped).toStrictEqual(Either.right(4));
+    expect(matched).toStrictEqual(4);
   });
 
   it('chains to Either.right(4)', () => {
@@ -215,11 +215,11 @@ describe('Either.left(false)', () => {
     expect(mapped).toStrictEqual(Either.right(3));
   });
 
-  it('match maps to Either.right("none")', () => {
+  it('matches to false', () => {
     const callback1 = jest.fn((data: string) => data.length);
     const callback2 = jest.fn(() => false);
 
-    const mapped = subject.matchMap({
+    const matched = subject.match({
       right: callback1,
       left: callback2,
     });
@@ -227,7 +227,7 @@ describe('Either.left(false)', () => {
     expect(callback1).toHaveBeenCalledTimes(0);
     expect(callback2).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledWith(false);
-    expect(mapped).toStrictEqual(Either.right(false));
+    expect(matched).toStrictEqual(false);
   });
 
   it('chains to self', () => {
@@ -321,6 +321,20 @@ describe('Either.fromNullable', () => {
     const value = Either.fromNullable(undefined, 'some-error');
 
     expect(value).toStrictEqual(Either.left('some-error'));
+  });
+});
+
+describe('fromEither()', () => {
+  it('extracts "data" from right', () => {
+    const value = Either.fromEither(Either.right('data'), 'none');
+
+    expect(value).toStrictEqual('data');
+  });
+
+  it('returns fallback from left', () => {
+    const value = Either.fromEither(Either.left(false), 'none');
+
+    expect(value).toStrictEqual('none');
   });
 });
 
