@@ -758,14 +758,14 @@ function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) =
 
 function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
   return chainTaskMaybe<R, R2>(_task, (maybe) => {
-    return op(maybe).matchMap<Task<R2>>({
+    return op(maybe).match<Task<R2>>({
       just: (either) =>
         either.matchMap<Task<R2>>({
           right: Task.resolved,
           left: Task.rejected,
         }).right,
       nothing: Task.canceled,
-    }).just;
+    });
   });
 }
 
@@ -852,7 +852,7 @@ class TaskClass<R> implements Task<R> {
 
   matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }) {
     return mapTaskMaybe(this, (maybe) => {
-      return maybe.matchMap<Right<R2 | R3 | R4, any>>({
+      return Maybe.just(maybe.match<Right<R2 | R3 | R4, any>>({
         just: (either) => {
           return either.matchMap({
             right: op.resolved,
@@ -860,13 +860,13 @@ class TaskClass<R> implements Task<R> {
           });
         },
         nothing: () => Either.right(op.canceled()),
-      });
+      }));
     });
   }
 
   matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }) {
     return chainTaskMaybe(this, (maybe) => {
-      return maybe.matchMap<Task<R2 | R3 | R4>>({
+      return maybe.match<Task<R2 | R3 | R4>>({
         just: (either) => {
           return either.matchMap<Task<R2 | R3>>({
             right: op.resolved,
@@ -874,7 +874,7 @@ class TaskClass<R> implements Task<R> {
           }).right;
         },
         nothing: op.canceled,
-      }).just;
+      });
     });
   }
 }

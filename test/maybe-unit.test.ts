@@ -74,11 +74,11 @@ describe('Maybe.just("data")', () => {
     expect(mapped).toStrictEqual(subject);
   });
 
-  it('match maps to Maybe.just(4)', () => {
+  it('matches to 4', () => {
     const callback1 = jest.fn((data: string) => data.length);
     const callback2 = jest.fn(() => false);
 
-    const mapped = subject.matchMap({
+    const matched = subject.match({
       just: callback1,
       nothing: callback2,
     });
@@ -86,7 +86,7 @@ describe('Maybe.just("data")', () => {
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback1).toHaveBeenCalledWith('data');
     expect(callback2).toHaveBeenCalledTimes(0);
-    expect(mapped).toStrictEqual(Maybe.just(4));
+    expect(matched).toStrictEqual(4);
   });
 
   it('chains to Maybe.just(4)', () => {
@@ -211,11 +211,11 @@ describe('Maybe.nothing()', () => {
     expect(mapped).toStrictEqual(Maybe.just(false));
   });
 
-  it('match maps to Maybe.just("none")', () => {
+  it('matches to false', () => {
     const callback1 = jest.fn((data: string) => data.length);
     const callback2 = jest.fn(() => false);
 
-    const mapped = subject.matchMap({
+    const matched = subject.match({
       just: callback1,
       nothing: callback2,
     });
@@ -223,7 +223,7 @@ describe('Maybe.nothing()', () => {
     expect(callback1).toHaveBeenCalledTimes(0);
     expect(callback2).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledWith();
-    expect(mapped).toStrictEqual(Maybe.just(false));
+    expect(matched).toStrictEqual(false);
   });
 
   it('chains to self', () => {
@@ -317,6 +317,20 @@ describe('fromNullable()', () => {
     const value = Maybe.fromNullable(null);
 
     expect(value).toStrictEqual(Maybe.nothing());
+  });
+});
+
+describe('fromMaybe()', () => {
+  it('extracts "data" from just', () => {
+    const value = Maybe.fromMaybe(Maybe.just('data'), 'none');
+
+    expect(value).toStrictEqual('data');
+  });
+
+  it('returns fallback from nothing', () => {
+    const value = Maybe.fromMaybe(Maybe.nothing(), 'none');
+
+    expect(value).toStrictEqual('none');
   });
 });
 

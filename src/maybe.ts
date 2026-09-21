@@ -31,7 +31,7 @@ export interface Just<R> {
   orTap(op: () => void): this;
 
   /**
-   * Maybe patter matching peeker function
+   * Maybe pattern matching peeker function
    *
    * Applied to 'just value' returns self invoking op.just(value) in process
    * Applied to 'nothing' returns self invoking op.nothing() in process
@@ -72,21 +72,21 @@ export interface Just<R> {
   orMap<R2>(this: Maybe<R>, op: () => R2): Just<R | R2>;
 
   /**
-   * Maybe patter matching transformer function
+   * Maybe pattern matching extractor function
    *
-   * Applied to 'just value' returns 'just op.just(value)'
-   * Applied to 'nothing' returns 'just op.nothing()'
+   * Applied to 'just value' returns op.just(value)
+   * Applied to 'nothing' returns op.nothing()
    *
-   * @template R2 just transformer function's return type
-   * @template R3 nothing transformer function's return type
-   * @param op.just transformer to be invoked with underlying value in case of just
-   * @param op.nothing transformer to be invoked in case of nothing
-   * @returns 'just op.just(value)' or 'just op.nothing()'
+   * @template R2 just extractor function's return type
+   * @template R3 nothing extractor function's return type
+   * @param op.just extractor to be invoked with underlying value in case of just
+   * @param op.nothing extractor to be invoked in case of nothing
+   * @returns op.just(value) or op.nothing()
    */
   // Just cases
-  matchMap<R2, R3 = R2>(this: Just<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2>;
+  match<R2, R3 = R2>(this: Just<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2;
   // General case
-  matchMap<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2 | R3>;
+  match<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2 | R3;
 
   /**
    * Maybe composition function
@@ -110,7 +110,7 @@ export interface Just<R> {
   /**
    * Maybe fallback composition function
    *
-   * Applied to 'just value' returns self witjout invoking composition function
+   * Applied to 'just value' returns self without invoking composition function
    * Applied to 'nothing' returns op()
    *
    * @template R2 transformer function result's underlying type
@@ -127,7 +127,7 @@ export interface Just<R> {
   orChain<R2>(this: Maybe<R>, op: () => Maybe<R2>): Maybe<R | R2>;
 
   /**
-   * Maybe patter matching composition function
+   * Maybe pattern matching composition function
    *
    * Applied to 'just value' returns 'op.just(value)'
    * Applied to 'nothing' returns op.nothing()
@@ -180,7 +180,7 @@ export interface Just<R> {
    *
    * @example
    * ```typescript
-   * if (maybe.isNohing()) {
+   * if (maybe.isNothing()) {
    *   console.log('nothing');
    * }
    * ```
@@ -190,7 +190,7 @@ export interface Just<R> {
   /**
    * Wrap Maybe to singleton generator
    *
-   * Userful in order to avoid ambiguous yied types
+   * Useful in order to avoid ambiguous yield types
    *
    * @returns generator of Maybe wrapping this
    */
@@ -200,7 +200,7 @@ export interface Just<R> {
 /**
  * Absolutely Nothing
  *
- * Maybe data type specialiation representing an absence of any value
+ * Maybe data type specialization representing an absence of any value
  */
 export interface Nothing<R> {
   /**
@@ -226,7 +226,7 @@ export interface Nothing<R> {
   orTap(op: () => void): this;
 
   /**
-   * Maybe patter matching peeker function
+   * Maybe pattern matching peeker function
    *
    * Applied to 'just value' returns self invoking op.just(value) in process
    * Applied to 'nothing' returns self invoking op.nothing() in process
@@ -267,21 +267,21 @@ export interface Nothing<R> {
   orMap<R2>(this: Maybe<R>, op: () => R2): Just<R | R2>;
 
   /**
-   * Maybe patter matching transformer function
+   * Maybe pattern matching extractor function
    *
-   * Applied to 'just value' returns 'just op.just(value)'
-   * Applied to 'nothing' returns 'just op.nothing()'
+   * Applied to 'just value' returns op.just(value)
+   * Applied to 'nothing' returns op.nothing()
    *
-   * @template R2 just transformer function's return type
-   * @template R3 nothing transformer function's return type
-   * @param op.just transformer to be invoked with underlying value in case of just
-   * @param op.nothing transformer to be invoked in case of nothing
-   * @returns 'just op.just(value)' or 'just op.nothing()'
+   * @template R2 just extractor function's return type
+   * @template R3 nothing extractor function's return type
+   * @param op.just extractor to be invoked with underlying value in case of just
+   * @param op.nothing extractor to be invoked in case of nothing
+   * @returns op.just(value) or op.nothing()
    */
   // Nothing cases
-  matchMap<R2, R3 = R2>(this: Nothing<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R3>;
-  // General cases
-  matchMap<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2 | R3>;
+  match<R2, R3 = R2>(this: Nothing<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R3;
+  // General case
+  match<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2 | R3;
 
   /**
    * Maybe composition function
@@ -305,7 +305,7 @@ export interface Nothing<R> {
   /**
    * Maybe fallback composition function
    *
-   * Applied to 'just value' returns self witjout invoking composition function
+   * Applied to 'just value' returns self without invoking composition function
    * Applied to 'nothing' returns op()
    *
    * @template R2 transformer function result's underlying type
@@ -322,7 +322,7 @@ export interface Nothing<R> {
   orChain<R2>(this: Maybe<R>, op: () => Maybe<R2>): Maybe<R | R2>;
 
   /**
-   * Maybe patter matching composition function
+   * Maybe pattern matching composition function
    *
    * Applied to 'just value' returns 'op.just(value)'
    * Applied to 'nothing' returns op.nothing()
@@ -375,7 +375,7 @@ export interface Nothing<R> {
    *
    * @example
    * ```typescript
-   * if (maybe.isNohing()) {
+   * if (maybe.isNothing()) {
    *   console.log('nothing');
    * }
    * ```
@@ -385,7 +385,7 @@ export interface Nothing<R> {
   /**
    * Wrap Maybe to singleton generator
    *
-   * Userful in order to avoid ambiguous yied types
+   * Useful in order to avoid ambiguous yield types
    *
    * @returns generator of Maybe wrapping this
    */
@@ -393,9 +393,9 @@ export interface Nothing<R> {
 }
 
 /**
- * Genric Maybe monad interface
+ * Generic Maybe monad interface
  *
- * As per classic Maybe monad implementation can eithr contain just a value or contain nothing
+ * As per classic Maybe monad implementation can either contain just a value or contain nothing
  * Used throughout the library to represent optional return type, specifically return type of cancelled tasks
  *
  * @template R underlying value
@@ -406,7 +406,7 @@ export namespace Just {
   /**
    * Standalone Just value extractor
    *
-   * Userful for passing as a function to collection transformers
+   * Useful for passing as a function to collection transformers
    *
    * @template R underlying value type
    * @param just Just instance
@@ -439,8 +439,8 @@ export namespace Maybe {
    *
    * @returns 'nothing'
    */
-  export function nothing(): Nothing<never> {
-    return staticNothing;
+  export function nothing<R = never>(): Nothing<R> {
+    return staticNothing as Nothing<R>;
   }
 
   /**
@@ -475,9 +475,28 @@ export namespace Maybe {
   }
 
   /**
+   * Standalone Maybe value extractor
+   *
+   * Applied to 'just value' returns underlying value without using fallback
+   * Applied to 'nothing' returns fallback
+   *
+   * @template R underlying value type
+   * @template R2 fallback value type
+   * @param maybe Maybe instance
+   * @param fallback value to be returned in case of 'nothing'
+   * @returns underlying value or fallback
+   */
+  export function fromMaybe<R>(maybe: Just<R>, fallback: unknown): R;
+  export function fromMaybe<R, R2>(maybe: Nothing<R>, fallback: R2): R2;
+  export function fromMaybe<R, R2>(maybe: Maybe<R>, fallback: R2): R | R2;
+  export function fromMaybe<R, R2>(maybe: Maybe<R>, fallback: R2) {
+    return maybe.match({ just: (value) => value, nothing: () => fallback });
+  }
+
+  /**
    * Standalone type guard for 'just'
    *
-   * Userful for passing as a predicate to collection transformers
+   * Useful for passing as a predicate to collection transformers
    *
    * @template R underlying value type
    * @param maybe Maybe instance
@@ -490,13 +509,13 @@ export namespace Maybe {
   /**
    * Standalone type guard for 'nothing'
    *
-   * Userful for passing as a predicate to collection transformers
+   * Useful for passing as a predicate to collection transformers
    *
    * @template R underlying value type
    * @param maybe Maybe instance
    * @returns 'true' in case wrapped value is 'nothing' (and resolves argument type to be 'nothing')
    */
-  export function isNothing<R>(maybe: Maybe<R>): maybe is Nothing<never> {
+  export function isNothing<R>(maybe: Maybe<R>): maybe is Nothing<R> {
     return maybe.isNothing();
   }
 
@@ -514,7 +533,7 @@ export namespace Maybe {
    * Standalone list predicate
    *
    * @param maybes a list of Maybe
-   * @returns true in case al east one list element is Just
+   * @returns true in case at least one list element is Just
    */
   export function someJust<R>(maybes: Maybe<R>[]): boolean {
     return maybes.some(Maybe.isJust);
@@ -544,29 +563,26 @@ export namespace Maybe {
    * Create compound Maybe from generator function
    *
    * Applying yield to a Maybe within the generator function unwraps the Maybe and returns underlying value in case of success
-   * However the convinient option for typescript is to use ```yield* maybe.generator()``` as othervise one may have to deal with union types
+   * However the convenient option for typescript is to use ```yield* maybe.generator()``` as otherwise one may have to deal with union types
    *
    * @template TT yielded Maybe type
    * @template R returned underlying type
    * @param maybeGeneratorFunction Maybe generator function
    * @returns Just wrapping the result of generator function or Nothing
-   * ```
    */
   export function generate<T, TT extends Maybe<T>, R>(maybeGeneratorFunction: MaybeGeneratorFunction<[], T, TT, R>): Maybe<R> {
     const generator = maybeGeneratorFunction();
+    let next = generator.next();
 
-    const sequentor = (next: IteratorResult<TT, R>): Maybe<R> => {
-      return next.done ? (
-        Maybe.just(next.value)
-      ) : (
-        next.value.matchChain<R>({
-          just: (value) => sequentor(generator.next(value)),
-          nothing: Maybe.nothing,
-        })
-      );
-    };
+    while (!next.done) {
+      if (next.value.isNothing()) {
+        return Maybe.nothing();
+      }
 
-    return Maybe.just(undefined).chain(() => sequentor(generator.next()));
+      next = generator.next(next.value.just);
+    }
+
+    return Maybe.just(next.value);
   }
 }
 
@@ -606,8 +622,8 @@ class JustClass<R> implements Just<R> {
   matchTap(op: { just: (value: R) => void }) {
     return this.tap(op.just);
   }
-  matchMap<R2>(op: { just: (value: R) => R2 }) {
-    return this.map(op.just);
+  match<R2>(op: { just: (value: R) => R2 }) {
+    return op.just(this.just);
   }
   matchChain<RR extends Maybe<unknown>>(op: { just: (value: R) => RR }) {
     return this.chain(op.just);
@@ -649,8 +665,8 @@ class NothingClass implements Nothing<never> {
   matchTap(op: { nothing: () => void }) {
     return this.orTap(op.nothing);
   }
-  matchMap<R2>(op: { nothing: () => R2 }) {
-    return this.orMap(op.nothing);
+  match<R2>(op: { nothing: () => R2 }) {
+    return op.nothing();
   }
   matchChain<RR extends Maybe<unknown>>(op: { nothing: () => RR }) {
     return this.orChain(op.nothing);
