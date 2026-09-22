@@ -275,6 +275,22 @@ describe('Task.fromCallback', () => {
     expect(callback).toHaveBeenCalledWith(Maybe.just(Either.right(undefined)));
   });
 
+  it('creates Task canceling in exactly 100ms', async () => {
+    const task = Task.fromCallback<NodeJS.Timeout, void>((_resolve, _reject, cancel) => setTimeout(cancel, 100), clearTimeout);
+
+    const callback = jest.fn();
+
+    task.resolve().then(callback);
+
+    await advanceTime(99);
+
+    expect(callback).toHaveBeenCalledTimes(0);
+
+    await advanceTime(1);
+
+    expect(callback).toHaveBeenCalledWith(Maybe.nothing());
+  });
+
   it('creates Task rejecting with some-error in exactly 100ms', async () => {
     const task = Task.fromCallback<NodeJS.Timeout, void>((_resolve, reject) => setTimeout(() => reject('some-error'), 100), clearTimeout);
 

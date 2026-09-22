@@ -253,7 +253,11 @@ export namespace Task {
    * @returns task resolving to specified value
    */
   export function resolved<R>(value: R) {
-    return Task.create<R>(Promise.resolve(Maybe.just(Either.right(value))), () => void undefined);
+    const cell = settleCell<Cancelable<R>>();
+
+    cell.resolve(Maybe.just(Either.right(value)));
+
+    return Task.create(cell.promise, (error) => cell.resolve(error.map(Either.left)));
   }
 
   /**
@@ -264,7 +268,11 @@ export namespace Task {
    * @returns task resolving to specified value
    */
   export function rejected<R>(error: any) {
-    return Task.create<R>(Promise.resolve(Maybe.just(Either.left(error))), () => void undefined);
+    const cell = settleCell<Cancelable<R>>();
+
+    cell.resolve(Maybe.just(Either.left(error)));
+
+    return Task.create(cell.promise, (error) => cell.resolve(error.map(Either.left)));
   }
 
   /**
@@ -274,7 +282,11 @@ export namespace Task {
    * @returns task resolving to specified value
    */
   export function canceled<R>() {
-    return Task.create<R>(Promise.resolve(Maybe.nothing()), () => void undefined);
+    const cell = settleCell<Cancelable<R>>();
+
+    cell.resolve(Maybe.nothing());
+
+    return Task.create(cell.promise, (error) => cell.resolve(error.map(Either.left)));
   }
 
   /**
@@ -294,19 +306,16 @@ export namespace Task {
    * ```
    */
   export function fromPromise<R>(promise: PromiseLike<R>): Task<R> {
-    const [resolve, setResolve] = resolver<Cancelable<R>>();
+    const cell = settleCell<Cancelable<R>>();
+    
+    promise
+      .then(Either.right, Either.left)
+      .then(Maybe.just)
+      .then(cell.resolve);
 
-    return Task.create(
-      new Promise<Cancelable<R>>((_resolve) => {
-        setResolve(_resolve);
-
-        promise
-          .then(Either.right, Either.left)
-          .then(Maybe.just)
-          .then(resolve);
-      }),
-      (error: Maybe<any>) => resolve(error.map(Either.left)),
-    );
+    return Task.create(cell.promise, (error: Maybe<any>) => {
+      return cell.resolve(error.map(Either.left));
+    });
   }
 
   /**
@@ -333,24 +342,19 @@ export namespace Task {
    * ```
    */
   export function fromFunction<R>(producer: () => R, cancelRef: { cancel: TaskCancel }): Task<R> {
-    const [resolve, setResolve] = resolver<Cancelable<R>>();
+    const cell = settleCell<Cancelable<R>>();
 
-    const cancel = (error: Maybe<any>) => resolve(error.map(Either.left));
+    const cancel = (error: Maybe<any>) => cell.resolve(error.map(Either.left));
 
     cancelRef.cancel = cancel;
 
-    return Task.create(
-      new Promise<Cancelable<R>>((_resolve) => {
-        setResolve(_resolve);
+    try {
+      cell.resolve(Maybe.just(Either.right(producer())));
+    } catch (e) {
+      cell.resolve(Maybe.just(Either.left(e)));
+    }
 
-        try {
-          resolve(Maybe.just(Either.right(producer())));
-        } catch (e) {
-          resolve(Maybe.just(Either.left(e)));
-        }
-      }),
-      cancel,
-    );
+    return Task.create(cell.promise, cancel);
   }
 
   /**
@@ -483,7 +487,7 @@ export namespace Task {
    * ```
    */
   export function timeout(delay: number) {
-    return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(() => resolve(), delay), clearTimeout);
+    return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(resolve, delay), clearTimeout);
   }
 
   /**
@@ -503,26 +507,19 @@ export namespace Task {
    * ```
    */
   export function fromCallback<H, R>(create: (resolve: (result: R) => void, reject: (error: any) => void, cancel: () => void) => H, onCancel: (handler: H) => void): Task<R> {
-    let handler: H;
+    const cell = settleCell<Cancelable<R>>();
 
-    const [resolve, setResolve] = resolver<Cancelable<R>>();
-
-    return Task.create(
-      new Promise<Cancelable<R>>((_resolve) => {
-        setResolve(_resolve);
-
-        handler = create(
-          (r) => resolve(Maybe.just(Either.right(r))),
-          (e) => resolve(Maybe.just(Either.left(e))),
-          () => resolve(Maybe.nothing())
-        );
-      }),
-      (error: Maybe<any>) => {
-        resolve(error.map(Either.left));
-
-        onCancel(handler);
-      },
+    const handler = create(
+      (r) => cell.resolve(Maybe.just(Either.right(r))),
+      (e) => cell.resolve(Maybe.just(Either.left(e))),
+      () => cell.resolve(Maybe.nothing()),
     );
+
+    return Task.create(cell.promise, (error: Maybe<any>) => {
+      const result = cell.resolve(error.map(Either.left));
+      onCancel(handler);
+      return result;
+    });
   }
 
   /**
@@ -553,11 +550,15 @@ export namespace Task {
    * @retuirns task resolving to the list of results
    */
   export function all<T>(tasks: Iterable<Task<T>>) {
-    const [resolve, setResolve] = resolver<Cancelable<T[]>>();
+    const cell = settleCell<Cancelable<T[]>>();
 
     const taskArray = Array.from(tasks);
 
-    const cancel = (error: Maybe<any>) => taskArray.forEach((task) => task._cancel(error));
+    if (taskArray.length < 1) {
+      return Task.resolved([]);
+    }
+
+    const cancel = (error: Maybe<any>) => taskArray.map((task) => task._cancel(error)).every((r) => r);
 
     const list = taskArray.map<Maybe<T>>(Maybe.nothing);
 
@@ -565,32 +566,23 @@ export namespace Task {
       list[i] = Maybe.just(value);
 
       if (Maybe.everyJust(list)) {
-        resolve(Maybe.just(Either.right(list.map(Just.just))));
+        cell.resolve(Maybe.just(Either.right(list.map(Just.just))));
       }
     };
     const rejected = (error: Maybe<any>) => {
-      resolve(error.map(Either.left));
+      cell.resolve(error.map(Either.left));
       cancel(error);
     };
 
-    return Task.create(
-      new Promise<Cancelable<T[]>>((_resolve) => {
-        setResolve(_resolve);
+    taskArray.map((task, i) => {
+      return task.matchTap({
+        resolved: (value) => resolved(value, i),
+        rejected: (error) => rejected(Maybe.just(error)),
+        canceled: () => rejected(Maybe.nothing()),
+      });
+    });
 
-        if (taskArray.length < 1) {
-          return resolve(Maybe.just(Either.right([])));
-        }
-
-        taskArray.map((task, i) => {
-          return task.matchTap({
-            resolved: (value) => resolved(value, i),
-            rejected: (error) => rejected(Maybe.just(error)),
-            canceled: () => rejected(Maybe.nothing()),
-          });
-        });
-      }),
-      cancel,
-    );
+    return Task.create(cell.promise, cancel);
   }
 
   /**
@@ -608,44 +600,40 @@ export namespace Task {
    * @retuirns task resolving to the result of first successfull task
    */
   export function any<T>(tasks: Iterable<Task<T>>) {
-    const [resolve, setResolve] = resolver<Cancelable<T>>();
+    const cell = settleCell<Cancelable<T>>();
 
     const taskArray = Array.from(tasks);
 
-    const cancel = (error: Maybe<any>) => taskArray.forEach((task) => task._cancel(error));
+    if (taskArray.length < 1) {
+      return Task.canceled();
+    }
+
+    const cancel = (error: Maybe<any>) => taskArray.map((task) => task._cancel(error)).every((r) => r);
 
     const list = taskArray.map<Maybe<any>>(Maybe.nothing);
 
     const resolved = (value: Maybe<T>) => {
-      resolve(value.map(Either.right));
+      cell.resolve(value.map(Either.right));
       cancel(Maybe.nothing());
     };
+
     const rejected = (error: any, i: number) => {
       list[i] = Maybe.just(error);
 
       if (Maybe.everyJust(list)) {
-        resolve(Maybe.just(Either.left(list.map(Just.just))));
+        cell.resolve(Maybe.just(Either.left(list.map(Just.just))));
       }
     };
 
-    return Task.create(
-      new Promise<Cancelable<T>>((_resolve) => {
-        setResolve(_resolve);
+    taskArray.map((task, i) => {
+      return task.matchTap({
+        resolved: (value) => resolved(Maybe.just(value)),
+        rejected: (error) => rejected(error, i),
+        canceled: () => resolved(Maybe.nothing()),
+      });
+    });
 
-        if (taskArray.length < 1) {
-          return resolve(Maybe.nothing());
-        }
-
-        taskArray.map((task, i) => {
-          return task.matchTap({
-            resolved: (value) => resolved(Maybe.just(value)),
-            rejected: (error) => rejected(error, i),
-            canceled: () => resolved(Maybe.nothing()),
-          });
-        });
-      }),
-      cancel,
-    );
+    return Task.create(cell.promise, cancel);
   }
 
   /**
@@ -682,7 +670,7 @@ export namespace Task {
 /// --------------------------------------------------------------------------------------
 
 type TaskInvoke<R> = Promise<Cancelable<R>>;
-type TaskCancel = (error: Maybe<any>) => void;
+type TaskCancel = (error: Maybe<any>) => boolean;
 
 /**
  * @hidden
@@ -698,58 +686,82 @@ interface TaskBase<R> {
   readonly _cancel: TaskCancel;
 }
 
-const resolver = <T>() => {
-  const stub: (t: T) => void = () => void undefined;
-
-  let globalResolve = stub;
-
-  const resolve = (value: T) => {
-    const r = globalResolve;
-
-    globalResolve = stub;
-
-    r(value);
-  };
-
-  const setResolve = (value: typeof resolve) => {
-    globalResolve = value;
-  };
-
-  return [resolve, setResolve] as [typeof resolve, typeof setResolve];
+/**
+ * One-shot settlement cell.
+ *
+ * The Promise is created internally, so there is no unarmed window: `resolve`
+ * before or after construction always owns the result (first writer wins).
+ * Later `resolve` calls are ignored. Reentrant `resolve` from the sink is ignored.
+ *
+ * `settled` is for skipping continuations; it does not cancel children by itself.
+ * After creating a child, if `settled` is already true, cancel that child with
+ * the stored value. Bind `_cancel` to the child only after that check.
+ */
+type SettleCell<T> = {
+  readonly promise: Promise<T>;
+  readonly resolve: (value: T) => boolean;
+  readonly settled: () => { value: T } | null;
 };
 
-function chainTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
-  const globalCancel = { cancel: _task._cancel };
+const settleCell = <T>(): SettleCell<T> => {
+  const stub: (t: T) => void = () => void undefined;
 
-  return Task.create(
-    _task._invoke.then(async (result) => {
-      // Tecnically it's not possible to throw here anymore as op is lifted into task now, but just in case
-      try {
-        const { _invoke: invoke2, _cancel: cancel2 } = Task.fromFunction(() => op(result), globalCancel);
+  let sink: (value: T) => void = stub;
+  let settled: { value: T } | null = null;
 
-        globalCancel.cancel = cancel2;
+  const promise = new Promise<T>((resolve) => {
+    sink = resolve;
+  });
 
-        const produced = await invoke2;
+  const resolve = (next: T) => {
+    if (settled) {
+      return false;
+    }
 
-        if (produced.isNothing()) {
-          return Maybe.nothing();
-        }
+    settled = { value: next };
 
-        if (produced.just.isLeft()) {
-          return Maybe.just(Either.left(produced.just.left));
-        }
+    const deliver = sink;
+    sink = stub;
+    deliver(next);
 
-        const { _invoke: invoke3, _cancel: cancel3 } = produced.just.right;
+    return true;
+  };
 
-        globalCancel.cancel = cancel3;
+  return {
+    promise,
+    resolve,
+    settled: () => settled,
+  };
+};
 
-        return invoke3;
-      } catch (e) {
-        return Maybe.just(Either.left(e));
-      }
-    }),
-    (error: Maybe<any>) => globalCancel.cancel(error),
-  );
+function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
+  const cell = settleCell<Cancelable<R2>>();
+
+  const globalCancel = { cancel: parent._cancel };
+
+  parent._invoke.then((result) => {
+    globalCancel.cancel = (e) => cell.resolve(e.map(Either.left))
+
+    let child: Task<R2> | null = null;
+    try {
+      child = op(result);
+    } catch (e) {
+      return cell.resolve(Maybe.just(Either.left(e)));
+    }
+
+    const settled = cell.settled();
+    if (settled) {
+      return child._cancel(settled.value.map(Either.left));
+    }
+
+    globalCancel.cancel = child._cancel;
+
+    return child._invoke.then(cell.resolve);
+  });
+
+  return Task.create(cell.promise, (error) => {
+    return globalCancel.cancel(error);
+  });
 }
 
 function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
