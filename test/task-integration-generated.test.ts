@@ -118,6 +118,52 @@ describe('generated scenarios', () => {
     expect(result).toStrictEqual(Maybe.nothing());
   });
 
+  it('cancel on first step in 50ms with finally', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+    const final = jest.fn();
+
+    const task = Task.generate(function*() {
+      try {
+        const data = yield* Task.promiseGenerator(delayedValuePromise('data', 100));
+
+        resolved(data);
+
+        const length = yield* Task.promiseGenerator(delayedValuePromise(data.length, 200));
+
+        resolved(length);
+
+        return length;
+      } finally {
+        final();
+      }
+    })
+      .tapCanceled(canceled)
+      .tapRejected(rejected);
+
+    await advanceTime(50);
+
+    task.cancel();
+
+    await flushPromises();
+
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    await advanceTime(250);
+
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+    expect(final).toHaveBeenCalledTimes(1);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
   it('cancel on second step in 150ms', async () => {
     const canceled = jest.fn();
     const rejected = jest.fn();
@@ -542,6 +588,67 @@ describe('generated scenarios', () => {
     expect(canceled).toHaveBeenCalledTimes(0);
     expect(rejected).toHaveBeenCalledTimes(1);
     expect(resolved).toHaveBeenCalledTimes(2);
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(3)));
+  });
+
+  it('fail internally on first step in 50ms with fallback with finally', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+    const final = jest.fn();
+
+    const task = Task.generate(function*() {
+      let data: string;
+      try {
+        data = yield* delayedValueTask('data', 50)
+          .tap(() => {
+            throw 'some-error';
+          })
+          .generator();
+      } catch (e) {
+        rejected(e);
+
+        data = 'cat';
+      } finally {
+        final()
+      }
+
+      resolved(data);
+
+      const length = yield* delayedValueTask(data.length, 200).generator();
+
+      resolved(length);
+
+      return length;
+    })
+      .tapCanceled(canceled)
+      .tapRejected(rejected);
+
+    await advanceTime(50);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith('cat');
+
+    await advanceTime(199);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).not.toHaveBeenCalledWith(3);
+
+    await advanceTime(1);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledWith(3);
+
+    const result = await task.resolve();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(2);
+    expect(final).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(3)));
   });

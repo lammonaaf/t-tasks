@@ -437,6 +437,13 @@ export namespace Task {
   export function generate<T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>): Task<R> {
     const generator = taskGeneratorFunction();
 
+    const cancel = (): Task<R> => {
+      generator.return(undefined as R);
+
+      return Task.canceled();
+    };
+
+
     const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
       return next.done ? (
         Task.resolved(next.value)
@@ -444,7 +451,7 @@ export namespace Task {
         next.value.matchChain<R>({
           resolved: (value) => sequentor(generator.next(value)),
           rejected: (error) => sequentor(generator.throw(error)),
-          canceled: Task.canceled,
+          canceled: cancel,
         })
       );
     };
