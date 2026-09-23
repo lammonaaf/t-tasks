@@ -307,15 +307,15 @@ export namespace Task {
    */
   export function fromPromise<R>(promise: PromiseLike<R>): Task<R> {
     const cell = settleCell<Cancelable<R>>();
+
+    const cancel: TaskCancel = (error: Maybe<any>) => cell.resolve(error.map(Either.left));
     
     promise
       .then(Either.right, Either.left)
       .then(Maybe.just)
       .then(cell.resolve);
 
-    return Task.create(cell.promise, (error: Maybe<any>) => {
-      return cell.resolve(error.map(Either.left));
-    });
+    return Task.create(cell.promise, cancel);
   }
 
   /**
@@ -344,12 +344,106 @@ export namespace Task {
   export function fromFunction<R>(producer: () => R, cancelRef: { cancel: TaskCancel }): Task<R> {
     const cell = settleCell<Cancelable<R>>();
 
-    const cancel = (error: Maybe<any>) => cell.resolve(error.map(Either.left));
+    const cancel: TaskCancel = (error: Maybe<any>) => cell.resolve(error.map(Either.left));
 
     cancelRef.cancel = cancel;
 
     try {
       cell.resolve(Maybe.just(Either.right(producer())));
+    } catch (e) {
+      cell.resolve(Maybe.just(Either.left(e)));
+    }
+
+    return Task.create(cell.promise, cancel);
+  }
+
+  /**
+   * Generic callback task
+   *
+   * Usefull for creating custom tasks from success and error callbacks and cancelaton function. Synchronous callbacks are not supported, @see fromFuction
+   *
+   * @param create task body with success and error callbacks
+   * @param cancel cancelation function intended for stopping task execution
+   * @returns task resolving to success value
+   *
+   * @example
+   * ```typescript
+   * export function timeout(delay: number) {
+   *   return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(() => resolve(), delay), clearTimeout);
+   * }
+   * ```
+   */
+  export function fromCallback<H, R>(create: (resolve: (result: R) => void, reject: (error: any) => void, cancel: () => void) => H, onCancel: (handler: H) => void): Task<R> {
+    const cell = settleCell<Cancelable<R>>();
+
+    let handler: { value: H } | null = null;
+
+    const cancel: TaskCancel = (error: Maybe<any>) => {
+      const wasPending = cell.resolve(error.map(Either.left));
+      if (wasPending && handler) {
+        onCancel(handler.value);
+      }
+      return wasPending;
+    }
+
+    try {
+      const value = create(
+        (r) => cell.resolve(Maybe.just(Either.right(r))),
+        (e) => cell.resolve(Maybe.just(Either.left(e))),
+        () => cancel(Maybe.nothing()),
+      );
+
+      handler = { value };
+    } catch (e) {
+      cell.resolve(Maybe.just(Either.left(e)));
+    }
+
+    return Task.create(cell.promise, cancel);
+  }
+
+  /**
+   * Lift an async operation that accepts an AbortSignal into a Task.
+   *
+   * Creates an internal AbortController and passes its signal to `producer`.
+   * If the resulting task is canceled or rejected externally, `controller.abort()`
+   * is called automatically.
+   *
+   * @template R returned task resolve type
+   * @param producer factory function receiving an AbortSignal
+   * @returns task wrapping the operation
+   *
+   * @example
+   * ```typescript
+   * const fetchUser = (id: string) =>
+   *   Task.fromAbortSignal((signal) =>
+   *     fetch(`/api/users/${id}`, { signal }).then((res) => res.json())
+   *   );
+   * ```
+   */
+  export function fromAbortSignal<R>(
+    producer: (signal: AbortSignal) => PromiseLike<R>
+  ): Task<R> {
+    const cell = settleCell<Cancelable<R>>();
+    const controller = new AbortController();
+
+    const cancel: TaskCancel = (error: Maybe<any>) => {
+      const wasPending = cell.resolve(error.map(Either.left));
+      if (wasPending) {
+        controller.abort(error.match({ just: (err) => err, nothing: () => undefined }));
+      }
+      return wasPending;
+    };
+
+    try {
+      producer(controller.signal).then((value) => {
+        cell.resolve(Maybe.just(Either.right(value)));
+      }, (error) => {
+        if (controller.signal.aborted && (error?.name === 'AbortError' || (typeof DOMException !== 'undefined' && error instanceof DOMException && error.name === 'AbortError'))) {
+          cell.resolve(Maybe.nothing());
+        } else {
+          cell.resolve(Maybe.just(Either.left(error)));
+        }
+      });
     } catch (e) {
       cell.resolve(Maybe.just(Either.left(e)));
     }
@@ -435,28 +529,31 @@ export namespace Task {
    * ```
    */
   export function generate<T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>): Task<R> {
-    const generator = taskGeneratorFunction();
+    const safe = <Args extends any[], R>(f: (...args: Args) => Task<R>) => (...args: Args): Task<R> => {
+      try {
+        return f(...args);
+      } catch (e) {
+        return Task.rejected(e);
+      }
+    }
 
-    const cancel = (): Task<R> => {
-      generator.return(undefined as R);
+    return Task.resolved(undefined).chain(() => {
+      const generator = taskGeneratorFunction();
 
-      return Task.canceled();
-    };
+      const sequentor = (next: IteratorResult<TT, R>, override?: Task<R>): Task<R> => {
+        return next.done ? (
+          override ?? Task.resolved(next.value)
+        ) : (
+          next.value.matchChain<R>({
+            resolved: safe((value) => sequentor(generator.next(value), override)),
+            rejected: safe((error) => sequentor(generator.throw(error), override)),
+            canceled: safe(() => sequentor(generator.return(undefined as R), Task.canceled())),
+          })
+        );
+      };
 
-
-    const sequentor = (next: IteratorResult<TT, R>): Task<R> => {
-      return next.done ? (
-        Task.resolved(next.value)
-      ) : (
-        next.value.matchChain<R>({
-          resolved: (value) => sequentor(generator.next(value)),
-          rejected: (error) => sequentor(generator.throw(error)),
-          canceled: cancel,
-        })
-      );
-    };
-
-    return Task.resolved(undefined).chain(() => sequentor(generator.next()));
+      return sequentor(generator.next())
+    });
   }
 
   /**
@@ -495,38 +592,6 @@ export namespace Task {
    */
   export function timeout(delay: number) {
     return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(resolve, delay), clearTimeout);
-  }
-
-  /**
-   * Generic callback task
-   *
-   * Usefull for creating custom tasks from success and error callbacks and cancelaton function. Synchronous callbacks are not supported, @see fromFuction
-   *
-   * @param create task body with success and error callbacks
-   * @param cancel cancelation function intended for stopping task execution
-   * @returns task resolving to success value
-   *
-   * @example
-   * ```typescript
-   * export function timeout(delay: number) {
-   *   return fromCallback<NodeJS.Timeout, void>((resolve) => setTimeout(() => resolve(), delay), clearTimeout);
-   * }
-   * ```
-   */
-  export function fromCallback<H, R>(create: (resolve: (result: R) => void, reject: (error: any) => void, cancel: () => void) => H, onCancel: (handler: H) => void): Task<R> {
-    const cell = settleCell<Cancelable<R>>();
-
-    const handler = create(
-      (r) => cell.resolve(Maybe.just(Either.right(r))),
-      (e) => cell.resolve(Maybe.just(Either.left(e))),
-      () => cell.resolve(Maybe.nothing()),
-    );
-
-    return Task.create(cell.promise, (error: Maybe<any>) => {
-      const result = cell.resolve(error.map(Either.left));
-      onCancel(handler);
-      return result;
-    });
   }
 
   /**
@@ -758,7 +823,7 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
 
     const settled = cell.settled();
     if (settled) {
-      return child._cancel(settled.value.map(Either.left));
+      return child._cancel(settled.value);
     }
 
     globalCancel.cancel = child._cancel;
