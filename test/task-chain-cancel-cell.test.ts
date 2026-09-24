@@ -2,19 +2,32 @@ import { Maybe, Task } from '../';
 
 const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
 
-/**
- * chainTaskMaybe does not own settlement: cancel only forwards to a mutable
- * slot, and `await invoke2` yields before that slot points at the child.
- *
- * These cases should stay canceled (Nothing) with no continuation side effects.
- * They fail on the current implementation.
- */
 describe('chain cancel cell races', () => {
   it('repeated relaunch case', async () => {
     const op = jest.fn(() => Task.resolved('from-chain'));
 
     const task = delayedValueTask('parent', 100).chain(op);
 
+    task.cancel();
+
+    expect(await task.resolve()).toStrictEqual(Maybe.nothing());
+    expect(op).not.toHaveBeenCalled();
+  });
+
+  it('cancel after chaining off a settled parent skips the continuation', async () => {
+    const op = jest.fn(() => Task.resolved('from-chain'));
+
+    const task = Task.resolved('parent').chain(op);
+    task.cancel();
+
+    expect(await task.resolve()).toStrictEqual(Maybe.nothing());
+    expect(op).not.toHaveBeenCalled();
+  });
+
+  it('cancel after mapping a settled parent skips the mapper', async () => {
+    const op = jest.fn(() => 'from-map');
+
+    const task = Task.resolved('parent').map(op);
     task.cancel();
 
     expect(await task.resolve()).toStrictEqual(Maybe.nothing());

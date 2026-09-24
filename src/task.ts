@@ -394,6 +394,10 @@ export namespace Task {
       );
 
       handler = { value };
+
+      if (cell.settled()) {
+        onCancel(value);
+      }
     } catch (e) {
       cell.resolve(Maybe.just(Either.left(e)));
     }
@@ -541,18 +545,18 @@ export namespace Task {
       const generator = taskGeneratorFunction();
 
       const sequentor = (next: IteratorResult<TT, R>, override?: Task<R>): Task<R> => {
-        return next.done ? (
-          override ?? Task.resolved(next.value)
-        ) : (
-          next.value.matchChain<R>({
-            resolved: safe((value) => sequentor(generator.next(value), override)),
-            rejected: safe((error) => sequentor(generator.throw(error), override)),
-            canceled: safe(() => sequentor(generator.return(undefined as R), Task.canceled())),
-          })
-        );
+        if (next.done) {
+          return override ?? Task.resolved(next.value);
+        }
+
+        return next.value.matchChain<R>({
+          resolved: safe((value) => sequentor(generator.next(value), override)),
+          rejected: safe((error) => sequentor(generator.throw(error), override)),
+          canceled: safe(() => sequentor(generator.return(undefined as R), Task.canceled())),
+        });
       };
 
-      return sequentor(generator.next())
+      return safe(() => sequentor(generator.next()))();
     });
   }
 
@@ -809,30 +813,53 @@ const settleCell = <T>(): SettleCell<T> => {
 function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
   const cell = settleCell<Cancelable<R2>>();
 
-  const globalCancel = { cancel: parent._cancel };
+  let state:
+    | { phase: 'parent', error: Maybe<any> | null }
+    | { phase: 'transform', error: Maybe<any> | null }
+    | { phase: 'child', cancel: TaskCancel } = { phase: 'parent', error: null };
 
   parent._invoke.then((result) => {
-    globalCancel.cancel = (e) => cell.resolve(e.map(Either.left))
+    const effectiveResult = state.phase === 'parent' && state.error ? state.error.map(Either.left) : result;
+
+    state = { phase: 'transform', error: null }
 
     let child: Task<R2> | null = null;
     try {
-      child = op(result);
+      child = op(effectiveResult);
     } catch (e) {
       return cell.resolve(Maybe.just(Either.left(e)));
     }
 
-    const settled = cell.settled();
-    if (settled) {
-      return child._cancel(settled.value);
-    }
+    const transformError = state.phase === 'transform' ? state.error : null;
 
-    globalCancel.cancel = child._cancel;
+    state = { phase: 'child', cancel: child._cancel };
+
+    if (transformError) {
+      cell.resolve(transformError.map(Either.left))
+      child._cancel(transformError);
+    }
 
     return child._invoke.then(cell.resolve);
   });
 
   return Task.create(cell.promise, (error) => {
-    return globalCancel.cancel(error);
+    if (cell.settled()) {
+      return false;
+    }
+
+    if (state.phase === 'parent') {
+      const parentCanceled = parent._cancel(error);
+      if (parentCanceled) {
+        return true;
+      }
+      state.error = error;
+      return true;
+    } else if (state.phase === 'transform') {
+      state.error = error;
+      return true;
+    } else {
+      return state.cancel(error);
+    }
   });
 }
 
