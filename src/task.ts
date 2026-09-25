@@ -395,7 +395,8 @@ export namespace Task {
 
       handler = { value };
 
-      if (cell.settled()) {
+      const result = cell.settled();
+      if (result && !result.value.match({ just: (v) => v.isRight(), nothing: () => false })) {
         onCancel(value);
       }
     } catch (e) {
