@@ -349,6 +349,7 @@ describe('self manipulation scenarios', () => {
 
   it('self reject can not be caught', async () => {
     const canceled = jest.fn();
+    const inrejected = jest.fn();
     const rejected = jest.fn();
     const resolved = jest.fn();
 
@@ -364,7 +365,7 @@ describe('self manipulation scenarios', () => {
 
         return data.length;
       } catch (e) {
-        console.log(e);
+        inrejected(e);
 
         return 63;
       }

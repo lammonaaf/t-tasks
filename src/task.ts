@@ -627,39 +627,35 @@ export namespace Task {
    * @retuirns task resolving to the list of results
    */
   export function all<T>(tasks: Iterable<Task<T>>) {
-    const cell = settleCell<Cancelable<T[]>>();
-
     const taskArray = Array.from(tasks);
-
-    if (taskArray.length < 1) {
+    if (taskArray.length === 0) {
       return Task.resolved([]);
     }
 
-    const cancel = (error: Maybe<any>) => taskArray.map((task) => task._cancel(error)).every((r) => r);
+    return Task.fromCallback<Task<T>[], T[]>((resolve, reject, cancel) => {
+      const results: T[] = new Array(taskArray.length);
+      let remaining = taskArray.length;
 
-    const list = taskArray.map<Maybe<T>>(Maybe.nothing);
-
-    const resolved = (value: T, i: number) => {
-      list[i] = Maybe.just(value);
-
-      if (Maybe.everyJust(list)) {
-        cell.resolve(Maybe.just(Either.right(list.map(Just.just))));
-      }
-    };
-    const rejected = (error: Maybe<any>) => {
-      cell.resolve(error.map(Either.left));
-      cancel(error);
-    };
-
-    taskArray.map((task, i) => {
-      return task.matchTap({
-        resolved: (value) => resolved(value, i),
-        rejected: (error) => rejected(Maybe.just(error)),
-        canceled: () => rejected(Maybe.nothing()),
+      taskArray.forEach((task, i) => {
+        task.matchTap({
+          resolved: (value) => {
+            results[i] = value;
+            remaining--;
+            if (remaining === 0) resolve(results);
+          },
+          rejected: (error) => {
+            reject(error);
+            taskArray.forEach((t) => t.cancel());
+          },
+          canceled: () => {
+            cancel();
+            taskArray.forEach((t) => t.cancel());
+          },
+        });
       });
-    });
 
-    return Task.create(cell.promise, cancel);
+      return taskArray;
+    }, (subtasks) => subtasks.forEach((t) => t.cancel()));
   }
 
   /**
@@ -687,7 +683,7 @@ export namespace Task {
 
     const cancel = (error: Maybe<any>) => taskArray.map((task) => task._cancel(error)).every((r) => r);
 
-    const list = taskArray.map<Maybe<any>>(Maybe.nothing);
+    const list = taskArray.map<Maybe<any>>(() => Maybe.nothing());
 
     const resolved = (value: Maybe<T>) => {
       cell.resolve(value.map(Either.right));
@@ -698,7 +694,7 @@ export namespace Task {
       list[i] = Maybe.just(error);
 
       if (Maybe.everyJust(list)) {
-        cell.resolve(Maybe.just(Either.left(list.map(Just.just))));
+        cell.resolve(Maybe.just(Either.left(list.map((v) => Just.just(v)))));
       }
     };
 
@@ -849,8 +845,7 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
     }
 
     if (state.phase === 'parent') {
-      const parentCanceled = parent._cancel(error);
-      if (parentCanceled) {
+      if (parent._cancel(error)) {
         return true;
       }
       state.error = error;

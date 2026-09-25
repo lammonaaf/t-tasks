@@ -5,7 +5,7 @@ import { setImmediate } from 'timers';
 
 import 'regenerator-runtime/runtime';
 
-const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
+const delayedValueTask = <R>(value: R, delay: number) => Task.fromCallback<NodeJS.Timeout, R>((resolve) => setTimeout(() => resolve(value), delay), clearTimeout);
 
 describe('chained scenarios', () => {
   beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
@@ -200,6 +200,58 @@ describe('chained scenarios', () => {
     expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
+  });
+
+  it('cancel on first step in 50ms with extra fallback', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const task = delayedValueTask('data', 100)
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved)
+      .matchChain({
+        resolved: (v) => delayedValueTask(v.length, 200),
+        rejected: (e) => Task.rejected<number>(e),
+        canceled: () => delayedValueTask(5, 200),
+      })
+      .tapCanceled(canceled)
+      .tapRejected(rejected)
+      .tap(resolved)
+      .chain((v) => delayedValueTask(v * 2, 100));
+
+    await advanceTime(50);
+
+    task.cancel();
+
+    await flushPromises();
+
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    await advanceTime(199);
+
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).not.toHaveBeenCalledWith(5);
+
+    await advanceTime(1);
+
+    expect(canceled).toHaveBeenCalled();
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(5);
+
+    await advanceTime(100);
+
+    const result = await task.resolve();
+
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(10)));
   });
 
   it('fail externally on first step in 50ms', async () => {

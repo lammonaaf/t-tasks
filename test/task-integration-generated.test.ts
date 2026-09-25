@@ -5,7 +5,7 @@ import { setImmediate } from 'timers';
 
 import 'regenerator-runtime/runtime';
 
-const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
+const delayedValueTask = <R>(value: R, delay: number) => Task.fromCallback<NodeJS.Timeout, R>((resolve) => setTimeout(() => resolve(value), delay), clearTimeout);
 const delayedValuePromise = async <R>(value: R, delay: number) => {
   return new Promise((resolve) => setTimeout(resolve, delay)).then(() => value);
 };
@@ -159,6 +159,59 @@ describe('generated scenarios', () => {
     expect(canceled).toHaveBeenCalledTimes(1);
     expect(rejected).toHaveBeenCalledTimes(0);
     expect(resolved).toHaveBeenCalledTimes(0);
+    expect(final).toHaveBeenCalledTimes(1);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('cancel on first step in 50ms with async finally', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+    const prefinal = jest.fn();
+    const final = jest.fn();
+
+    const task = Task.generate(function*() {
+      try {
+        const data = yield* delayedValueTask('data', 100).generator();
+        resolved(data);
+        const length = yield* delayedValueTask(data.length, 200).generator();
+        resolved(length);
+        return length;
+      } finally {
+        const data = yield* delayedValueTask('helloa', 100).generator();
+        prefinal(data);
+        const length = yield* delayedValueTask(data.length, 150).generator();
+        prefinal(length);
+
+        final();
+      }
+    })
+      .tapCanceled(canceled)
+      .tapRejected(rejected);
+
+    await advanceTime(50);
+
+    task.cancel();
+
+    await flushPromises();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+    expect(prefinal).toHaveBeenCalledTimes(0);
+    expect(final).toHaveBeenCalledTimes(0);
+
+    await advanceTime(100);
+
+    await advanceTime(150);
+
+    const result = await task.resolve();
+
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+    expect(prefinal).toHaveBeenCalledTimes(2);
     expect(final).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.nothing());
