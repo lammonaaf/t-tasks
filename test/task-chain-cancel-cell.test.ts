@@ -1,6 +1,8 @@
 import { Maybe, Task } from '../';
 
-const delayedValueTask = <R>(value: R, delay: number) => Task.timeout(delay).map(() => value);
+import { setImmediate } from 'timers';
+
+const delayedValueTask = <R>(value: R, delay: number) => Task.fromCallback<NodeJS.Timeout, R>((resolve) => setTimeout(() => resolve(value), delay), clearTimeout);
 
 describe('chain cancel cell races', () => {
   it('repeated relaunch case', async () => {
@@ -17,7 +19,7 @@ describe('chain cancel cell races', () => {
   it('cancel after chaining off a settled parent skips the continuation', async () => {
     const op = jest.fn(() => Task.resolved('from-chain'));
 
-    const task = Task.resolved('parent').chain(op);
+    const task = Task.fromPromise(Promise.resolve('parent')).chain(op);
     task.cancel();
 
     expect(await task.resolve()).toStrictEqual(Maybe.nothing());
@@ -27,8 +29,22 @@ describe('chain cancel cell races', () => {
   it('cancel after mapping a settled parent skips the mapper', async () => {
     const op = jest.fn(() => 'from-map');
 
-    const task = Task.resolved('parent').map(op);
+    const task = Task.fromPromise(Promise.resolve('parent')).map(op);
     task.cancel();
+
+    expect(await task.resolve()).toStrictEqual(Maybe.nothing());
+    expect(op).not.toHaveBeenCalled();
+  });
+
+  it('cancel after mapping a settled parent skips the mapper', async () => {
+    const op = jest.fn(() => 'from-map');
+    const cancel = jest.fn();
+
+    const cancelRef = { cancel: () => cancel() }
+
+    const task = Task.fromPromise(Promise.resolve('parent').then(() => cancelRef.cancel())).map(op);
+
+    cancelRef.cancel = () => task.cancel();
 
     expect(await task.resolve()).toStrictEqual(Maybe.nothing());
     expect(op).not.toHaveBeenCalled();
@@ -46,15 +62,15 @@ describe('chain cancel cell races', () => {
       ).tap(childFinished),
     );
 
-    const task = Task.resolved('parent').chain(op);
+    const task = Task.fromPromise(Promise.resolve('parent')).chain(op);
 
-    await Promise.resolve();
+    await new Promise((resolve) => setImmediate(resolve));
 
     expect(op).toHaveBeenCalledTimes(1);
 
     task.cancel();
 
-    await Promise.resolve();
+    await new Promise((resolve) => setImmediate(resolve));
 
     finishChild('from-child');
 

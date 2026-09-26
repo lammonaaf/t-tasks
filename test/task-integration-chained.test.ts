@@ -106,7 +106,7 @@ describe('chained scenarios', () => {
     expect(result).toStrictEqual(Maybe.nothing());
   });
 
-  it('cancel on second step in 150ms', async () => {
+  it('cancel on second step in 150ms c', async () => {
     const canceled = jest.fn();
     const rejected = jest.fn();
     const resolved = jest.fn();

@@ -705,4 +705,38 @@ describe('generated scenarios', () => {
 
     expect(result).toStrictEqual(Maybe.just(Either.right(3)));
   });
+
+  it('Cancellation Leak', async () => {
+    const canceled = jest.fn();
+    const rejected = jest.fn();
+    const resolved = jest.fn();
+
+    const childTask = () => Task.fromCallback(
+      (resolve) => {
+        const timer = setTimeout(() => {
+          resolved();
+          resolve('Finished');
+        }, 500);
+        return timer;
+      },
+      (timer) => {
+        clearTimeout(timer);
+        canceled()
+      }
+    );
+
+    const outerTask = Task.generate(function* () {
+      return yield* childTask().generator();
+    });
+
+    outerTask.cancel();
+
+    const result = await outerTask.resolve()
+
+    expect(canceled).toHaveBeenCalledTimes(1);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
 });
