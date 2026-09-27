@@ -89,6 +89,21 @@ describe('Either.right("data")', () => {
     expect(matched).toStrictEqual(4);
   });
 
+  it('matches to Right(4)', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => 'none');
+
+    const matched = subject.matchMap({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
+    expect(matched).toStrictEqual(Either.right(4));
+  });
+
   it('chains to Either.right(4)', () => {
     const callback = jest.fn((data: string) => Either.right(data.length));
 
@@ -228,6 +243,21 @@ describe('Either.left(false)', () => {
     expect(callback2).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledWith(false);
     expect(matched).toStrictEqual(false);
+  });
+
+  it('matches to Right(false)', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => false);
+
+    const matched = subject.matchMap({
+      right: callback1,
+      left: callback2,
+    });
+
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith(false);
+    expect(matched).toStrictEqual(Either.right(false));
   });
 
   it('chains to self', () => {

@@ -566,11 +566,15 @@ describe('chained scenarios', () => {
     expect(rejected).toHaveBeenCalledWith('some-error');
     expect(resolved).not.toHaveBeenCalledWith(5);
 
+    expect(task.resolved()).toStrictEqual(null);
+
     await advanceTime(1);
 
     expect(canceled).toHaveBeenCalledTimes(0);
     expect(rejected).toHaveBeenCalledWith('some-error');
     expect(resolved).toHaveBeenCalledWith(5);
+
+    expect(task.resolved()).toStrictEqual(Maybe.just(Either.right(5)));
 
     const result = await task.resolve();
 
@@ -579,5 +583,94 @@ describe('chained scenarios', () => {
     expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
+  });
+
+  beforeEach(() => {
+    // Ensure clean state before each test if GC is exposed
+    if (global.gc) {
+      global.gc();
+    }
+  });
+
+  it('memory bloat', async () => {
+    if (!global.gc) {
+      console.warn('Memory test skipped: run Jest with "node --expose-gc"');
+      return;
+    }
+
+    global.gc();
+    const baselineHeap = process.memoryUsage().heapUsed;
+
+    const measure = (tag: string) => {
+      global.gc?.();
+      const finalHeap = process.memoryUsage().heapUsed;
+
+      // 5. Calculate retained memory growth in MB
+      const retainedBytes = finalHeap - baselineHeap;
+      const retainedMB = retainedBytes / (1024 * 1024);
+
+      console.log(tag, 'retainedMB', retainedMB);
+    }
+
+    // const taskChain = (length: number, start: number) => (
+    //   new Array(length).fill(1).reduce<Task<number>>((p, c) => p.chain((pp) => Task.fromPromise(Promise.resolve(pp + c))), Task.fromPromise(Promise.resolve(start)))
+    // );
+
+    // const task = taskChain(100000, 0)
+    //   .chain((value) => delayedValueTask(value, 100).chain((value) => taskChain(100000, value)))
+    //   .chain((value) => delayedValueTask(value, 100).chain((value) => taskChain(100000, value)));
+
+    const task = Task.generate(function* () {
+      let sum = 0;
+
+      for (let i = 0; i < 100000; ++i) {
+        yield* Task.fromPromise(Promise.resolve()).generator();
+        sum += 1;
+      }
+
+      yield* Task.timeout(100).generator();
+
+      for (let i = 0; i < 100000; ++i) {
+        yield* Task.fromPromise(Promise.resolve()).generator();
+        sum += 1;
+      }
+
+      yield* Task.timeout(100).generator();
+
+      for (let i = 0; i < 100000; ++i) {
+        yield* Task.fromPromise(Promise.resolve()).generator();
+        sum += 1;
+      }
+
+      return sum;
+    });
+
+    measure('fresh');
+
+    await flushPromises();
+
+    measure('after flush');
+
+    await advanceTime(98);
+
+    measure('after advance');
+
+    await advanceTime(2);
+
+    measure('after step');
+
+    await advanceTime(98);
+
+    measure('after advance');
+
+    await advanceTime(2);
+
+    measure('after step');
+
+    const result = await task.resolve();
+
+    measure('after resolve');
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(300000)));
   });
 });

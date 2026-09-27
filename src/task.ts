@@ -178,6 +178,8 @@ export interface Task<R> extends TaskBase<R> {
    */
   matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4>;
 
+  resolved: () => Cancelable<R> | null;
+
   /**
    * Return underlying promise in order to await result
    *
@@ -522,30 +524,49 @@ export namespace Task {
    * ```
    */
   export function generate<T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<[], T, TT, R>): Task<R> {
-    const safe = <Args extends any[], R>(f: (...args: Args) => Task<R>) => (...args: Args): Task<R> => {
+    const generator: TaskGenerator<T, TT, R> = taskGeneratorFunction();
+    const cell = settleCell<Cancelable<R>>();
+
+    let current: { task: Task<T>; error: Maybe<any> | null } | null = null;
+
+    const sequentor = (invoke: () => IteratorResult<TT, R>, override?: Cancelable<R>) => {
       try {
-        return f(...args);
-      } catch (e) {
-        return Task.rejected(e);
-      }
-    }
+        const next = invoke();
 
-    return Task.resolved(undefined).chain(() => {
-      const generator = taskGeneratorFunction();
-
-      const sequentor = (next: IteratorResult<TT, R>, override?: Task<R>): Task<R> => {
         if (next.done) {
-          return override ?? Task.resolved(next.value);
+          cell.resolve(override ?? current?.error?.map(Either.left) ?? Maybe.just(Either.right(next.value)));
+          current = null;
+          return;
         }
 
-        return next.value.matchChain<R>({
-          resolved: safe((value) => sequentor(generator.next(value), override)),
-          rejected: safe((error) => sequentor(generator.throw(error), override)),
-          canceled: safe(() => sequentor(generator.return(undefined as R), Task.canceled())),
-        });
-      };
+        current = {
+          task: next.value,
+          error: null,
+        };
 
-      return safe(() => sequentor(generator.next()))();
+        next.value._invoke((maybe) => maybe.matchTap({
+          just: (either) => either.matchTap({
+            right: (value) => sequentor(() => generator.next(value), override),
+            left: (error) => sequentor(() => generator.throw(error), override),
+          }),
+          nothing: () => sequentor(() => generator.return(undefined as R), Maybe.nothing()),
+        }))
+      } catch (error) {
+        cell.resolve(override ?? Maybe.just(Either.left(error)));
+        current = null;
+      }
+    };
+
+    sequentor(() => generator.next());
+
+    return Task.create(cell.promise, (error) => {
+      if (cell.settled() || !current) {
+        return false;
+      }
+
+      current.error = error;
+
+      return current.task._cancel(error);
     });
   }
 
@@ -793,7 +814,8 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
   let state:
     | { phase: 'parent' }
     | { phase: 'transform', error: Maybe<any> | null }
-    | { phase: 'child', cancel: TaskCancel } = { phase: 'parent' };
+    | { phase: 'child', cancel: TaskCancel }
+    | { phase: 'closed' } = { phase: 'parent' };
 
   parent._invoke((result) => {
     state = { phase: 'transform', error: null }
@@ -802,7 +824,9 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
     try {
       child = op(result);
     } catch (e) {
-      return cell.resolve(Maybe.just(Either.left(e)));
+      cell.resolve(Maybe.just(Either.left(e)));
+      state = { phase: 'closed' };
+      return;
     }
 
     const transformError = state.phase === 'transform' ? state.error : null;
@@ -810,11 +834,16 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
     state = { phase: 'child', cancel: (error) => child._cancel(error) };
 
     if (transformError) {
-      cell.resolve(transformError.map(Either.left))
+      cell.resolve(transformError.map(Either.left));
+      state = { phase: 'closed' };
       child._cancel(transformError);
+      return;
     }
 
-    return child._invoke(cell.resolve);
+    return child._invoke((value) => {
+      cell.resolve(value);
+      state = { phase: 'closed' };
+    });
   });
 
   return Task.create(cell.promise, (error) => {
@@ -827,8 +856,10 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
     } else if (state.phase === 'transform') {
       state.error = error;
       return true;
-    } else {
+    } else if (state.phase === 'child') {
       return state.cancel(error);
+    } else {
+      return false;
     }
   });
 }
@@ -927,6 +958,14 @@ class TaskClass<R> implements Task<R> {
   }
   chain<R2>(op: (value: R) => Task<R2>) {
     return chainTaskEither<R, R2>(this, (either) => either.map(op).orMap<Task<R2>>(Task.rejected).right);
+  }
+
+  resolved() {
+    if (this._state.resolved) {
+      return this._state.result;
+    } else {
+      return null;
+    }
   }
 
   resolve() {

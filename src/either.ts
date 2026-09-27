@@ -89,6 +89,11 @@ export interface Right<R, L> {
   // General case
   match<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): R2 | R3;
 
+  // Right case
+  matchMap<R2, R3 = R2>(this: Right<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2, never>;
+  // General case
+  matchMap<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2 | R3, never>;
+
   /**
    * Either composition function
    *
@@ -292,6 +297,11 @@ export interface Left<R, L> {
   match<R2, R3 = R2>(this: Left<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): R3;
   // General case
   match<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): R2 | R3;
+
+  // Left case
+  matchMap<R2, R3 = R2>(this: Left<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R3, never>;
+  // General case
+  matchMap<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2 | R3, never>;
 
   /**
    * Either composition function
@@ -654,11 +664,14 @@ class RightClass<R> implements Right<R, never> {
   isLeft(): this is Left<R, never> {
     return false;
   }
+  match<R2>(op: { right: (value: R) => R2 }) {
+    return op.right(this.right);
+  }
   matchTap(op: { right: (value: R) => void }) {
     return this.tap(op.right);
   }
-  match<R2>(op: { right: (value: R) => R2 }) {
-    return op.right(this.right);
+  matchMap<R2>(op: { right: (value: R) => R2 }) {
+    return this.map(op.right);
   }
   matchChain<RR extends Either<unknown, unknown>>(op: { right: (value: R) => RR }) {
     return this.chain(op.right);
@@ -699,11 +712,14 @@ class LeftClass<L> implements Left<never, L> {
   isLeft(): this is Left<never, L> {
     return true;
   }
+  match<R2>(op: { left: (error: L) => R2 }) {
+    return op.left(this.left);
+  }
   matchTap(op: { left: (error: L) => void }) {
     return this.orTap(op.left);
   }
-  match<R2>(op: { left: (error: L) => R2 }) {
-    return op.left(this.left);
+  matchMap<R2>(op: { left: (error: L) => R2 }) {
+    return this.orMap(op.left);
   }
   matchChain<RR extends Either<unknown, unknown>>(op: { left: (error: L) => RR }) {
     return this.orChain(op.left);

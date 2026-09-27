@@ -89,6 +89,21 @@ describe('Maybe.just("data")', () => {
     expect(matched).toStrictEqual(4);
   });
 
+  it('matches to Just(4)', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => false);
+
+    const matched = subject.matchMap({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1).toHaveBeenCalledWith('data');
+    expect(callback2).toHaveBeenCalledTimes(0);
+    expect(matched).toStrictEqual(Maybe.just(4));
+  });
+
   it('chains to Maybe.just(4)', () => {
     const callback = jest.fn((data: string) => Maybe.just(data.length));
 
@@ -224,6 +239,21 @@ describe('Maybe.nothing()', () => {
     expect(callback2).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledWith();
     expect(matched).toStrictEqual(false);
+  });
+
+  it('matches to Maybe.just(false)', () => {
+    const callback1 = jest.fn((data: string) => data.length);
+    const callback2 = jest.fn(() => false);
+
+    const matched = subject.matchMap({
+      just: callback1,
+      nothing: callback2,
+    });
+
+    expect(callback1).toHaveBeenCalledTimes(0);
+    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledWith();
+    expect(matched).toStrictEqual(Maybe.just(false));
   });
 
   it('chains to self', () => {

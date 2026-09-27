@@ -5,7 +5,7 @@ import { setImmediate } from 'timers';
 
 import 'regenerator-runtime/runtime';
 
-const delayedValueTask = <R>(value: R, delay: number) => Task.fromCallback<NodeJS.Timeout, R>((resolve) => setTimeout(() => resolve(value), delay), clearTimeout);
+const delayedValueTask = <R>(value: R, delay: number) =>Task.fromCallback<NodeJS.Timeout, R>((resolve) => setTimeout(() => resolve(value), delay), clearTimeout);
 const delayedValuePromise = async <R>(value: R, delay: number) => {
   return new Promise((resolve) => setTimeout(resolve, delay)).then(() => value);
 };

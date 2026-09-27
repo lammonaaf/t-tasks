@@ -150,6 +150,8 @@ describe('Task.timeout', () => {
     await advanceTime(1);
 
     expect(callback).toHaveBeenCalledWith(Maybe.just(Either.right(undefined)));
+
+    expect(task.resolved()).toStrictEqual(Maybe.just(Either.right(undefined)));
   });
 
   it('creates Task resolving with undefined in exactly 1ms', async () => {

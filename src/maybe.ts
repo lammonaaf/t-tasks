@@ -88,6 +88,12 @@ export interface Just<R> {
   // General case
   match<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2 | R3;
 
+  // Nothing cases
+  matchMap<R2, R3 = R2>(this: Just<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2>;
+  // General case
+  matchMap<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2 | R3>;
+
+
   /**
    * Maybe composition function
    *
@@ -282,6 +288,11 @@ export interface Nothing<R> {
   match<R2, R3 = R2>(this: Nothing<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R3;
   // General case
   match<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2 | R3;
+
+  // Just cases
+  matchMap<R2, R3 = R2>(this: Nothing<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R3>;
+  // General case
+  matchMap<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2 | R3>;
 
   /**
    * Maybe composition function
@@ -619,11 +630,14 @@ class JustClass<R> implements Just<R> {
   isNothing(): this is Nothing<R> {
     return false;
   }
+  match<R2>(op: { just: (value: R) => R2 }) {
+    return op.just(this.just);
+  }
   matchTap(op: { just: (value: R) => void }) {
     return this.tap(op.just);
   }
-  match<R2>(op: { just: (value: R) => R2 }) {
-    return op.just(this.just);
+  matchMap<R2>(op: { just: (value: R) => R2 }) {
+    return this.map(op.just);
   }
   matchChain<RR extends Maybe<unknown>>(op: { just: (value: R) => RR }) {
     return this.chain(op.just);
@@ -662,11 +676,14 @@ class NothingClass implements Nothing<never> {
   isNothing(): this is Nothing<never> {
     return true;
   }
+  match<R2>(op: { nothing: () => R2 }) {
+    return op.nothing();
+  }
   matchTap(op: { nothing: () => void }) {
     return this.orTap(op.nothing);
   }
-  match<R2>(op: { nothing: () => R2 }) {
-    return op.nothing();
+  matchMap<R2>(op: { nothing: () => R2 }) {
+    return this.orMap(op.nothing);
   }
   matchChain<RR extends Maybe<unknown>>(op: { nothing: () => RR }) {
     return this.orChain(op.nothing);
