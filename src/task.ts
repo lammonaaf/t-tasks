@@ -582,9 +582,7 @@ export namespace Task {
    * @returns task resolving to generator's return type
    */
   export function generateFunction<A extends any[], T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<A, T, TT, R>): TaskFunction<A, R> {
-    return (...args: A) => generate(function* () {
-      return yield* taskGeneratorFunction(...args);
-    });
+    return (...args: A) => generate(() => taskGeneratorFunction(...args));
   }
 
   /**
@@ -904,10 +902,11 @@ type SyncState<R> =
 class TaskClass<R> implements Task<R> {
   constructor(private _state: SyncState<R>) {
     if (!this._state.resolved) {
-      this._state.invoke.then((result) => {
+      this._state.invoke = this._state.invoke.then((result) => {
         if (!this._state.resolved) {
           this._state = { resolved: true, result }
         }
+        return result;
       });
     }
   }

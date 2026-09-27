@@ -585,6 +585,41 @@ describe('chained scenarios', () => {
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
 
+  test('Task.repeat or deep chainRejected recursion should not exceed call stack size', async () => {
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    const runWithRetry = (): Task<number> => {
+      attempts++;
+      if (attempts >= maxAttempts) {
+        return Task.resolved(attempts);
+      }
+      return Task.rejected<number>('sync error').chainRejected(runWithRetry);
+    };
+
+    const task = runWithRetry();
+
+    await task.resolve();
+
+    expect(task.resolved()).toStrictEqual(Maybe.just(Either.right(maxAttempts)));
+  });
+
+  test('task.resolved() should not return settled result immediately after synchronous cancel()', async () => {
+    const pendingTask = Task.fromPromise(new Promise(() => {
+      //
+    }));
+
+    expect(pendingTask.resolved()).toBeNull();
+
+    pendingTask.cancel();
+
+    expect(pendingTask.resolved()).toStrictEqual(null);
+
+    await pendingTask.resolve();
+
+    expect(pendingTask.resolved()).toStrictEqual(Maybe.nothing());
+  });
+
   beforeEach(() => {
     // Ensure clean state before each test if GC is exposed
     if (global.gc) {
