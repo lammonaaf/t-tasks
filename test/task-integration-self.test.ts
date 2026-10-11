@@ -113,10 +113,12 @@ describe('self manipulation scenarios', () => {
     const inspect = jest.fn();
 
     const task: Task<number> = delayedValueTask('data', 100)
-      .tap((data) => {
+      .map((data) => {
         inspect(data);
 
         task.cancel();
+
+        return data;
       })
       .map((value) => value.length)
       .tapCanceled(canceled)
@@ -234,10 +236,12 @@ describe('self manipulation scenarios', () => {
     const inspect = jest.fn();
 
     const task: Task<number> = delayedValueTask('data', 100)
-      .tap((data) => {
+      .map((data) => {
         inspect(data);
 
         task.reject('some-error');
+
+        return data;
       })
       .map((value) => value.length)
       .tapCanceled(canceled)

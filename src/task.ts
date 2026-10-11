@@ -806,7 +806,7 @@ const settleCell = <T>(): SettleCell<T> => {
   };
 };
 
-function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
+function chainTaskMaybe<R, R2>(parent: Task<R>, op: (value: Cancelable<R>) => Task<R2>): Task<R2> {
   const cell = settleCell<Cancelable<R2>>();
 
   let state:
@@ -862,36 +862,70 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
   });
 }
 
-function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
+function mapTaskMaybe<R, R2>(parent: Task<R>, op: (value: Cancelable<R>) => Cancelable<R2>): Task<R2> {
+  const cell = settleCell<Cancelable<R2>>();
+
+  let state:
+    | { phase: 'parent' }
+    | { phase: 'transform', error: Maybe<any> | null }
+    | { phase: 'closed' } = { phase: 'parent' };
+
+  parent._invoke((result) => {
+    state = { phase: 'transform', error: null }
+
+    let value: Cancelable<R2> | null = null;
+    try {
+      value = op(result);
+    } catch (e) {
+      cell.resolve(Maybe.just(Either.left(e)));
+      state = { phase: 'closed' };
+      return;
+    }
+
+    const transformError = state.phase === 'transform' ? state.error : null;
+
+    if (transformError) {
+      cell.resolve(transformError.map(Either.left));
+    } else {
+      cell.resolve(value);
+    }
+    
+    state = { phase: 'closed' };
+  });
+
+  return Task.create(cell.promise, (error) => {
+    if (cell.settled()) {
+      return false;
+    }
+
+    if (state.phase === 'parent') {
+      return parent._cancel(error);
+    } else if (state.phase === 'transform') {
+      state.error = error;
+      return true;
+    } else {
+      return false;
+    }
+  });
+}
+
+function tapTaskMaybe<R>(parent: Task<R>, op: (value: Cancelable<R>) => void): Task<R> {
+  parent._invoke((result) => {
+    op(result);
+  });
+
+  return parent;
+}
+
+function chainTaskEither<R, R2>(_task: Task<R>, op: (value: Rejectable<R>) => Task<R2>): Task<R2> {
   return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op).orMap<Task<R2>>(Task.canceled).just);
 }
 
-function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
-  return chainTaskMaybe<R, R2>(_task, (maybe) => {
-    return op(maybe).match<Task<R2>>({
-      just: (either) =>
-        either.match<Task<R2>>({
-          right: Task.resolved,
-          left: Task.rejected,
-        }),
-      nothing: Task.canceled,
-    });
-  });
-}
-
-function mapTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Rejectable<R2>) {
+function mapTaskEither<R, R2>(_task: Task<R>, op: (value: Rejectable<R>) => Rejectable<R2>): Task<R2> {
   return mapTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op));
 }
 
-function tapTaskMaybe<R>(_task: TaskBase<R>, op: (value: Cancelable<R>) => void) {
-  return mapTaskMaybe<R, R>(_task, (value) => {
-    op(value);
-
-    return value;
-  });
-}
-
-function tapTaskEither<R>(_task: TaskBase<R>, op: (value: Rejectable<R>) => void) {
+function tapTaskEither<R>(_task: Task<R>, op: (value: Rejectable<R>) => void): Task<R> {
   return tapTaskMaybe<R>(_task, (maybe) => maybe.tap(op));
 }
 
@@ -927,35 +961,35 @@ class TaskClass<R> implements Task<R> {
     }
   }
 
-  tapCanceled(op: () => void) {
+  tapCanceled(op: () => void): Task<R> {
     return tapTaskMaybe<R>(this, (maybe) => maybe.orTap(op));
   }
-  tapRejected(op: (error: any) => void) {
+  tapRejected(op: (error: any) => void): Task<R> {
     return tapTaskEither<R>(this, (either) => either.orTap(op));
   }
-  tap(op: (value: R) => void) {
+  tap(op: (value: R) => void): Task<R> {
     return tapTaskEither<R>(this, (either) => either.tap(op));
   }
 
-  mapCanceled<R2>(op: () => R2) {
+  mapCanceled<R2>(op: () => R2): Task<R | R2> {
     return mapTaskMaybe<R, R | R2>(this, (maybe) => maybe.orMap(() => Either.right(op())));
   }
-  mapRejected<R2>(op: (error: any) => R2) {
+  mapRejected<R2>(op: (error: any) => R2): Task<R | R2> {
     return mapTaskEither<R, R | R2>(this, (either) => either.orMap(op));
   }
-  map<R2>(op: (value: R) => R2) {
+  map<R2>(op: (value: R) => R2): Task<R2> {
     return mapTaskEither<R, R2>(this, (either) => either.map(op));
   }
 
-  chainCanceled<R2>(op: () => Task<R2>) {
+  chainCanceled<R2>(op: () => Task<R2>): Task<R | R2> {
     const mapEither = (either: Rejectable<R>) => either.map(Task.resolved).orMap<Task<R>>(Task.rejected).right;
 
     return chainTaskMaybe<R, R | R2>(this, (maybe) => maybe.map(mapEither).orMap(op).just);
   }
-  chainRejected<R2>(op: (error: any) => Task<R2>) {
+  chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>  {
     return chainTaskEither<R, R | R2>(this, (either) => either.map(Task.resolved).orMap(op).right);
   }
-  chain<R2>(op: (value: R) => Task<R2>) {
+  chain<R2>(op: (value: R) => Task<R2>): Task<R2> {
     return chainTaskEither<R, R2>(this, (either) => either.map(op).orMap<Task<R2>>(Task.rejected).right);
   }
 
@@ -995,7 +1029,7 @@ class TaskClass<R> implements Task<R> {
     })(this);
   }
 
-  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }) {
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }): Task<R> {
     return tapTaskMaybe(this, (maybe) => {
       return maybe.matchTap({
         just: (either) => {
@@ -1009,7 +1043,7 @@ class TaskClass<R> implements Task<R> {
     });
   }
 
-  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }) {
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }): Task<R2 | R3 | R4> {
     return mapTaskMaybe(this, (maybe) => {
       return Maybe.just(maybe.match<Right<R2 | R3 | R4, any>>({
         just: (either) => {
@@ -1023,7 +1057,7 @@ class TaskClass<R> implements Task<R> {
     });
   }
 
-  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }) {
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4> {
     return chainTaskMaybe(this, (maybe) => {
       return maybe.match<Task<R2 | R3 | R4>>({
         just: (either) => {

@@ -189,8 +189,9 @@ describe('basic scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask(42, 50)
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -219,8 +220,9 @@ describe('basic scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask(42, 50)
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .mapRejected(rejected)

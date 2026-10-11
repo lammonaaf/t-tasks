@@ -186,8 +186,9 @@ describe('Task.liftPromise scenarios', () => {
     const resolved = jest.fn();
 
     const task = Task.fromPromise(delayedValuePromise(42, 50))
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .tapRejected(rejected)

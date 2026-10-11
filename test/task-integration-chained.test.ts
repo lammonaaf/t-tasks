@@ -375,8 +375,9 @@ describe('chained scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask('data', 50)
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -456,8 +457,9 @@ describe('chained scenarios', () => {
       .tapRejected(rejected)
       .tap(resolved)
       .chain((value) => delayedValueTask(value.length, 50))
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -543,8 +545,9 @@ describe('chained scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask('data', 50)
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .tapRejected(rejected)
