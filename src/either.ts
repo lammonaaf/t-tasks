@@ -64,6 +64,7 @@ export interface Right<R, L> {
    * Applied to 'right value' returns self without invoking transformer
    * Applied to 'left error' returns 'right op(error)'
    *
+   * @template R2 transformer function's return type
    * @param op transformer to be invoked with underlying error
    * @returns 'right value' or 'right op(error)'
    */
@@ -89,6 +90,18 @@ export interface Right<R, L> {
   // General case
   match<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): R2 | R3;
 
+  /**
+   * Either pattern matching transformer function
+   *
+   * Applied to 'right value' returns 'right op.right(value)'
+   * Applied to 'left error' returns 'right op.left(error)'
+   *
+   * @template R2 right transformer function's return type
+   * @template R3 left transformer function's return type
+   * @param op.right transformer to be invoked with underlying value in case of 'right'
+   * @param op.left transformer to be invoked with underlying error in case of 'left'
+   * @returns 'right op.right(value)' or 'right op.left(error)'
+   */
   // Right case
   matchMap<R2, R3 = R2>(this: Right<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R2, never>;
   // General case
@@ -115,7 +128,7 @@ export interface Right<R, L> {
   chain<R2, L2>(this: Either<R, L>, op: (value: R) => Either<R2, L2>): Either<R2, L | L2>;
 
   /**
-   * Either composition function
+   * Either fallback composition function
    *
    * Applied to 'right value' returns self without invoking composition function
    * Applied to 'left error' returns 'op(error)'
@@ -146,7 +159,7 @@ export interface Right<R, L> {
    * @template L3 left transformer function result's underlying error type
    * @param op.right transformer to be invoked with underlying value in case of 'right'
    * @param op.left transformer to be invoked with underlying error in case of 'left'
-   * @returns 'op(value)' or 'op(error)'
+   * @returns 'op.right(value)' or 'op.left(error)'
    */
   // Right cases
   matchChain<R2, L2, R3 = R2, L3 = L2>(this: Right<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R2, never>;
@@ -273,6 +286,7 @@ export interface Left<R, L> {
    * Applied to 'right value' returns self without invoking transformer
    * Applied to 'left error' returns 'right op(error)'
    *
+   * @template R2 transformer function's return type
    * @param op transformer to be invoked with underlying error
    * @returns 'right value' or 'right op(error)'
    */
@@ -298,6 +312,18 @@ export interface Left<R, L> {
   // General case
   match<R2, R3 = R2>(this: Either<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): R2 | R3;
 
+  /**
+   * Either pattern matching transformer function
+   *
+   * Applied to 'right value' returns 'right op.right(value)'
+   * Applied to 'left error' returns 'right op.left(error)'
+   *
+   * @template R2 right transformer function's return type
+   * @template R3 left transformer function's return type
+   * @param op.right transformer to be invoked with underlying value in case of 'right'
+   * @param op.left transformer to be invoked with underlying error in case of 'left'
+   * @returns 'right op.right(value)' or 'right op.left(error)'
+   */
   // Left case
   matchMap<R2, R3 = R2>(this: Left<R, L>, op: { right: (value: R) => R2; left: (error: L) => R3 }): Right<R3, never>;
   // General case
@@ -355,7 +381,7 @@ export interface Left<R, L> {
    * @template L3 left transformer function result's underlying error type
    * @param op.right transformer to be invoked with underlying value in case of 'right'
    * @param op.left transformer to be invoked with underlying error in case of 'left'
-   * @returns 'op(value)' or 'op(error)'
+   * @returns 'op.right(value)' or 'op.left(error)'
    */
   // Left cases
   matchChain<R2, L2, R3 = R2, L3 = L2>(this: Left<R, L>, op: { right: (value: R) => Right<R2, L2>; left: (error: L) => Right<R3, L3> }): Right<R3, never>;
@@ -459,7 +485,23 @@ export namespace Left {
   }
 }
 
+/**
+ * Either generator
+ *
+ * @template T yielded underlying type
+ * @template TT yielded Either type
+ * @template R returned underlying type
+ */
 export type EitherGenerator<T, TT extends Either<T, any>, R> = Generator<TT, R, T>;
+
+/**
+ * Function returning Either generator (generator function)
+ *
+ * @template A argument types
+ * @template T yielded underlying type
+ * @template TT yielded Either type
+ * @template R returned underlying type
+ */
 export type EitherGeneratorFunction<A extends unknown[], T, TT extends Either<T, any>, R> = (...args: A) => EitherGenerator<T, TT, R>;
 
 export namespace Either {
@@ -490,6 +532,8 @@ export namespace Either {
    *
    * Resolves to 'left error' in case of undefined value and 'right value' otherwise
    *
+   * @template R underlying value type
+   * @template L underlying error type
    * @param value possibly undefined value
    * @param error error to use in case of undefined value
    * @returns either 'right value' or 'left error'
@@ -506,8 +550,10 @@ export namespace Either {
    *
    * Resolves to 'left error' in case of undefined or null value and 'right value' otherwise
    *
-   * @param value possibly undefined or nullable value
-   * @param error error to use in case of undefined or nullable value
+   * @template R underlying value type
+   * @template L underlying error type
+   * @param value possibly undefined or null value
+   * @param error error to use in case of undefined or null value
    * @returns either 'right value' or 'left error'
    */
   export function fromNullable<L>(value: undefined, error: L): Left<never, L>;
@@ -544,6 +590,7 @@ export namespace Either {
    * Useful for passing as a predicate to collection transformers
    *
    * @template R underlying value type
+   * @template L underlying error type
    * @param either Either instance
    * @returns 'true' in case argument is 'right value' (and resolves type to be 'right')
    */
@@ -557,6 +604,7 @@ export namespace Either {
    * Useful for passing as a predicate to collection transformers
    *
    * @template R underlying value type
+   * @template L underlying error type
    * @param either Either instance
    * @returns 'true' in case argument is 'left error' (and resolves type to be 'left')
    */
@@ -567,6 +615,8 @@ export namespace Either {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
+   * @template L underlying error type
    * @param eithers a list of Either
    * @returns true in case every list element is Right
    */
@@ -577,6 +627,8 @@ export namespace Either {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
+   * @template L underlying error type
    * @param eithers a list of Either
    * @returns true in case at least one list element is Right
    */
@@ -587,6 +639,8 @@ export namespace Either {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
+   * @template L underlying error type
    * @param eithers a list of Either
    * @returns true in case every list element is Left
    */
@@ -597,6 +651,8 @@ export namespace Either {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
+   * @template L underlying error type
    * @param eithers a list of Either
    * @returns true in case at least one list element is Left
    */
@@ -610,6 +666,7 @@ export namespace Either {
    * Applying yield to an Either within the generator function unwraps the Either and returns underlying value in case of success
    * However the convenient option for typescript is to use ```yield* either.generator()``` as otherwise one may have to deal with union types
    *
+   * @template T yielded underlying type
    * @template TT yielded Either type
    * @template R returned underlying type
    * @param eitherGeneratorFunction Either generator function
