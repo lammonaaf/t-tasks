@@ -28,7 +28,7 @@ describe('Task.any', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(Maybe.nothing());
+    expect(result).toStrictEqual(Maybe.just(Either.left([])));
   });
 
   it('succeed in 200ms with 42', async () => {
@@ -74,7 +74,7 @@ describe('Task.any', () => {
 
     const result = await task.resolve();
 
-    expect(result).toStrictEqual(Maybe.just(Either.left(['some-error', 'some-error', 'some-error'])));
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
 
   it('succeed in 400ms with 40', async () => {

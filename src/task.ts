@@ -647,7 +647,7 @@ export namespace Task {
    * @param tasks iterable of tasks to execute
    * @returns task resolving to the list of results
    */
-  export function all<T>(tasks: Iterable<Task<T>>) {
+  export function all<T>(tasks: Iterable<Task<T>>): Task<T[]> {
     const taskArray = Array.from(tasks);
     if (taskArray.length === 0) {
       return Task.resolved([]);
@@ -693,41 +693,46 @@ export namespace Task {
    * @param tasks iterable of tasks to execute
    * @returns task resolving to the result of first successfull task
    */
-  export function any<T>(tasks: Iterable<Task<T>>) {
-    const cell = settleCell<Cancelable<T>>();
-
+  export function any<T>(tasks: Iterable<Task<T>>): Task<T> {
     const taskArray = Array.from(tasks);
 
-    if (taskArray.length < 1) {
-      return Task.canceled();
+    if (taskArray.length === 0) {
+      return Task.rejected([]);
     }
 
-    const cancel = (error: Maybe<any>) => taskArray.map((task) => task._cancel(error)).every((r) => r);
+    return Task.fromCallback<Task<T>[], T>((resolve, reject, cancel) => {
+      const errors: Maybe<any>[] = taskArray.map(() => Maybe.nothing());
+      let remaining = taskArray.length;
 
-    const list = taskArray.map<Maybe<any>>(() => Maybe.nothing());
+      const checkAllFailed = () => {
+        remaining--;
+        if (remaining === 0) {
+          const rawErrors = errors.map((e) =>
+            e.match({ just: (err) => err, nothing: () => undefined })
+          );
+          reject(rawErrors);
+        }
+      };
 
-    const resolved = (value: Maybe<T>) => {
-      cell.resolve(value.map(Either.right));
-      cancel(Maybe.nothing());
-    };
-
-    const rejected = (error: any, i: number) => {
-      list[i] = Maybe.just(error);
-
-      if (Maybe.everyJust(list)) {
-        cell.resolve(Maybe.just(Either.left(list.map((v) => Just.just(v)))));
-      }
-    };
-
-    taskArray.map((task, i) => {
-      return task.matchTap({
-        resolved: (value) => resolved(Maybe.just(value)),
-        rejected: (error) => rejected(error, i),
-        canceled: () => resolved(Maybe.nothing()),
+      taskArray.forEach((task, i) => {
+        task.matchTap({
+          resolved: (value) => {
+            resolve(value);
+            taskArray.forEach((t) => t.cancel());
+          },
+          rejected: (error) => {
+            errors[i] = Maybe.just(error);
+            checkAllFailed();
+          },
+          canceled: () => {
+            cancel();
+            taskArray.forEach((t) => t.cancel());
+          },
+        });
       });
-    });
 
-    return Task.create(cell.promise, cancel);
+      return taskArray;
+    }, (subtasks) => subtasks.forEach((t) => t.cancel()));
   }
 
   /**
@@ -742,7 +747,7 @@ export namespace Task {
    * @returns task limites according to limitTask
    */
   export function limit<T>(task: Task<T>, limitTask: Task<void>) {
-    return Task.any<T>([task, limitTask.chain<T>(Task.canceled)]).chainRejected((errors) => Task.rejected<T>(errors[0]));
+    return Task.any<T>([task, limitTask.chain<T>(Task.canceled)]);
   }
 
   /**
