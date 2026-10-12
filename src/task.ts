@@ -26,6 +26,7 @@ export type TaskFunction<A extends unknown[], R> = (...args: A) => Task<R>;
 /**
  * Task generator
  *
+ * @template T yielded underlying type
  * @template TT yielded task type
  * @template R returned task resolve type
  *
@@ -44,6 +45,7 @@ export type TaskGenerator<T, TT extends Task<T>, R> = Generator<TT, R, T>;
  * Function returning task generator (generator function)
  *
  * @template A argument types
+ * @template T yielded underlying type
  * @template TT yielded task type
  * @template R returned task resolve type
  *
@@ -178,6 +180,11 @@ export interface Task<R> extends TaskBase<R> {
    */
   matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4>;
 
+  /**
+   * Read the settled result when the task has already finished
+   *
+   * @returns settled result, or null when the task is still pending
+   */
   resolved: () => Cancelable<R> | null;
 
   /**
@@ -188,14 +195,17 @@ export interface Task<R> extends TaskBase<R> {
   resolve: () => TaskInvoke<R>;
 
   /**
-   * Invoke underlying canel method without error
+   * Invoke underlying cancel method without error
+   *
+   * @returns 'true' when the task was still pending and cancelation was applied
    */
   cancel: () => boolean;
 
   /**
-   * Invoke underlying canel method with error
+   * Invoke underlying cancel method with error
    *
    * @param error error value to be injected from outside
+   * @returns 'true' when the task was still pending and the error was applied
    */
   reject: (error: any) => boolean;
 
@@ -263,7 +273,7 @@ export namespace Task {
    *
    * @template R returned task's resolve type
    * @param error error to be returned upon awaiting
-   * @returns task resolving to specified value
+   * @returns task rejected with the specified error
    */
   export function rejected<R>(error: any): Task<R> {
     return new TaskClass<R>({ resolved: true, result: Maybe.just(Either.left(error)) });
@@ -273,7 +283,7 @@ export namespace Task {
    * Invariant task constructor creating canceled task
    *
    * @template R returned task's resolve type
-   * @returns task resolving to specified value
+   * @returns canceled task
    */
   export function canceled<R>(): Task<R> {
     return new TaskClass<R>({ resolved: true, result: Maybe.nothing() });
@@ -350,10 +360,12 @@ export namespace Task {
   /**
    * Generic callback task
    *
-   * Usefull for creating custom tasks from success and error callbacks and cancelaton function. Synchronous callbacks are not supported, @see fromFuction
+   * Usefull for creating custom tasks from success and error callbacks and cancelaton function. Synchronous callbacks are not supported, @see fromFunction
    *
+   * @template H cancelation handler type
+   * @template R returned task resolve type
    * @param create task body with success and error callbacks
-   * @param cancel cancelation function intended for stopping task execution
+   * @param onCancel cancelation function intended for stopping task execution
    * @returns task resolving to success value
    *
    * @example
@@ -460,9 +472,8 @@ export namespace Task {
   /**
    * Convinience shortcut for yielding timers
    *
-   * @template R returned generator resolve type
-   * @param promise promise to be resolved
-   * @returns generator to be be used with yield*
+   * @param delay duration in ms after that the generator resolves
+   * @returns generator to be used with yield*
    */
    export function timeoutGenerator(delay: number) {
     return Task.timeout(delay).generator();
@@ -500,6 +511,7 @@ export namespace Task {
    *
    * If error is not caught the task is interrupted and returns 'just left error' immediately. In case of cancelation the task is interrupted and returns 'nothing' immediately
    *
+   * @template T yielded underlying type
    * @template TT yielded task type
    * @template R returned task resolve type
    * @param taskGeneratorFunction task generator function
@@ -575,11 +587,12 @@ export namespace Task {
    * 
    * Simplifies wrighting functions returning generated tasks
    * 
-   * @template Args generator arguments
+   * @template A generator arguments
+   * @template T yielded underlying type
    * @template TT yielded task type
    * @template R returned task resolve type
    * @param taskGeneratorFunction function* (...args) task generator function
-   * @returns task resolving to generator's return type
+   * @returns task function resolving to generator's return type
    */
   export function generateFunction<A extends any[], T, TT extends Task<T>, R>(taskGeneratorFunction: TaskGeneratorFunction<A, T, TT, R>): TaskFunction<A, R> {
     return (...args: A) => generate(() => taskGeneratorFunction(...args));
@@ -609,6 +622,7 @@ export namespace Task {
   /**
    * Start multiple tasks one after another
    *
+   * @template T underlying task type
    * @param taskFunctions list of task functions (without arguments)
    * @returns composite task invoring every task in order and resolving to the list of results
    */
@@ -631,7 +645,7 @@ export namespace Task {
    *
    * @template T underlying task type
    * @param tasks iterable of tasks to execute
-   * @retuirns task resolving to the list of results
+   * @returns task resolving to the list of results
    */
   export function all<T>(tasks: Iterable<Task<T>>) {
     const taskArray = Array.from(tasks);
@@ -677,7 +691,7 @@ export namespace Task {
    *
    * @template T underlying task type
    * @param tasks iterable of tasks to execute
-   * @retuirns task resolving to the result of first successfull task
+   * @returns task resolving to the result of first successfull task
    */
   export function any<T>(tasks: Iterable<Task<T>>) {
     const cell = settleCell<Cancelable<T>>();
@@ -722,6 +736,7 @@ export namespace Task {
    * If the second task resolves sooner than the first, resulting task is canceled
    * Otherwise the resulting task resolves together with the first one
    *
+   * @template T underlying task type
    * @param task task to limit
    * @param limitTask limiting task
    * @returns task limites according to limitTask
@@ -736,7 +751,9 @@ export namespace Task {
    * Given task is re-generated in case of failure (both external and internal)
    * Resulting task is still cancelable by standard means
    *
+   * @template T underlying task type
    * @param taskFunction task preoducing function
+   * @returns task that retries until the produced task resolves
    */
   export function repeat<T>(taskFunction: TaskFunction<[], T>) {
     const sequentor = (): Task<T> => taskFunction().chainRejected(sequentor);
@@ -806,7 +823,7 @@ const settleCell = <T>(): SettleCell<T> => {
   };
 };
 
-function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) => Task<R2>) {
+function chainTaskMaybe<R, R2>(parent: Task<R>, op: (value: Cancelable<R>) => Task<R2>): Task<R2> {
   const cell = settleCell<Cancelable<R2>>();
 
   let state:
@@ -862,36 +879,74 @@ function chainTaskMaybe<R, R2>(parent: TaskBase<R>, op: (value: Cancelable<R>) =
   });
 }
 
-function chainTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Task<R2>) {
+function mapTaskMaybe<R, R2>(parent: Task<R>, op: (value: Cancelable<R>) => Cancelable<R2>): Task<R2> {
+  const cell = settleCell<Cancelable<R2>>();
+
+  let state:
+    | { phase: 'parent' }
+    | { phase: 'transform', error: Maybe<any> | null }
+    | { phase: 'closed' } = { phase: 'parent' };
+
+  parent._invoke((result) => {
+    state = { phase: 'transform', error: null }
+
+    let value: Cancelable<R2> | null = null;
+    try {
+      value = op(result);
+    } catch (e) {
+      cell.resolve(Maybe.just(Either.left(e)));
+      state = { phase: 'closed' };
+      return;
+    }
+
+    const transformError = state.phase === 'transform' ? state.error : null;
+
+    if (transformError) {
+      cell.resolve(transformError.map(Either.left));
+    } else {
+      cell.resolve(value);
+    }
+    
+    state = { phase: 'closed' };
+  });
+
+  return Task.create(cell.promise, (error) => {
+    if (cell.settled()) {
+      return false;
+    }
+
+    if (state.phase === 'parent') {
+      return parent._cancel(error);
+    } else if (state.phase === 'transform') {
+      state.error = error;
+      return true;
+    } else {
+      return false;
+    }
+  });
+}
+
+function tapTaskMaybe<R>(parent: Task<R>, op: (value: Cancelable<R>) => void): Task<R> {
+  parent._invoke((result) => {
+    try {
+      op(result);
+    } catch (e) {
+      reportError(e);
+    }
+  });
+
+  return parent;
+}
+
+function chainTaskEither<R, R2>(_task: Task<R>, op: (value: Rejectable<R>) => Task<R2>): Task<R2> {
   return chainTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op).orMap<Task<R2>>(Task.canceled).just);
 }
 
-function mapTaskMaybe<R, R2>(_task: TaskBase<R>, op: (value: Cancelable<R>) => Cancelable<R2>) {
-  return chainTaskMaybe<R, R2>(_task, (maybe) => {
-    return op(maybe).match<Task<R2>>({
-      just: (either) =>
-        either.match<Task<R2>>({
-          right: Task.resolved,
-          left: Task.rejected,
-        }),
-      nothing: Task.canceled,
-    });
-  });
-}
-
-function mapTaskEither<R, R2>(_task: TaskBase<R>, op: (value: Rejectable<R>) => Rejectable<R2>) {
+function mapTaskEither<R, R2>(_task: Task<R>, op: (value: Rejectable<R>) => Rejectable<R2>): Task<R2> {
   return mapTaskMaybe<R, R2>(_task, (maybe) => maybe.map(op));
 }
 
-function tapTaskMaybe<R>(_task: TaskBase<R>, op: (value: Cancelable<R>) => void) {
-  return mapTaskMaybe<R, R>(_task, (value) => {
-    op(value);
-
-    return value;
-  });
-}
-
-function tapTaskEither<R>(_task: TaskBase<R>, op: (value: Rejectable<R>) => void) {
+function tapTaskEither<R>(_task: Task<R>, op: (value: Rejectable<R>) => void): Task<R> {
   return tapTaskMaybe<R>(_task, (maybe) => maybe.tap(op));
 }
 
@@ -927,35 +982,35 @@ class TaskClass<R> implements Task<R> {
     }
   }
 
-  tapCanceled(op: () => void) {
+  tapCanceled(op: () => void): Task<R> {
     return tapTaskMaybe<R>(this, (maybe) => maybe.orTap(op));
   }
-  tapRejected(op: (error: any) => void) {
+  tapRejected(op: (error: any) => void): Task<R> {
     return tapTaskEither<R>(this, (either) => either.orTap(op));
   }
-  tap(op: (value: R) => void) {
+  tap(op: (value: R) => void): Task<R> {
     return tapTaskEither<R>(this, (either) => either.tap(op));
   }
 
-  mapCanceled<R2>(op: () => R2) {
+  mapCanceled<R2>(op: () => R2): Task<R | R2> {
     return mapTaskMaybe<R, R | R2>(this, (maybe) => maybe.orMap(() => Either.right(op())));
   }
-  mapRejected<R2>(op: (error: any) => R2) {
+  mapRejected<R2>(op: (error: any) => R2): Task<R | R2> {
     return mapTaskEither<R, R | R2>(this, (either) => either.orMap(op));
   }
-  map<R2>(op: (value: R) => R2) {
+  map<R2>(op: (value: R) => R2): Task<R2> {
     return mapTaskEither<R, R2>(this, (either) => either.map(op));
   }
 
-  chainCanceled<R2>(op: () => Task<R2>) {
+  chainCanceled<R2>(op: () => Task<R2>): Task<R | R2> {
     const mapEither = (either: Rejectable<R>) => either.map(Task.resolved).orMap<Task<R>>(Task.rejected).right;
 
     return chainTaskMaybe<R, R | R2>(this, (maybe) => maybe.map(mapEither).orMap(op).just);
   }
-  chainRejected<R2>(op: (error: any) => Task<R2>) {
+  chainRejected<R2>(op: (error: any) => Task<R2>): Task<R | R2>  {
     return chainTaskEither<R, R | R2>(this, (either) => either.map(Task.resolved).orMap(op).right);
   }
-  chain<R2>(op: (value: R) => Task<R2>) {
+  chain<R2>(op: (value: R) => Task<R2>): Task<R2> {
     return chainTaskEither<R, R2>(this, (either) => either.map(op).orMap<Task<R2>>(Task.rejected).right);
   }
 
@@ -995,7 +1050,7 @@ class TaskClass<R> implements Task<R> {
     })(this);
   }
 
-  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }) {
+  matchTap(op: { resolved: (value: R) => void; rejected: (error: any) => void; canceled: () => void }): Task<R> {
     return tapTaskMaybe(this, (maybe) => {
       return maybe.matchTap({
         just: (either) => {
@@ -1009,7 +1064,7 @@ class TaskClass<R> implements Task<R> {
     });
   }
 
-  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }) {
+  matchMap<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => R2; rejected: (error: any) => R3; canceled: () => R4 }): Task<R2 | R3 | R4> {
     return mapTaskMaybe(this, (maybe) => {
       return Maybe.just(maybe.match<Right<R2 | R3 | R4, any>>({
         just: (either) => {
@@ -1023,7 +1078,7 @@ class TaskClass<R> implements Task<R> {
     });
   }
 
-  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }) {
+  matchChain<R2, R3 = R2, R4 = R3>(op: { resolved: (value: R) => Task<R2>; rejected: (error: any) => Task<R3>; canceled: () => Task<R4> }): Task<R2 | R3 | R4> {
     return chainTaskMaybe(this, (maybe) => {
       return maybe.match<Task<R2 | R3 | R4>>({
         just: (either) => {
@@ -1035,5 +1090,11 @@ class TaskClass<R> implements Task<R> {
         nothing: op.canceled,
       });
     });
+  }
+}
+
+function reportError(error: unknown): void {
+  if (typeof globalThis.reportError === 'function') {
+    globalThis.reportError(error);
   }
 }

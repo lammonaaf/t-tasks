@@ -63,6 +63,7 @@ export interface Just<R> {
    * Applied to 'just value' returns self without invoking transformer
    * Applied to 'nothing' returns 'just op()'
    *
+   * @template R2 transformer function's return type
    * @param op function to be invoked
    * @returns 'just value' or 'just op()'
    */
@@ -88,7 +89,19 @@ export interface Just<R> {
   // General case
   match<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2 | R3;
 
-  // Nothing cases
+  /**
+   * Maybe pattern matching transformer function
+   *
+   * Applied to 'just value' returns 'just op.just(value)'
+   * Applied to 'nothing' returns 'just op.nothing()'
+   *
+   * @template R2 just transformer function's return type
+   * @template R3 nothing transformer function's return type
+   * @param op.just transformer to be invoked with underlying value in case of just
+   * @param op.nothing transformer to be invoked in case of nothing
+   * @returns 'just op.just(value)' or 'just op.nothing()'
+   */
+  // Just cases
   matchMap<R2, R3 = R2>(this: Just<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2>;
   // General case
   matchMap<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2 | R3>;
@@ -207,6 +220,8 @@ export interface Just<R> {
  * Absolutely Nothing
  *
  * Maybe data type specialization representing an absence of any value
+ *
+ * @template R underlying value
  */
 export interface Nothing<R> {
   /**
@@ -264,6 +279,7 @@ export interface Nothing<R> {
    * Applied to 'just value' returns self without invoking transformer
    * Applied to 'nothing' returns 'just op()'
    *
+   * @template R2 transformer function's return type
    * @param op function to be invoked
    * @returns 'just value' or 'just op()'
    */
@@ -289,7 +305,19 @@ export interface Nothing<R> {
   // General case
   match<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): R2 | R3;
 
-  // Just cases
+  /**
+   * Maybe pattern matching transformer function
+   *
+   * Applied to 'just value' returns 'just op.just(value)'
+   * Applied to 'nothing' returns 'just op.nothing()'
+   *
+   * @template R2 just transformer function's return type
+   * @template R3 nothing transformer function's return type
+   * @param op.just transformer to be invoked with underlying value in case of just
+   * @param op.nothing transformer to be invoked in case of nothing
+   * @returns 'just op.just(value)' or 'just op.nothing()'
+   */
+  // Nothing cases
   matchMap<R2, R3 = R2>(this: Nothing<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R3>;
   // General case
   matchMap<R2, R3 = R2>(this: Maybe<R>, op: { just: (value: R) => R2; nothing: () => R3 }): Just<R2 | R3>;
@@ -430,7 +458,23 @@ export namespace Just {
 
 export namespace Nothing {}
 
+/**
+ * Maybe generator
+ *
+ * @template T yielded underlying type
+ * @template TT yielded Maybe type
+ * @template R returned underlying type
+ */
 export type MaybeGenerator<T, TT extends Maybe<T>, R> = Generator<TT, R, T>;
+
+/**
+ * Function returning Maybe generator (generator function)
+ *
+ * @template A argument types
+ * @template T yielded underlying type
+ * @template TT yielded Maybe type
+ * @template R returned underlying type
+ */
 export type MaybeGeneratorFunction<A extends unknown[], T, TT extends Maybe<T>, R> = (...args: A) => MaybeGenerator<T, TT, R>;
 
 export namespace Maybe {
@@ -459,6 +503,7 @@ export namespace Maybe {
    *
    * Resolves to 'nothing' in case of undefined value and 'just value' otherwise
    *
+   * @template R underlying type
    * @param value possibly undefined value
    * @returns either 'just value' or 'nothing'
    */
@@ -474,7 +519,8 @@ export namespace Maybe {
    *
    * Resolves to 'nothing' in case of undefined or null value and 'just value' otherwise
    *
-   * @param value possibly undefined value
+   * @template R underlying type
+   * @param value possibly undefined or null value
    * @returns either 'just value' or 'nothing'
    */
   export function fromNullable(value: undefined): Nothing<never>;
@@ -533,6 +579,7 @@ export namespace Maybe {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
    * @param maybes a list of Maybe
    * @returns true in case every list element is Just
    */
@@ -543,6 +590,7 @@ export namespace Maybe {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
    * @param maybes a list of Maybe
    * @returns true in case at least one list element is Just
    */
@@ -553,6 +601,7 @@ export namespace Maybe {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
    * @param maybes a list of Maybe
    * @returns true in case every list element is Nothing
    */
@@ -563,6 +612,7 @@ export namespace Maybe {
   /**
    * Standalone list predicate
    *
+   * @template R underlying value type
    * @param maybes a list of Maybe
    * @returns true in case at least one list element is Nothing
    */
@@ -576,6 +626,7 @@ export namespace Maybe {
    * Applying yield to a Maybe within the generator function unwraps the Maybe and returns underlying value in case of success
    * However the convenient option for typescript is to use ```yield* maybe.generator()``` as otherwise one may have to deal with union types
    *
+   * @template T yielded underlying type
    * @template TT yielded Maybe type
    * @template R returned underlying type
    * @param maybeGeneratorFunction Maybe generator function

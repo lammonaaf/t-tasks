@@ -407,8 +407,9 @@ describe('generated scenarios', () => {
 
     const task = Task.generate(function*() {
       const data = yield* delayedValueTask('data', 50)
-        .tap(() => {
+        .map((r) => {
           throw 'some-error';
+          return r;
         })
         .generator();
 
@@ -490,8 +491,9 @@ describe('generated scenarios', () => {
       resolved(data);
 
       const length = yield* delayedValueTask(data.length, 50)
-        .tap(() => {
+        .map((r) => {
           throw 'some-error';
+          return r;
         })
         .generator();
 
@@ -597,8 +599,9 @@ describe('generated scenarios', () => {
       let data: string;
       try {
         data = yield* delayedValueTask('data', 50)
-          .tap(() => {
+          .map((r) => {
             throw 'some-error';
+            return r;
           })
           .generator();
       } catch (e) {
@@ -655,8 +658,9 @@ describe('generated scenarios', () => {
       let data: string;
       try {
         data = yield* delayedValueTask('data', 50)
-          .tap(() => {
+          .map((r) => {
             throw 'some-error';
+            return r;
           })
           .generator();
       } catch (e) {

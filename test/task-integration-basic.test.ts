@@ -189,8 +189,9 @@ describe('basic scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask(42, 50)
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .tapRejected(rejected)
@@ -219,8 +220,9 @@ describe('basic scenarios', () => {
     const resolved = jest.fn();
 
     const task = delayedValueTask(42, 50)
-      .tap(() => {
+      .map((r) => {
         throw 'some-error';
+        return r;
       })
       .tapCanceled(canceled)
       .mapRejected(rejected)
@@ -241,5 +243,126 @@ describe('basic scenarios', () => {
     expect(resolved).toHaveBeenCalledTimes(1);
 
     expect(result).toStrictEqual(Maybe.just(Either.right(63)));
+  });
+
+  it('resolve in 100ms with matchMap', async () => {
+    const canceled = jest.fn(() => 63);
+    const rejected = jest.fn(() => 46);
+    const resolved = jest.fn(() => 32);
+
+    const task = delayedValueTask(42, 100).matchMap({
+      resolved,
+      rejected,
+      canceled,
+    });
+
+    await advanceTime(99);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    await advanceTime(1);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledWith(42);
+
+    const result = await task.resolve();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(0);
+    expect(resolved).toHaveBeenCalledTimes(1);
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(32)));
+  });
+
+  it('resolve in 100ms ignoring mapCanceled', async () => {
+    const canceled = jest.fn(() => 63);
+
+    const task = delayedValueTask(42, 100).mapCanceled(canceled);
+
+    await advanceTime(99);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    await advanceTime(1);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(42)));
+  });
+
+  it('fail externally in 50ms ignoring mapCanceled', async () => {
+    const canceled = jest.fn(() => 63);
+
+    const task = delayedValueTask(42, 100).mapCanceled(canceled);
+
+    await advanceTime(50);
+
+    task.reject('some-error');
+
+    await flushPromises();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    await advanceTime(50);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+
+  it('cancel in 50ms ignoring mapRejected', async () => {
+    const rejected = jest.fn(() => 63);
+
+    const task = delayedValueTask(42, 100).mapRejected(rejected);
+
+    await advanceTime(50);
+
+    task.cancel();
+
+    await flushPromises();
+
+    expect(rejected).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    await advanceTime(50);
+
+    expect(rejected).toHaveBeenCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('reports an error thrown from tap and keeps the resolved value', async () => {
+    const error = new Error('tap-error');
+    const reportError = jest.fn();
+    const originalReportError = globalThis.reportError;
+
+    globalThis.reportError = reportError;
+
+    try {
+      const task = delayedValueTask(42, 100)
+        .tap(() => {
+          throw error;
+        })
+        .map((value) => value + 1);
+
+      await advanceTime(100);
+
+      expect(reportError).toHaveBeenCalledTimes(1);
+      expect(reportError).toHaveBeenCalledWith(error);
+
+      const result = await task.resolve();
+
+      expect(result).toStrictEqual(Maybe.just(Either.right(43)));
+    } finally {
+      globalThis.reportError = originalReportError;
+    }
   });
 });

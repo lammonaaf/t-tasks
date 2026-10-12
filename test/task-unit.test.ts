@@ -46,6 +46,14 @@ describe('Task.resolved()', () => {
 
     expect(result).toStrictEqual(Maybe.just(Either.right('some-data')));
   });
+
+  it('exposes the settled result and ignores cancel and reject', () => {
+    const task = Task.resolved('some-data');
+
+    expect(task.resolved()).toStrictEqual(Maybe.just(Either.right('some-data')));
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('some-error')).toBe(false);
+  });
 });
 
 describe('Task.rejected()', () => {
@@ -82,6 +90,14 @@ describe('Task.rejected()', () => {
 
     expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
   });
+
+  it('exposes the settled result and ignores cancel and reject', () => {
+    const task = Task.rejected('some-error');
+
+    expect(task.resolved()).toStrictEqual(Maybe.just(Either.left('some-error')));
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('other-error')).toBe(false);
+  });
 });
 
 describe('Task.canceled()', () => {
@@ -117,6 +133,14 @@ describe('Task.canceled()', () => {
     const result = await task.resolve();
 
     expect(result).toStrictEqual(Maybe.nothing());
+  });
+
+  it('exposes the settled result and ignores cancel and reject', () => {
+    const task = Task.canceled();
+
+    expect(task.resolved()).toStrictEqual(Maybe.nothing());
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('some-error')).toBe(false);
   });
 });
 
@@ -363,6 +387,121 @@ describe('Task.fromCallback', () => {
 
     expect(callback).toHaveBeenCalledWith(Maybe.just(Either.left('some-error')));
   });
+
+  it('calls onCancel once when canceled externally and ignores a later resolve', async () => {
+    let resolve!: (value: true) => void;
+    const cleanup = jest.fn();
+
+    const task = Task.fromCallback<number, true>((res) => {
+      resolve = res;
+      return 42;
+    }, cleanup);
+
+    expect(task.cancel()).toBe(true);
+    expect(task.cancel()).toBe(false);
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(cleanup).toHaveBeenCalledWith(42);
+
+    resolve(true);
+
+    await flushPromises();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(await task.resolve()).toStrictEqual(Maybe.nothing());
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('some-error')).toBe(false);
+  });
+
+  it('calls onCancel once when rejected externally and ignores a later resolve', async () => {
+    let resolve!: (value: true) => void;
+    const cleanup = jest.fn();
+
+    const task = Task.fromCallback<number, true>((res) => {
+      resolve = res;
+      return 42;
+    }, cleanup);
+
+    expect(task.reject('some-error')).toBe(true);
+    expect(task.reject('other-error')).toBe(false);
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(cleanup).toHaveBeenCalledWith(42);
+
+    resolve(true);
+
+    await flushPromises();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(await task.resolve()).toStrictEqual(Maybe.just(Either.left('some-error')));
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('other-error')).toBe(false);
+  });
+
+  it('calls onCancel once when canceled synchronously', async () => {
+    const cleanup = jest.fn();
+
+    const task = Task.fromCallback<number, true>((_resolve, _reject, cancel) => {
+      cancel();
+      return 42;
+    }, cleanup);
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(cleanup).toHaveBeenCalledWith(42);
+
+    await flushPromises();
+
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(await task.resolve()).toStrictEqual(Maybe.nothing());
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('some-error')).toBe(false);
+  });
+});
+
+describe('Task.fromPromise', () => {
+  beforeEach(() => jest.useFakeTimers({ legacyFakeTimers: true }));
+  afterEach(() => jest.useRealTimers());
+
+  const flushPromises = async () => {
+    return new Promise((resolve) => setImmediate(resolve));
+  };
+
+  it('returns true from cancel and reject only while pending', async () => {
+    let resolvePromise!: (value: number) => void;
+    const task = Task.fromPromise(new Promise<number>((resolve) => {
+      resolvePromise = resolve;
+    }));
+
+    expect(task.resolved()).toBeNull();
+    expect(task.reject('some-error')).toBe(true);
+    expect(task.reject('other-error')).toBe(false);
+    expect(task.cancel()).toBe(false);
+
+    resolvePromise(42);
+
+    await flushPromises();
+
+    expect(await task.resolve()).toStrictEqual(Maybe.just(Either.left('some-error')));
+    expect(task.resolved()).toStrictEqual(Maybe.just(Either.left('some-error')));
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('other-error')).toBe(false);
+  });
+
+  it('stays canceled when the promise rejects afterwards', async () => {
+    let rejectPromise!: (error: unknown) => void;
+    const task = Task.fromPromise(new Promise<number>((_resolve, reject) => {
+      rejectPromise = reject;
+    }));
+
+    expect(task.cancel()).toBe(true);
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('some-error')).toBe(false);
+
+    rejectPromise('some-error');
+
+    await flushPromises();
+
+    expect(await task.resolve()).toStrictEqual(Maybe.nothing());
+    expect(task.resolved()).toStrictEqual(Maybe.nothing());
+  });
 });
 
 describe('Task.fromFunction', () => {
@@ -433,5 +572,37 @@ describe('Task.fromFunction', () => {
     await flushPromises();
 
     expect(callback).toHaveBeenCalledWith(Maybe.nothing());
+  });
+
+  it('ignores the value returned after cancelation', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const ref = { cancel: (_error: Maybe<any>) => true };
+
+    const task = Task.fromFunction(() => {
+      ref.cancel(Maybe.nothing());
+      return 42;
+    }, ref);
+
+    const callback = jest.fn();
+
+    task.resolve().then(callback);
+
+    await flushPromises();
+
+    expect(callback).toHaveBeenCalledWith(Maybe.nothing());
+  });
+
+  it('returns false from cancel and reject after the producer returns', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const ref = { cancel: (_error: Maybe<any>) => true };
+
+    const task = Task.fromFunction(() => 42, ref);
+
+    expect(task.cancel()).toBe(false);
+    expect(task.reject('some-error')).toBe(false);
+
+    await flushPromises();
+
+    expect(await task.resolve()).toStrictEqual(Maybe.just(Either.right(42)));
   });
 });
