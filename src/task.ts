@@ -1,4 +1,4 @@
-import { Maybe, Just } from './maybe';
+import { Maybe } from './maybe';
 import { Either, Right } from './either';
 
 /**
