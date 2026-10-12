@@ -588,6 +588,106 @@ describe('chained scenarios', () => {
     expect(result).toStrictEqual(Maybe.just(Either.right(5)));
   });
 
+  it('fail externally on first step in 50ms with matchChain', async () => {
+    const canceled = jest.fn(() => delayedValueTask(7, 100));
+    const rejected = jest.fn(() => delayedValueTask(5, 200));
+    const resolved = jest.fn((value: string) => delayedValueTask(value.length, 200));
+
+    const task = delayedValueTask('data', 100).matchChain({
+      resolved,
+      rejected,
+      canceled,
+    });
+
+    await advanceTime(50);
+
+    task.reject('some-error');
+
+    await flushPromises();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledWith('some-error');
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    await advanceTime(199);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    await advanceTime(1);
+
+    const result = await task.resolve();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+    expect(rejected).toHaveBeenCalledTimes(1);
+    expect(resolved).toHaveBeenCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.right(5)));
+  });
+
+  it('resolve in 100ms ignoring chainCanceled', async () => {
+    const canceled = jest.fn(() => delayedValueTask('cat', 50));
+
+    const task = delayedValueTask('data', 100).chainCanceled(canceled);
+
+    await advanceTime(99);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    await advanceTime(1);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    expect(result).toStrictEqual(Maybe.just(Either.right('data')));
+  });
+
+  it('fail externally in 50ms ignoring chainCanceled', async () => {
+    const canceled = jest.fn(() => delayedValueTask('cat', 50));
+
+    const task = delayedValueTask('data', 100).chainCanceled(canceled);
+
+    await advanceTime(50);
+
+    task.reject('some-error');
+
+    await flushPromises();
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    await advanceTime(50);
+
+    expect(canceled).toHaveBeenCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.just(Either.left('some-error')));
+  });
+
+  it('cancel in 50ms ignoring chainRejected', async () => {
+    const rejected = jest.fn(() => delayedValueTask(5, 50));
+
+    const task = delayedValueTask('data', 100).chainRejected(rejected);
+
+    await advanceTime(50);
+
+    task.cancel();
+
+    await flushPromises();
+
+    expect(rejected).toHaveBeenCalledTimes(0);
+
+    const result = await task.resolve();
+
+    await advanceTime(50);
+
+    expect(rejected).toHaveBeenCalledTimes(0);
+
+    expect(result).toStrictEqual(Maybe.nothing());
+  });
+
   test('Task.repeat or deep chainRejected recursion should not exceed call stack size', async () => {
     let attempts = 0;
     const maxAttempts = 100;

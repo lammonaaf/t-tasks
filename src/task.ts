@@ -928,7 +928,11 @@ function mapTaskMaybe<R, R2>(parent: Task<R>, op: (value: Cancelable<R>) => Canc
 
 function tapTaskMaybe<R>(parent: Task<R>, op: (value: Cancelable<R>) => void): Task<R> {
   parent._invoke((result) => {
-    op(result);
+    try {
+      op(result);
+    } catch (e) {
+      reportError(e);
+    }
   });
 
   return parent;
@@ -1086,5 +1090,11 @@ class TaskClass<R> implements Task<R> {
         nothing: op.canceled,
       });
     });
+  }
+}
+
+function reportError(error: unknown): void {
+  if (typeof globalThis.reportError === 'function') {
+    globalThis.reportError(error);
   }
 }
